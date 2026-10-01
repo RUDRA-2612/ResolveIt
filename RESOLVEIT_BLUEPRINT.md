@@ -1,7 +1,7 @@
-# RESOLVEIT - PROJECT BLUEPRINT
+# RESOLVELT - PROJECT BLUEPRINT
 
 ## 1. Project Overview
-**Name:** ResolveIt
+**Name:** Resolvelt
 **Description:** A centralized College and Hostel Grievance Addressal System for JKLU.
 **Status:** Planning phase complete. Awaiting final command to start codebase setup.
 

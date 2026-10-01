@@ -1,6 +1,6 @@
-# 🎓 ResolveIt
+# 🎓 Resolvelt
 
-**ResolveIt** is a centralized, next-generation Grievance Addressal System built specifically for college and hostel environments. It aims to replace informal and scattered complaint channels (like WhatsApp groups, verbal complaints, or paper forms) with a structured, transparent, and highly accountable platform.
+**Resolvelt** is a centralized, next-generation Grievance Addressal System built specifically for college and hostel environments. It aims to replace informal and scattered complaint channels (like WhatsApp groups, verbal complaints, or paper forms) with a structured, transparent, and highly accountable platform.
 
 ## 🚀 Key Features
 
