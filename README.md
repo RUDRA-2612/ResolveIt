@@ -1,31 +1,56 @@
-# 🎓 Resolvelt
+# sv
 
-**Resolvelt** is a centralized, next-generation Grievance Addressal System built specifically for college and hostel environments. It aims to replace informal and scattered complaint channels (like WhatsApp groups, verbal complaints, or paper forms) with a structured, transparent, and highly accountable platform.
+Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
 
-## 🚀 Key Features
+## Creating a project
 
-- **Exclusive Access**: Secure login restricted strictly to official college Microsoft accounts (OAuth).
-- **Smart Duplicate Detection**: Real-time AI checks based on location and category to prevent duplicate tickets and encourage upvoting on existing issues.
-- **Community Feed**: A subreddit-style public feed to browse, upvote, and comment on open campus issues categorized by departments (Hostel, Mess, IT, etc.).
-- **Live Camera Verification**: Proof uploads are restricted to the live camera to prevent fake or AI-generated grievance images.
-- **Auto-Escalation & Timers**: Each ticket carries a strict deadline timer. If unresolved by Level 1 authorities, the issue automatically escalates to Level 2 supervisors.
-- **Accountability Score**: Authority dashboards display their average resolution times and escalation rates to ensure maximum efficiency and transparency.
+If you're seeing this, you've probably already done this step. Congrats!
 
-## 💻 Technology Stack
+```sh
+# create a new project
+npx sv create my-app
+```
 
-- **Frontend & Routing**: SvelteKit, TypeScript
-- **Styling**: Tailwind CSS v4
-- **Database**: PostgreSQL
-- **Backend ORM**: Drizzle ORM, pg driver
-- **Icons**: Lucide-Svelte
+To recreate this project with the same configuration:
 
-## 👥 Role Hierarchy
+```sh
+# recreate this project
+npx sv@1.0.1 create --template minimal --types ts --add tailwindcss="plugins:none" --install npm .
+```
 
-1. **Non-Authority (Students/Staff)**: Can report issues, upvote, comment, and confirm resolutions.
-2. **Level 1 Handlers**: Wardens, Mess In-charge, IT Support (First responders).
-3. **Level 2 Supervisors**: Chief Warden, Transport Officer (Auto-escalation handlers).
-4. **Level 3 Top Authority**: Dean, Registrar (Final oversight).
-5. **System Admin**: Manages categories, deadlines, and authority mappings.
+## Adding features
 
----
-*Built as a comprehensive DBMS Project.*
+Add features to your project with `sv add`:
+
+```sh
+npx sv add
+```
+
+For example, to add Tailwind CSS:
+
+```sh
+npx sv add tailwindcss
+```
+
+## Developing
+
+Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+
+```sh
+npm run dev
+
+# or start the server and open the app in a new browser tab
+npm run dev -- --open
+```
+
+## Building
+
+To create a production version of your app:
+
+```sh
+npm run build
+```
+
+You can preview the production build with `npm run preview`.
+
+> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
