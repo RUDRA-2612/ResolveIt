@@ -1,56 +1,37 @@
-# sv
+# ResolveIt 🎓
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+**Built by the students, for the students.**
 
-## Creating a project
+ResolveIt is a modern, fast, and premium campus issue reporting system. It provides a seamless way for students to report problems across the campus (like maintenance, IT, or hostel issues) and track them until they are resolved.
 
-If you're seeing this, you've probably already done this step. Congrats!
+## 🚀 Features
 
-```sh
-# create a new project
-npx sv create my-app
-```
+- **Premium UI/UX:** Built with a modern design system featuring beautiful gradients, interactive dancing text animations, and smooth transitions.
+- **Custom Search:** An embedded, horizontally expanding search bar for quickly finding tickets and locations.
+- **Smart Forms:** Animated custom dropdowns and responsive layouts for easy issue reporting.
+- **Student Dashboard:** Track the status of your reported tickets (Pending, In Progress, Resolved).
+- **Persistent Sessions:** Smooth login flow with session persistence.
 
-To recreate this project with the same configuration:
+## 💻 Tech Stack
 
-```sh
-# recreate this project
-npx sv@1.0.1 create --template minimal --types ts --add tailwindcss="plugins:none" --install npm .
-```
+- **Framework:** SvelteKit
+- **Language:** TypeScript / JavaScript
+- **Styling:** TailwindCSS
+- **Icons:** Lucide-Svelte
 
-## Adding features
+## 🛠️ How to Run Locally
 
-Add features to your project with `sv add`:
-
-```sh
-npx sv add
-```
-
-For example, to add Tailwind CSS:
-
-```sh
-npx sv add tailwindcss
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```sh
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/RUDRA-2612/Resolvelt.git
+   ```
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+3. **Run the development server**
+   ```bash
+   npm run dev
+   ```
+4. **Open in browser**
+   Navigate to `http://localhost:5173` to view the application.
