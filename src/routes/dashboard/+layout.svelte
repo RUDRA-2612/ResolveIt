@@ -7,6 +7,7 @@
     X,
     User,
     MessageSquare,
+    Flag,
   } from "lucide-svelte";
   import { searchStore } from "../../lib/store.svelte";
   import { beforeNavigate } from "$app/navigation";
@@ -136,7 +137,7 @@
             class="w-8 h-8 object-contain drop-shadow-md group-hover:rotate-12 transition-transform duration-300"
           />
           <span
-            class="text-xl font-bold tracking-tight hidden sm:block group-hover:text-orange-400 transition-colors duration-300"
+            class="text-lg sm:text-xl font-bold tracking-tight group-hover:text-orange-400 transition-colors duration-300 {isSearchOpen ? 'hidden sm:block' : ''}"
             >ResolveIt</span
           >
         </a>
@@ -153,7 +154,7 @@
               use:focusElement
               bind:value={searchStore.query}
               placeholder="Search tickets, issues, or locations..."
-              class="w-48 sm:w-64 px-4 py-2 bg-teal-800 text-white placeholder-teal-300/70 rounded-full border border-teal-600 focus:outline-none focus:border-orange-400 text-sm"
+              class="w-36 sm:w-64 px-3 sm:px-4 py-2 bg-teal-800 text-white placeholder-teal-300/70 rounded-full border border-teal-600 focus:outline-none focus:border-orange-400 text-sm"
               onclick={(e) => e.stopPropagation()}
             />
           {:else}
@@ -245,6 +246,13 @@
                 >
                   <MessageSquare size={16} /> Feedback
                 </button>
+                <a
+                  href="/dashboard/report"
+                  onclick={closeModal}
+                  class="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-teal-600 rounded-lg flex items-center gap-2"
+                >
+                  <Flag size={16} /> Report
+                </a>
                 <div class="border-t border-slate-100 my-1"></div>
                 <button
                   onclick={() => {
