@@ -78,7 +78,7 @@
                 <button onclick={(e) => { e.preventDefault(); localStorage.setItem('user_email', email.toLowerCase()); window.location.href = '/dashboard'; }} class="flex-1 py-3.5 bg-teal-600 hover:bg-teal-700 text-white text-center rounded-xl font-bold shadow-lg shadow-teal-500/30 transition-all hover:-translate-y-0.5">
                   Student
                 </button>
-                <button onclick={(e) => { e.preventDefault(); localStorage.setItem('user_email', email.toLowerCase()); window.location.href = '/dashboard'; }} class="flex-1 py-3.5 bg-slate-800 hover:bg-slate-900 text-white text-center rounded-xl font-bold shadow-lg shadow-slate-500/30 transition-all hover:-translate-y-0.5">
+                <button onclick={(e) => { e.preventDefault(); localStorage.setItem('user_email', email.toLowerCase()); window.location.href = '/authority'; }} class="flex-1 py-3.5 bg-slate-800 hover:bg-slate-900 text-white text-center rounded-xl font-bold shadow-lg shadow-slate-500/30 transition-all hover:-translate-y-0.5">
                   Authority
                 </button>
               </div>

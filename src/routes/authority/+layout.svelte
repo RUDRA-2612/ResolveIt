@@ -1,18 +1,18 @@
 <script lang="ts">
   import {
-    ShieldCheck,
     Bell,
     Search,
     Menu,
     X,
     User,
-    MessageSquare,
-    Flag,
+    LogOut,
+    CheckCircle2,
+    Clock,
+    AlertCircle
   } from "lucide-svelte";
-  import { searchStore } from "../../lib/store.svelte";
   import { beforeNavigate } from "$app/navigation";
   import { page } from "$app/state";
-  import { fade, fly, scale, slide } from "svelte/transition";
+  import { fade, fly, slide, scale } from "svelte/transition";
   import { onMount } from "svelte";
 
   let { children } = $props();
@@ -26,17 +26,21 @@
   let isProfileOpen = $state(false);
   let isNotifOpen = $state(false);
   let isSearchOpen = $state(false);
-
+  
   let isProfileModalOpen = $state(false);
-  let isFeedbackModalOpen = $state(false);
+  
+  let searchQuery = $state("");
 
-  function openModal(type: "menu" | "profileModal" | "feedbackModal") {
+  function openModal(type: "menu" | "profileModal") {
     if (typeof window !== "undefined")
       window.history.pushState({ modal: true }, "");
     if (type === "menu") isMenuOpen = true;
-    if (type === "profileModal") isProfileModalOpen = true;
-    if (type === "feedbackModal") isFeedbackModalOpen = true;
-    closeAll();
+    if (type === "profileModal") {
+      isProfileModalOpen = true;
+      closeAll();
+    } else {
+      closeAll();
+    }
   }
 
   function closeModal() {
@@ -45,7 +49,6 @@
     } else {
       isMenuOpen = false;
       isProfileModalOpen = false;
-      isFeedbackModalOpen = false;
       closeAll();
     }
   }
@@ -53,19 +56,11 @@
   function handlePopState() {
     isMenuOpen = false;
     isProfileModalOpen = false;
-    isFeedbackModalOpen = false;
     closeAll();
   }
 
   beforeNavigate(({ cancel, type }) => {
-    if (
-      isMenuOpen ||
-      isProfileOpen ||
-      isNotifOpen ||
-      isSearchOpen ||
-      isProfileModalOpen ||
-      isFeedbackModalOpen
-    ) {
+    if (isMenuOpen || isProfileOpen || isNotifOpen || isSearchOpen || isProfileModalOpen) {
       if (type === 'popstate') {
         cancel();
       }
@@ -104,14 +99,7 @@
   }
 
   function handleOutsideClick() {
-    if (
-      isMenuOpen ||
-      isProfileOpen ||
-      isNotifOpen ||
-      isSearchOpen ||
-      isProfileModalOpen ||
-      isFeedbackModalOpen
-    ) {
+    if (isMenuOpen || isProfileOpen || isNotifOpen || isSearchOpen) {
       closeModal();
     }
   }
@@ -124,7 +112,7 @@
 <svelte:window onclick={handleOutsideClick} onpopstate={handlePopState} />
 
 <div class="min-h-screen bg-[#f4f9f8] font-sans flex flex-col">
-  <!-- Global Navbar -->
+  <!-- Global Navbar for Authority -->
   <header class="bg-teal-700 text-white sticky top-0 z-50 shadow-md">
     <div class="w-full px-4 sm:px-6 h-16 flex items-center justify-between">
       <!-- Left: Menu & Brand -->
@@ -136,7 +124,7 @@
           <Menu size={24} />
         </button>
         <a
-          href="/dashboard"
+          href="/authority"
           class="group flex items-center gap-2 transition-all hover:scale-105 duration-300"
         >
           <img
@@ -150,7 +138,7 @@
               >ResolveIt</span
             >
             <span class="text-[10px] font-bold bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded-full border border-orange-500/30 shadow-sm {isSearchOpen ? 'hidden sm:block' : ''}">
-              STUDENT
+              AUTHORITY
             </span>
           </div>
         </a>
@@ -165,9 +153,9 @@
               transition:slide={{ axis: 'x', duration: 300 }}
               type="text"
               use:focusElement
-              bind:value={searchStore.query}
-              placeholder="Search tickets, issues, or locations..."
-              class="w-36 sm:w-64 px-3 sm:px-4 py-2 bg-teal-800 text-white placeholder-teal-300/70 rounded-full border border-teal-600 focus:outline-none focus:border-orange-400 text-sm"
+              bind:value={searchQuery}
+              placeholder="Search ID, student, or category..."
+              class="w-36 sm:w-64 px-3 sm:px-4 py-2 bg-slate-900 text-white placeholder-slate-400 rounded-full border border-slate-600 focus:outline-none focus:border-orange-400 text-sm"
               onclick={(e) => e.stopPropagation()}
             />
           {:else}
@@ -201,21 +189,22 @@
               transition:fly={{ y: -10, duration: 200 }}
               class="absolute top-12 -right-4 sm:right-0 w-80 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden"
             >
-              <div class="p-4 bg-slate-50 border-b border-slate-100">
-                <h4 class="font-bold text-slate-800">Notifications</h4>
+              <div class="p-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
+                <h4 class="font-bold text-slate-800">Alerts</h4>
+                <span class="text-xs font-bold bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full">2 New</span>
               </div>
               <div class="max-h-64 overflow-y-auto p-2">
                 <div class="p-3 hover:bg-slate-50 rounded-xl cursor-pointer">
-                  <p class="text-sm font-semibold text-slate-800">
-                    TKT-104 is now In Progress
+                  <p class="text-sm font-semibold text-slate-800 flex items-center gap-1.5">
+                    <AlertCircle size={14} class="text-red-500" /> TKT-104 is breaching SLA
                   </p>
-                  <p class="text-xs text-slate-500 mt-1">10 minutes ago</p>
+                  <p class="text-xs text-slate-500 mt-1">Countdown &lt; 30 mins</p>
                 </div>
                 <div class="p-3 hover:bg-slate-50 rounded-xl cursor-pointer">
-                  <p class="text-sm font-semibold text-slate-800">
-                    New announcement from Warden
+                  <p class="text-sm font-semibold text-slate-800 flex items-center gap-1.5">
+                    <Clock size={14} class="text-blue-500" /> New ticket in Hostel Mess
                   </p>
-                  <p class="text-xs text-slate-500 mt-1">1 hour ago</p>
+                  <p class="text-xs text-slate-500 mt-1">10 minutes ago</p>
                 </div>
               </div>
             </div>
@@ -226,9 +215,9 @@
         <div class="relative">
           <button
             onclick={(e) => toggle("profile", e)}
-            class="w-9 h-9 rounded-full bg-teal-100 flex items-center justify-center text-teal-800 font-bold text-sm border-2 border-teal-500 hover:ring-2 hover:ring-orange-400 transition-all"
+            class="w-9 h-9 rounded-full bg-teal-600 flex items-center justify-center text-white font-bold text-sm border-2 border-teal-500 hover:ring-2 hover:ring-orange-400 transition-all"
           >
-            RS
+            AD
           </button>
 
           <!-- Profile Dropdown -->
@@ -240,41 +229,40 @@
               transition:fly={{ y: -10, duration: 200 }}
               class="absolute top-12 right-0 w-48 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden"
             >
-              <div class="p-4 border-b border-slate-100">
-                <p class="font-bold text-slate-800">Rudrapal Singh Shekhawat</p>
-                <p class="text-xs text-slate-500 truncate">
-                  rudrapalsinghshekhawat@jklu.edu.in
-                </p>
+              <div class="p-4 border-b border-slate-100 bg-slate-50">
+                <p class="font-bold text-slate-800">Authority</p>
               </div>
               <div class="p-2">
                 <button
                   onclick={() => openModal("profileModal")}
-                  class="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-teal-600 rounded-lg flex items-center gap-2"
+                  class="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-slate-900 rounded-lg flex items-center gap-2"
                 >
                   <User size={16} /> Profile
                 </button>
-                <button
-                  onclick={() => openModal("feedbackModal")}
-                  class="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-teal-600 rounded-lg flex items-center gap-2"
-                >
-                  <MessageSquare size={16} /> Feedback
-                </button>
+                <div class="border-t border-slate-100 my-1"></div>
                 <a
-                  href="/dashboard/report"
+                  href="#"
                   onclick={closeModal}
-                  class="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-teal-600 rounded-lg flex items-center gap-2"
+                  class="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-slate-900 rounded-lg flex items-center gap-2"
                 >
-                  <Flag size={16} /> Report
+                  Feedback
+                </a>
+                <div class="border-t border-slate-100 my-1"></div>
+                <a
+                  href="#"
+                  onclick={closeModal}
+                  class="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-slate-900 rounded-lg flex items-center gap-2"
+                >
+                  Report Issue
                 </a>
                 <div class="border-t border-slate-100 my-1"></div>
                 <button
                   onclick={() => {
-                    localStorage.removeItem("user_email");
                     window.location.href = "/";
                   }}
                   class="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg flex items-center gap-2 font-medium"
                 >
-                  Log Out
+                  <LogOut size={16} /> Log Out
                 </button>
               </div>
             </div>
@@ -289,11 +277,11 @@
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
-      class="fixed inset-0 bg-slate-900/50 z-50"
+      class="fixed inset-0 bg-slate-900/50 z-[60]"
       transition:fade={{ duration: 300 }}
     ></div>
     <div
-      class="fixed top-0 left-0 h-full w-72 bg-white z-50 shadow-2xl flex flex-col"
+      class="fixed top-0 left-0 h-full w-72 bg-white z-[60] shadow-2xl flex flex-col"
       transition:fly={{ x: -300, duration: 300 }}
       onclick={(e) => e.stopPropagation()}
     >
@@ -301,7 +289,7 @@
         class="p-4 bg-teal-700 text-white flex justify-between items-center h-16"
       >
         <div class="flex items-center gap-2">
-          <span class="text-lg font-bold">Menu</span>
+          <span class="text-lg font-bold">Authority Menu</span>
         </div>
         <button
           onclick={closeModal}
@@ -313,48 +301,51 @@
 
       <div class="flex-1 overflow-y-auto p-4">
         <a
-          href="/dashboard"
+          href="/authority"
           onclick={closeModal}
-          class="flex items-center gap-3 px-4 py-3 text-slate-700 hover:bg-teal-100 hover:text-teal-800 font-medium rounded-xl transition-colors"
+          class="flex items-center gap-3 px-4 py-3 text-slate-700 hover:bg-slate-100 hover:text-slate-900 font-medium rounded-xl transition-colors"
         >
           Home
         </a>
-        <div class="border-t border-teal-100 mx-4 my-1"></div>
+        <div class="border-t border-slate-100 mx-4 my-1"></div>
         <a
           href="#"
           onclick={closeModal}
-          class="flex items-center gap-3 px-4 py-3 text-slate-700 hover:bg-teal-100 hover:text-teal-800 font-medium rounded-xl transition-colors"
+          class="flex items-center gap-3 px-4 py-3 text-slate-700 hover:bg-slate-100 hover:text-slate-900 font-medium rounded-xl transition-colors"
         >
-          Recent Reported
+          Recently Solved Tickets
         </a>
-        <div class="border-t border-teal-100 mx-4 my-1"></div>
+
         {#if userEmail.toLowerCase() === 'rudrapalsinghshekhawat@jklu.edu.in'}
+          <div class="border-t border-slate-100 mx-4 my-1"></div>
           <a
             href="#"
             onclick={closeModal}
-            class="flex items-center gap-3 px-4 py-3 text-slate-700 hover:bg-teal-100 hover:text-teal-800 font-medium rounded-xl transition-colors"
+            class="flex items-center gap-3 px-4 py-3 text-slate-700 hover:bg-slate-100 hover:text-slate-900 font-medium rounded-xl transition-colors"
           >
             Admin Panel
           </a>
-          <div class="border-t border-teal-100 mx-4 my-1"></div>
         {/if}
+
+        <div class="border-t border-slate-100 mx-4 my-1"></div>
         <a
           href="#"
           onclick={closeModal}
-          class="flex items-center gap-3 px-4 py-3 text-slate-700 hover:bg-teal-100 hover:text-teal-800 font-medium rounded-xl transition-colors"
+          class="flex items-center gap-3 px-4 py-3 text-slate-700 hover:bg-slate-100 hover:text-slate-900 font-medium rounded-xl transition-colors"
         >
           Credits
         </a>
+
       </div>
 
       {#if userEmail.toLowerCase() === 'rudrapalsinghshekhawat@jklu.edu.in'}
-        <div class="p-4 mt-auto border-t border-teal-100">
+        <div class="p-4 mt-auto border-t border-slate-100">
           <a
-            href="/authority"
+            href="/dashboard"
             onclick={closeModal}
             class="flex items-center justify-center gap-2 w-full px-4 py-3 text-emerald-700 hover:bg-emerald-100 font-bold rounded-xl transition-colors bg-emerald-50"
           >
-            Switch to Authority
+            Switch to Student
           </a>
         </div>
       {/if}
@@ -362,14 +353,14 @@
   {/if}
 
   <!-- Page Content -->
-  <div class="flex-1 flex flex-col">
+  <div class="flex-1 flex flex-col min-w-0 h-full">
     {@render children()}
   </div>
 
   <!-- Global Footer -->
-  {#if page.url.pathname === "/dashboard"}
+  {#if page.url.pathname === '/authority'}
     <footer
-      class="bg-slate-100 text-center py-8 mt-auto border-t-2 border-teal-100 flex flex-col items-center"
+      class="bg-slate-100 text-center py-8 mt-auto border-t border-teal-500 flex flex-col items-center"
     >
       <img
         src="/logo_2.png"
@@ -396,6 +387,8 @@
     class="fixed inset-0 bg-slate-900/60 z-[100] flex items-center justify-center p-4 backdrop-blur-sm"
     transition:fade={{ duration: 200 }}
   >
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
       class="bg-white rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden"
       transition:scale={{ start: 0.95, duration: 200 }}
@@ -404,7 +397,7 @@
       <div
         class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-teal-50"
       >
-        <h3 class="font-bold text-teal-800 text-lg">Student Profile</h3>
+        <h3 class="font-bold text-teal-800 text-lg">Authority Profile</h3>
         <button
           onclick={closeModal}
           class="p-2 text-slate-400 hover:bg-teal-100 hover:text-teal-700 rounded-full transition-colors"
@@ -414,85 +407,29 @@
       </div>
       <div class="p-6 space-y-4">
         <div>
-          <p
-            class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1"
-          >
-            Full Name
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">
+            Department
           </p>
-          <p class="font-semibold text-slate-800">Rudrapal Singh Shekhawat</p>
+          <p class="font-semibold text-slate-800">Hostel Department</p>
         </div>
         <div>
-          <p
-            class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1"
-          >
-            Roll Number
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">
+            Role
           </p>
-          <p class="font-semibold text-slate-800">2023BTECH001</p>
+          <p class="font-semibold text-slate-800">Chief Warden</p>
         </div>
         <div>
-          <p
-            class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1"
-          >
-            Course
-          </p>
-          <p class="font-semibold text-slate-800">B.Tech CSE (2nd Year)</p>
-        </div>
-        <div>
-          <p
-            class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1"
-          >
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">
             Email ID
           </p>
-          <p class="font-semibold text-slate-800">
-            rudrapalsinghshekhawat@jklu.edu.in
-          </p>
+          <p class="font-semibold text-slate-800">hostel.authority@jklu.edu.in</p>
         </div>
-      </div>
-    </div>
-  </div>
-{/if}
-
-<!-- Feedback Modal -->
-{#if isFeedbackModalOpen}
-  <div
-    class="fixed inset-0 bg-slate-900/60 z-[100] flex items-center justify-center p-4 backdrop-blur-sm"
-    transition:fade={{ duration: 200 }}
-  >
-    <div
-      class="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden"
-      transition:scale={{ start: 0.95, duration: 200 }}
-      onclick={(e) => e.stopPropagation()}
-    >
-      <div
-        class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-orange-50"
-      >
-        <h3 class="font-bold text-orange-800 text-lg">Submit Feedback</h3>
-        <button
-          onclick={closeModal}
-          class="p-2 text-slate-400 hover:bg-orange-100 hover:text-orange-700 rounded-full transition-colors"
-        >
-          <X size={20} />
-        </button>
-      </div>
-      <div class="p-6">
-        <p class="text-sm text-slate-600 mb-4">
-          Help us improve the ResolveIt platform. Describe any bugs, UI issues,
-          or feature requests below.
-        </p>
-        <textarea
-          rows="4"
-          placeholder="Type your feedback here..."
-          class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all bg-slate-50 resize-none mb-4"
-        ></textarea>
-        <button
-          onclick={() => {
-            closeModal();
-            alert("Feedback Submitted!");
-          }}
-          class="w-full py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl shadow-lg shadow-orange-500/30 transition-all"
-        >
-          Submit Feedback
-        </button>
+        <div>
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">
+            Contact Number
+          </p>
+          <p class="font-semibold text-slate-800">+91 98765 43210</p>
+        </div>
       </div>
     </div>
   </div>
