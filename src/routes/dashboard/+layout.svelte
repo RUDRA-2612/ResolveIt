@@ -132,7 +132,7 @@
           class="group flex items-center gap-2 transition-all hover:scale-105 duration-300"
         >
           <img
-            src="/logo.png"
+            src="/logo_2.png"
             alt="ResolveIt Logo"
             class="w-8 h-8 object-contain drop-shadow-md group-hover:rotate-12 transition-transform duration-300"
           />
@@ -345,7 +345,7 @@
       class="bg-slate-100 text-center py-8 mt-auto border-t-2 border-teal-100 flex flex-col items-center"
     >
       <img
-        src="/logo.png"
+        src="/logo_2.png"
         alt="ResolveIt Logo"
         class="w-16 h-16 object-contain mb-3 drop-shadow-sm opacity-90"
       />

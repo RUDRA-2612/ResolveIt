@@ -25,7 +25,7 @@
     
     <div class="z-10 text-center group cursor-pointer hover-dance">
       <div class="flex justify-center mb-4 lg:mb-8">
-        <img src="/logo.png" alt="ResolveIt Logo" class="w-24 h-24 lg:w-48 lg:h-48 object-contain drop-shadow-2xl transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" />
+        <img src="/logo_2.png" alt="ResolveIt Logo" class="w-24 h-24 lg:w-48 lg:h-48 object-contain drop-shadow-2xl transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" />
       </div>
       <h1 class="text-4xl lg:text-6xl font-extrabold tracking-tight text-white drop-shadow-sm transition-colors duration-300 group-hover:text-orange-400">ResolveIt</h1>
     </div>
