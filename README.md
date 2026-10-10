@@ -1,31 +1,32 @@
-# Resolvelt
+# React + TypeScript + Vite
 
-A centralized College and Hostel Grievance Addressal System for JKLU.
+This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
 
-## Project Overview
-**Resolvelt** is designed to streamline the reporting and resolution of issues within the campus and hostels. It provides a structured flow from the student reporting a problem to the final authority resolving it.
+Currently, two official plugins are available:
 
-### Core Features
-- **Official Login:** Exclusive access via JKLU Microsoft Email (OAuth).
-- **Report a Problem First:** The primary action is front and center to ensure immediate grievance reporting.
-- **AI Duplicate Checks:** Prevents spam by analyzing the location and category of newly reported tickets against existing ones.
-- **Auto-Escalation:** Integrated countdown timers for tickets. If a ticket isn't acknowledged or resolved in time, it automatically escalates to the next level of authority.
-- **Role-Based Dashboards:** Separate experiences for Reporters (Students/Staff) and Handlers/Supervisors (Wardens, IT, Deans).
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-## Tech Stack (Frontend-Only Architecture)
-We are building the frontend as a highly responsive, modern Single Page Application (SPA) with a focus on premium aesthetics (glassmorphism, micro-animations, and fluid UIs).
+## React Compiler
 
-- **Core Framework:** React 18
-- **Bundler:** Vite
-- **Language:** TypeScript
-- **Styling:** Tailwind CSS
-- **Components & Icons:** shadcn/ui & Lucide-React
-- **Animations:** Framer Motion
-- **Routing:** React Router v6
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-## Development
-Currently in the initial setup phase. To run the project locally once initialized:
-```bash
-npm install
-npm run dev
+## Expanding the Oxlint configuration
+
+If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+
+```json
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "typescript", "oxc"],
+  "options": {
+    "typeAware": true
+  },
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "react/only-export-components": ["warn", { "allowConstantExport": true }]
+  }
+}
 ```
+
+See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.

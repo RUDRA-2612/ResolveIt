@@ -1,0 +1,1201 @@
+RESOLVEIT
+College Grievance & MaintenanceIssue Catalogue
+A categorized reference list for hostel, academics, campus facilities, student life and support services
+
+Purpose. This document is a broad issue catalogue for a college grievance and maintenance website. Students can select a main category and subcategory, choose an issue, and add their own description, location, urgency, and supporting evidence when submitting a report.
+How to use this catalogue. Use the listed issues as suggested options, not as assumptions that every issue exists on campus. Keep an “Issue Not Listed / Other” option available. For sensitive concerns—such as harassment, discrimination, health, emotional well-being, or safety—route reports to an authorized and confidential process rather than exposing them publicly.
+Recommended fields in the website: Main category • Subcategory • Issue title • Description • Location/building • Date/time • Urgency • Optional attachment • Status • Assigned department • Updates • Resolution confirmation.
+Category Index
+1. HOSTEL
+2. MESS
+3. LAUNDRY
+4. ACADEMICS & TEACHING
+5. ACADEMIC BUILDINGS & CLASSROOM INFRASTRUCTURE
+6. CAMPUS INFRASTRUCTURE, UTILITIES & MAINTENANCE
+7. CAMPUS IT, INTERNET & DIGITAL SERVICES
+8. LIBRARY, STUDY SPACES & ACADEMIC RESOURCES
+9. HEALTH, WELL-BEING & EMOTIONAL SUPPORT
+10. SOCIAL LIFE, STUDENT COMMUNITY & INCLUSION
+11. SAFETY, SECURITY & EMERGENCY RESPONSE
+12. ADMINISTRATION, FINANCE & STUDENT SERVICES
+13. FACULTY, STAFF & PROFESSIONAL CONDUCT
+14. SPORTS, FITNESS & RECREATION
+15. FINANCIAL, ACCESSIBILITY & STUDENT SUPPORT
+16. GENERAL, COMMON & OTHER ISSUES
+
+CAMPUS-SPECIFIC LOCATION DIRECTORY
+This section adapts the general catalogue to the buildings and facilities described for the campus. Use the location as a separate field from the issue category: for example, Category = Electrical Maintenance; Location = EB1, Floor 2, Room 204.
+A. Hostel, Residence & Residential-Service Locations
+Location code / name
+Location label for website
+Common issue types
+GH1
+Girls Hostel 1
+Room, bed, washroom, electrical, plumbing, cleaning, Wi-Fi, safety and common-area issues.
+GS2 / Girls Hostel 2
+Girls Hostel 2 (name recorded as GS2)
+Room and building maintenance, water, sanitation, furniture, access, safety and housekeeping.
+BH1
+Boys Hostel 1
+Room, bed, washroom, electrical, plumbing, cleaning, Wi-Fi, safety and common-area issues.
+BH2
+Boys Hostel 2
+Room and building maintenance, water, sanitation, furniture, access, safety and housekeeping.
+Mess Building
+Mess / Dining Facility
+Food quality, menu, hygiene, serving, seating, water, kitchen equipment and staff/service issues.
+Laundry Building
+Laundry Facility
+Washing, ironing, pickup/delivery, missing or damaged clothes, tracking and laundry-area maintenance.
+Gym + Activity Centre
+Gym and Academy/Activity Centre in the same building
+Gym equipment, sports/fitness facilities, activity rooms, shared utilities, washrooms, lighting and booking issues.
+Girls Double-Seater / Additional Girls Residence
+Girls' double-seater or other girls' residential building; exact official name to be confirmed
+Room allocation, occupancy, beds, furniture, washrooms, safety, housekeeping and utilities.
+Faculty Quarters
+Faculty residential quarters
+Common building maintenance, water, electricity, plumbing, lighting, waste, access and shared-area issues.
+VC Quarters
+Vice-Chancellor's residential quarters
+Building and utility maintenance; access should be handled only by authorized staff.
+B. Academic, Library & Administrative Buildings
+Location code / name
+Location label for website
+Common issue types
+EB1
+EB1 Academic Building
+Classrooms, furniture, lights, fans/AC, projector, audio, sockets, Wi-Fi, washrooms, corridors and cleanliness.
+EB2
+EB2 Academic Building
+Classrooms, furniture, lights, fans/AC, projector, audio, sockets, Wi-Fi, washrooms, corridors and cleanliness.
+TB1 / Technical Block
+Technical Block 1
+Technical classrooms, labs, computers, lab equipment, software, electrical safety, network and ventilation.
+HSB
+HSB Academic Building
+Classrooms, faculty/student facilities, utilities, washrooms, signage, accessibility and maintenance.
+Admin Block
+Administrative Block
+Student service counters, office facilities, queue/access issues, records/fee service, signage, washrooms and utilities.
+LRC / Library
+Learning Resource Centre / Library
+Books, study seats, library systems, printers, quiet areas, lighting, AC, washrooms and access.
+LRC Labs
+Laboratories located in or associated with LRC
+Computer/system faults, software, peripherals, lab seating, network, electrical safety and lab scheduling.
+C. Grounds, Sports & Outdoor Facilities
+Facility / location
+Location label for website
+Common issue types
+Football Ground
+Football field / goal area
+Uneven or waterlogged surface, damaged goalposts/nets, missing balls/cones, poor lighting, unsafe boundary or booking conflict.
+Volleyball Court
+Volleyball court
+Damaged/loose net, missing or damaged poles, worn court surface/markings, insufficient volleyballs, lighting or booking issue.
+Badminton Court
+Badminton court
+Damaged net/posts, worn or slippery floor, missing shuttlecocks/rackets, lighting, ventilation or court booking issue.
+Table Tennis Area
+Table tennis tables / playing area
+Damaged or uneven table, broken net, missing bats/balls, insufficient tables, poor lighting or access issue.
+Billiards / Pool Area
+Billiards or pool facility
+Damaged table/felt, missing cues/balls/chalk, faulty lights, booking conflicts or insufficient equipment.
+Squash Court (if available)
+Squash court; confirm campus facility availability
+Court wall/floor damage, unsafe surface, lighting, ventilation, racket/ball shortage or booking issue.
+Gym
+Gym and fitness area
+Broken/unsafe equipment, missing weights or accessories, worn mats, hygiene, ventilation, overcrowding or trainer/timing issue.
+Outdoor Common Areas
+Paths, seating, lawns, open areas and recreation spaces
+Broken benches, damaged paths, poor lighting, litter, waterlogging, unsafe surfaces, missing bins or landscaping concerns.
+D. Common Building-Maintenance Issue Set
+Issue family
+Possible reportable issues
+Civil / Structural
+Cracked plaster, damaged wall/ceiling, peeling paint, broken tiles, damaged flooring, loose handrail, damaged door/window, broken lock/handle, roof leakage, seepage, dampness, damaged staircase, loose ceiling panel.
+Electrical
+Light not working, flickering light, fan not working, AC not cooling, switch/socket damage, insufficient sockets, power outage in room, exposed wiring, electrical burning smell, backup power issue.
+Water / Plumbing / Washrooms
+No water, low water pressure, leaking tap/pipe, blocked drain, flush not working, broken shower, basin blockage, water heater issue, washroom door/latch issue, bad smell, waterlogging.
+IT / AV / Lab Equipment
+Wi-Fi dead zone, LAN port failure, projector not working, HDMI/cable missing, microphone/speaker fault, smart board failure, computer not starting, printer/scanner failure, software unavailable.
+Cleanliness / Hygiene
+Room/classroom not cleaned, dirty corridor/staircase, overflowing bin, pests, bad odour, dirty washroom, insufficient soap/tissue, drinking-water point dirty, waste collection delay.
+Access / Safety / Accessibility
+Lift not working, ramp/handrail issue, blocked corridor, exit sign missing, fire extinguisher inaccessible, emergency light not working, unsafe floor, poor outdoor lighting, access door issue, inaccessible route.
+Furniture / Fixtures
+Broken chair, desk, bed, shelf, cupboard, bench, damaged curtain/blind, broken mirror, missing furniture, loose fittings, damaged noticeboard or signage.
+Heating / Cooling / Air Quality
+AC/cooler failure, ventilation problem, room too hot/cold, excessive dust, smoke/fumes, water seepage causing dampness, persistent indoor odour.
+E. Sports Equipment Shortage & Facility Requests
+Sport / facility
+Possible shortage or maintenance issue
+Volleyball
+Not enough volleyballs, damaged balls, missing/loose net, damaged poles, missing boundary lines or antennae.
+Football
+Not enough footballs, damaged balls, missing cones/markers, damaged goal net, unsafe goalpost, insufficient bibs/pinnies.
+Badminton
+Shortage of rackets, shuttlecocks, nets, grips or court availability; damaged rackets or net posts.
+Table Tennis
+Shortage of bats, balls, nets or tables; damaged table surface or net clamp.
+Billiards / Pool
+Shortage of cues, balls, chalk or cue tips; damaged table cloth, cushions or lighting.
+Squash (if available)
+Shortage of rackets/balls, damaged court, unavailable protective equipment or unclear booking process.
+Gym / Fitness
+Insufficient dumbbells/plates, missing collars, broken treadmill/cycle, damaged benches, worn mats, unavailable resistance bands or cleaning supplies.
+General Sports
+No equipment issue/return register, unclear booking schedule, equipment locked away, missing inventory, delayed repairs or unfair access to facilities.
+F. Suggested Location Field Options for ResolveIt
+Recommended location hierarchy: Main Area → Building / Facility → Floor / Zone → Room / Exact Spot. Keep issue category and physical location separate. The same electrical, plumbing, cleanliness or safety issue can occur in several buildings.
+Main area
+Location choices
+Hostel / Residence
+GH1; GS2 / Girls Hostel 2; BH1; BH2; Girls Double-Seater / Additional Girls Residence; Faculty Quarters; VC Quarters
+Residential Services
+Mess Building; Laundry Building; Gym + Activity Centre
+Academic
+EB1; EB2; TB1 / Technical Block; HSB; LRC / Library; LRC Labs
+Administration
+Admin Block
+Sports / Outdoor
+Football Ground; Volleyball Court; Badminton Court; Table Tennis Area; Billiards / Pool Area; Squash Court (if available); Outdoor Common Areas
+Campus-Wide
+Main Gate / Entrance; Campus Road; Parking; Walkway; Garden / Lawn; Other Campus Area
+Naming note: “GS2” has been retained as provided for Girls Hostel 2. The exact official name of the girls' double-seater/additional residence and whether a squash court is present should be confirmed before the website goes live.
+
+1. HOSTEL
+Issues related to hostel rooms, washrooms, housekeeping, utilities, safety, and resident facilities.
+Room Furniture & Fixtures
+Problem / Issue
+Description
+Broken Study Table
+Study tables are damaged, unstable, or have broken parts.
+Broken Chair
+Chairs are damaged, unstable, or uncomfortable to use.
+Damaged Almirah
+Almirah doors, locks, shelves, or hinges are damaged.
+Damaged Room Mirror
+Room mirrors are broken or damaged and need replacement.
+Bed / Bed Frame Damage
+A bed, frame, headboard, or supporting part is broken or unstable.
+Mattress / Pillow Issue
+Mattresses or pillows are damaged, unhygienic, or need replacement.
+Insufficient Furniture
+The room does not have the furniture expected for its occupancy.
+Curtain / Window Blind Damage
+Curtains, rods, or blinds are damaged or missing.
+Room Door / Handle Damage
+Room doors, handles, hinges, or stoppers need repair.
+Room Lock / Key Issue
+A room lock is faulty, a key is missing, or access is unreliable.
+
+Washroom & Plumbing
+Problem / Issue
+Description
+Broken Taps
+Washroom taps are damaged, leaking, or not functioning properly.
+Broken Showers
+Showers are damaged or have low or no water flow.
+Flush / Toilet Issues
+Flush systems or toilet fittings are not working properly.
+Broken Washroom Mirrors
+Washroom mirrors are damaged, broken, or require replacement.
+Plumbing Issues
+Water leakage, drainage problems, or other plumbing issues require attention.
+Blocked Drain / Washbasin
+Water drains slowly or not at all from a drain, basin, or shower.
+Water Leakage
+Pipes, ceilings, taps, or fittings leak and may cause damage.
+Hot Water Not Available
+Hot-water supply is unavailable or inconsistent when expected.
+Washroom Door / Latch Issue
+Washroom doors or privacy latches do not close or lock properly.
+Insufficient Washroom Fixtures
+There are not enough working taps, showers, toilets, or basins.
+
+Electrical & Room Utilities
+Problem / Issue
+Description
+Electrical Socket Issues
+Electrical sockets are loose, damaged, sparking, or not working.
+Room Lights / Fans
+Lights or fans are damaged or not functioning properly.
+Power Outage in Room
+Electricity supply is interrupted in a room or a section of the hostel.
+AC / Cooler Issue
+Cooling equipment is faulty, leaking, or not cooling adequately.
+Wi-Fi / Network Issue
+Hostel internet is unavailable, weak, or repeatedly disconnects.
+Poor Corridor Lighting
+Corridors may have insufficient lighting, especially during evening or night.
+Exposed / Unsafe Wiring
+Wiring, switches, or electrical panels appear unsafe and need urgent inspection.
+Charging / Power Point Shortage
+There are not enough usable power points for residents.
+
+Cleanliness & Housekeeping
+Problem / Issue
+Description
+Irregular Room Cleaning
+Rooms are not cleaned according to the expected housekeeping schedule.
+Insufficient Cleaning Frequency
+Room cleaning is missed or delayed compared with the expected schedule.
+Unclean Washrooms
+Washrooms are not cleaned properly and may remain dirty for long periods.
+Poor Washroom Hygiene
+Washrooms have bad odour, stains, or generally unhygienic conditions.
+Dirty Corridors
+Corridors are not cleaned regularly or properly.
+Dirty Common Areas
+Common spaces require more frequent cleaning and housekeeping.
+Delayed Waste Collection
+Garbage is not collected or disposed of on time.
+Pest / Insect Infestation
+Mosquitoes, cockroaches, ants, rodents, or other pests are present.
+Bad Odour
+Persistent unpleasant smells occur in rooms, washrooms, drains, or common areas.
+Laundry / Drying Area Cleanliness
+Shared washing or clothes-drying areas are dirty or poorly maintained.
+
+Facilities & Availability
+Problem / Issue
+Description
+Lack of Clothes Hangers
+Adequate clothes hangers are not provided in rooms or wardrobes.
+Missing Floor Microwave
+A microwave facility expected on each floor is unavailable or insufficient.
+Insufficient Common Facilities
+Required facilities in common areas are unavailable or insufficient.
+Water Availability Issues
+Water supply may be irregular, insufficient, or interrupted.
+Common Room Equipment Issue
+Television, indoor games, seating, or other common-room equipment is faulty.
+Drinking Water Facility Issue
+Water dispensers or drinking-water points are unavailable, dirty, or faulty.
+Lift / Elevator Issue
+A lift is out of service, unreliable, or difficult to access.
+Washing / Drying Facility Issue
+Shared washing or drying facilities are insufficient or not working.
+
+Safety, Security & Residence Management
+Problem / Issue
+Description
+Unsecured Entry / Exit
+Entry points, doors, or access controls do not provide expected security.
+Visitor Management Issue
+Visitor registration or visiting-hour procedures are unclear or inconsistently followed.
+Emergency Exit Obstruction
+Emergency routes, staircases, or exits are blocked or difficult to use.
+Fire Safety Equipment Issue
+Fire extinguishers, alarms, or safety signage are missing, expired, or inaccessible.
+Night Security Concern
+A security guard, patrol, or response is unavailable when needed.
+Harassment / Bullying in Hostel
+A resident reports intimidation, bullying, or harassment in the hostel.
+Noise / Quiet Hours Violation
+Excessive noise disrupts sleep, study, or rest during expected quiet hours.
+Room Allocation / Roommate Issue
+Room allocation, occupancy, or roommate arrangements need review.
+Hostel Rules / Communication Issue
+Residence rules, notices, or policy changes are unclear or not communicated.
+Urgent Maintenance Not Addressed
+A safety-critical hostel issue has not received timely attention.
+
+2. MESS
+Issues related to food quality, menu, hygiene, dining arrangements, staff, and service.
+Food Quality & Safety
+Problem / Issue
+Description
+Excessively Oily Food
+Food often contains excessive oil, making it unpleasant to eat regularly.
+Poor Taste of Food
+Food quality and taste are inconsistent and below student expectations.
+Compromised Food Quality
+Ingredient quality or food preparation may not meet expected standards.
+Low-Quality / Questionable Paneer
+Paneer appears to be of poor or questionable quality and needs checking.
+Stale Food
+Food lacks freshness or appears to have been prepared or stored too long.
+Poor Food Hygiene
+Hygiene standards during food preparation or serving may be unsatisfactory.
+Undercooked / Overcooked Food
+Food is not cooked consistently or thoroughly.
+Foreign Object in Food
+A student finds an unexpected object in food; this should be escalated promptly.
+Food Temperature Issue
+Hot food is served cold or chilled food is not kept appropriately cool.
+Suspected Food-Borne Illness
+Multiple students report illness after eating; urgent review is needed.
+Poor Ingredient Quality
+Vegetables, grains, dairy, or other ingredients appear spoiled or low quality.
+Allergen / Dietary Information Missing
+Ingredients or common allergens are not clearly communicated.
+
+Menu & Nutrition
+Problem / Issue
+Description
+Repeated Menu
+The same dishes are repeated frequently, resulting in limited variety.
+Lack of Menu Variety
+Students have limited options and variety in daily meals.
+Menu Not Student-Friendly
+The menu may not adequately consider student preferences and requirements.
+No Proper Menu Feedback System
+There is no structured system for students to officially suggest menu changes.
+Insufficient Portion Size
+Food portions are insufficient for a regular meal.
+Food Item Frequently Unavailable
+Listed menu items run out before all students are served.
+Special Diet / Medical Meal Request
+A reasonable dietary requirement needs to be communicated and reviewed.
+Poor Balance of Meals
+Meals may lack variety across major food groups or adequate options.
+
+Dining Hall, Equipment & Cleanliness
+Problem / Issue
+Description
+Poorly Organized Mess
+The mess arrangement is inefficient and causes inconvenience to students.
+Long Queues
+Students wait in long queues during peak meal hours.
+Overcrowding
+Excessive crowding makes the dining experience uncomfortable.
+Poor Seating Management
+Available seating is not properly managed during busy hours.
+Serving Management Issues
+Serving counters become congested or difficult to manage.
+Dirty Dining Tables
+Tables are not cleaned properly between users.
+Unclean Dining Floor
+The dining floor is dirty, slippery, or not cleaned regularly.
+Dirty Plates / Cutlery
+Plates, glasses, or cutlery are not properly cleaned.
+Insufficient Plates / Cutlery
+Clean utensils are not available in adequate numbers.
+Water Dispenser Issue
+Drinking-water points in the dining area are dirty or not working.
+Kitchen / Serving Equipment Breakdown
+Equipment needed for safe preparation or serving is faulty.
+Pest Issue in Dining Area
+Flies, cockroaches, rodents, or other pests are present near food.
+
+Staff, Service & Management
+Problem / Issue
+Description
+Poor Staff Responsiveness
+Mess staff do not respond properly to students' complaints or requests.
+Delayed Complaint Resolution
+Reported food or service issues are not addressed quickly.
+Lack of Accountability
+There is no clear accountability when repeated problems occur.
+Lack of Official Feedback System
+Students lack a centralized platform to submit and track feedback.
+Meal Timing / Schedule Issue
+Meal service timings are unsuitable, unclear, or not followed.
+Rude / Inappropriate Staff Behaviour
+A student reports disrespectful or inappropriate treatment by staff.
+Billing / Meal Plan Discrepancy
+Meal charges, entitlements, or records appear incorrect.
+Special Meal / Event Coordination Issue
+Meal arrangements for approved events or special schedules are inadequate.
+
+3. LAUNDRY
+Issues related to washing, ironing, collection, delivery, tracking, and accountability.
+Washing, Drying & Ironing
+Problem / Issue
+Description
+Delayed Clothes Return
+Clothes are not returned within the expected timeframe.
+Poor Ironing Quality
+Clothes are returned with improper or incomplete ironing.
+Poor Washing Quality
+Clothes are not cleaned properly or retain stains or odour.
+Damaged Clothes
+Clothes are damaged during washing, drying, or ironing.
+Clothes Returned Damp
+Clothes are returned wet or insufficiently dried.
+Colour Bleeding / Mixing
+Clothes are washed together in a way that causes colour transfer.
+Missing Buttons / Accessories
+Buttons, hooks, or detachable clothing accessories are lost or damaged.
+Incorrect Laundry Count
+The recorded number of submitted or returned items is incorrect.
+Laundry Pickup Missed
+A scheduled collection is missed or delayed.
+Laundry Delivery Missed
+A scheduled delivery is missed or delayed.
+Poor Stain Treatment
+Stains are not treated appropriately or are made worse.
+Strong Chemical Smell
+Clothes retain an unusually strong detergent or chemical smell.
+
+Tracking, Collection & Accountability
+Problem / Issue
+Description
+Clothes Misplacement
+Clothes may get misplaced during washing and sorting.
+No Accountability for Missing Clothes
+There is no clear responsibility or compensation process for missing clothes.
+Poor Tracking System
+Students lack a proper way to track the status of submitted clothes.
+No Proper Complaint Mechanism
+There is no effective system to report laundry-related problems.
+Delayed Issue Resolution
+Complaints about missing, damaged, or delayed clothes take too long to resolve.
+Laundry Token / Receipt Issue
+A token, receipt, or item record is missing or incorrect.
+Wrong Clothes Returned
+A student receives clothing belonging to another person.
+Unclear Laundry Charges
+Laundry pricing, extra charges, or payment records are unclear.
+Pickup / Delivery Location Issue
+Collection points, timings, or delivery arrangements are inconvenient.
+Laundry Capacity / Queue Issue
+Service capacity is insufficient and causes long waits.
+
+Facility & Hygiene
+Problem / Issue
+Description
+Laundry Machine Breakdown
+A washer, dryer, or ironing machine is faulty or unavailable.
+Unclean Laundry Area
+Laundry counters, shelves, or shared areas are dirty.
+Insufficient Drying Space
+There is not enough safe and usable space to dry clothes.
+Poor Ventilation in Laundry Area
+The area has inadequate airflow, moisture, or persistent odour.
+Lost-and-Found Process Missing
+There is no clear procedure for unclaimed or unidentified clothes.
+
+4. ACADEMICS & TEACHING
+Issues related to classes, faculty support, timetable, attendance, exams, labs, projects, and learning resources.
+Classes, Timetable & Attendance
+Problem / Issue
+Description
+Timetable Clash
+Two scheduled classes, labs, or required activities overlap.
+Incorrect / Late Timetable Update
+A timetable change is communicated late or contains incorrect information.
+Class Cancelled Without Notice
+A class is cancelled or moved without timely notification.
+Classroom Allocation Issue
+A class is assigned to an unsuitable, unavailable, or incorrect room.
+Insufficient Class Duration
+Scheduled class time is not sufficient to cover required content.
+Attendance Record Error
+Attendance is missing, incorrectly marked, or not updated.
+Attendance Policy Clarification
+A student needs clarification about attendance rules or recorded shortages.
+Make-up Class Request
+A missed class or disruption requires a make-up arrangement.
+Academic Calendar Conflict
+Exam, holiday, event, or deadline dates conflict or are unclear.
+Late Notice of Academic Change
+Important academic information is shared too late.
+
+Teaching & Faculty Support
+Problem / Issue
+Description
+Teaching Pace Too Fast / Slow
+The teaching pace makes it difficult for students to follow the material.
+Topics Not Explained Clearly
+A topic needs clearer explanation or additional examples.
+Syllabus Not Completed
+Required syllabus content remains uncovered near the assessment period.
+Mismatch Between Teaching and Assessment
+Assessment questions appear misaligned with the taught syllabus or stated outcomes.
+Faculty Unavailability During Office Hours
+A student cannot access expected academic support.
+Doubt Resolution Delay
+Questions submitted in class or through official channels remain unanswered.
+Inconsistent Instructions
+Different instructions are provided for the same task, course, or assessment.
+Course Material Not Shared
+Slides, notes, readings, or references are not shared when expected.
+Assignment Instructions Unclear
+Requirements, format, rubric, or submission instructions are ambiguous.
+Feedback on Assignment Delayed
+Feedback or marks are not returned within a reasonable or announced period.
+Faculty Communication Concern
+A communication or classroom interaction needs review by the appropriate office.
+Course Registration / Add-Drop Issue
+A student cannot register, drop, or change a course as intended.
+
+Exams, Results & Assessment
+Problem / Issue
+Description
+Exam Schedule Clash
+Two examinations or required assessments overlap.
+Exam Room / Seating Issue
+Exam room allocation or seating creates a problem.
+Question Paper Error / Ambiguity
+A question contains a possible error, unclear wording, or missing information.
+Out-of-Syllabus Concern
+A student believes an assessment includes content outside the stated syllabus.
+Evaluation / Marks Discrepancy
+A mark, total, or evaluation record may be incorrect and needs review.
+Rechecking / Re-evaluation Request
+A student requests the official review process for assessed work.
+Result Not Published
+A result or grade is delayed beyond the communicated timeline.
+LMS / Exam Portal Issue
+The learning or examination portal fails during a required task.
+Assignment Submission Failure
+A submission is blocked, not recorded, or incorrectly marked late.
+Exam Accommodation Request
+A student needs an approved accommodation or accessible arrangement.
+Academic Integrity Process Concern
+A student seeks review or clarification about an academic misconduct process.
+Missed Assessment Due to Emergency
+An emergency affected attendance at an assessment and requires formal guidance.
+
+Laboratories, Projects & Learning Resources
+Problem / Issue
+Description
+Lab Equipment Not Working
+Laboratory equipment is broken, unavailable, or unreliable.
+Insufficient Lab Components / Materials
+Required components, consumables, or materials are unavailable.
+Lab Slot / Batch Allocation Issue
+Lab schedules or batch allocations conflict or are unsuitable.
+Unsafe Laboratory Condition
+A lab has a hazard, missing safety equipment, or unsafe procedure.
+Software / License Unavailable
+Required software, license, or development tool cannot be accessed.
+Project Guide Allocation Issue
+A project supervisor or guide has not been allocated or is unavailable.
+Project Evaluation Criteria Unclear
+Project deliverables, milestones, or grading criteria are unclear.
+Library Book / Resource Unavailable
+Required books, journals, or learning resources are unavailable.
+Digital Learning Resource Access Issue
+A student cannot access required e-books, databases, or course resources.
+Academic Support / Tutoring Request
+A student needs additional academic support or remedial sessions.
+
+5. ACADEMIC BUILDINGS & CLASSROOM INFRASTRUCTURE
+Building and classroom maintenance issues in academic blocks, including equipment, utilities, accessibility, and shared facilities.
+Building, Furniture & Indoor Conditions
+Problem / Issue
+Description
+Broken Classroom Chair / Desk
+Classroom seating or desks are damaged, unstable, or insufficient.
+Damaged Whiteboard / Projector Screen
+A board or projection surface is damaged or difficult to use.
+Classroom Door / Window Issue
+Doors, windows, handles, or latches need repair.
+Ceiling / Wall Damage
+Cracks, peeling paint, damaged plaster, or ceiling damage need inspection.
+Roof / Ceiling Leakage
+Water leaks from a roof or ceiling, especially during rain.
+Poor Classroom Ventilation
+Air circulation is inadequate or the room feels stuffy.
+AC / Heating Issue
+Temperature-control equipment is faulty or insufficient.
+Poor Lighting in Classroom
+Lighting is too dim, flickering, or uneven.
+Blackboard / Whiteboard Visibility Issue
+Board surfaces or room layout make content difficult to see.
+Classroom Capacity Issue
+The room is too small or overcrowded for the assigned class.
+Unclean Classroom
+Classrooms are not cleaned adequately between sessions.
+Bad Odour in Building
+Persistent unpleasant odours occur in classrooms or corridors.
+
+Electrical, IT & Teaching Equipment
+Problem / Issue
+Description
+Projector Not Working
+The projector does not start, display correctly, or connect to a device.
+Classroom Audio / Microphone Issue
+Speakers or microphones are unavailable, distorted, or faulty.
+Power Socket / Charging Point Issue
+Sockets are damaged or insufficient for teaching needs.
+Wi-Fi / Internet Dead Zone
+Wireless internet is weak or unavailable in part of the building.
+Smart Board / AV System Failure
+Interactive boards or audiovisual systems are not functioning.
+Power Backup Failure
+Teaching equipment or essential systems lose power during outages.
+Network / LAN Port Issue
+Wired network points are damaged or cannot connect.
+Computer Lab System Failure
+Desktop computers or peripherals are faulty or unavailable.
+
+Shared Building Facilities
+Problem / Issue
+Description
+Corridor / Staircase Cleanliness
+Shared circulation areas are dirty or not maintained.
+Lift / Elevator Breakdown
+A lift is unavailable, unreliable, or inaccessible.
+Washroom Maintenance in Academic Block
+Academic-block washrooms have faulty fixtures or need repair.
+Insufficient Drinking Water Points
+Students cannot easily access clean drinking water.
+Building Signage / Room Number Issue
+Room labels, directions, or floor maps are missing or incorrect.
+Blocked Corridor / Staircase
+Furniture, stored items, or other obstructions block passageways.
+Accessibility / Ramp Issue
+Ramps, handrails, lifts, or routes are difficult to access.
+Parking / Drop-off Congestion
+Vehicles or drop-off traffic obstruct safe access to the building.
+Building Opening / Closing Access Issue
+Access hours or door arrangements prevent legitimate use.
+Common Area Seating Shortage
+There are too few seats in waiting or study areas.
+
+6. CAMPUS INFRASTRUCTURE, UTILITIES & MAINTENANCE
+Common campus infrastructure issues that may affect hostels, academic buildings, offices, and outdoor spaces.
+Water, Drainage & Sanitation
+Problem / Issue
+Description
+Campus Water Supply Interruption
+Water supply is unavailable or insufficient in a campus area.
+Drinking Water Quality Concern
+Water has unusual colour, taste, odour, or a reported quality concern.
+Blocked Drain / Sewer Issue
+Drainage is blocked, overflowing, or producing unpleasant odours.
+Waterlogging After Rain
+Rainwater collects on walkways, roads, entrances, or open areas.
+Public Washroom Not Maintained
+Shared campus washrooms need cleaning, supplies, or repairs.
+Leaking Pipe / Valve
+A campus pipe, valve, or connection is leaking.
+
+Electricity, Climate & Equipment
+Problem / Issue
+Description
+Campus Power Outage
+Power supply is interrupted in a campus area.
+Streetlight / Outdoor Lighting Failure
+Outdoor lighting is insufficient or not functioning.
+Electrical Panel / Cable Hazard
+Exposed cables or electrical equipment appear unsafe.
+Generator / Backup Issue
+Backup power equipment is unavailable or unreliable.
+Solar / Utility Equipment Issue
+A campus utility installation is damaged or not operating as expected.
+
+Roads, Walkways & Outdoor Areas
+Problem / Issue
+Description
+Pothole / Damaged Campus Road
+Road surfaces have potholes, cracks, or unsafe sections.
+Broken / Uneven Footpath
+A footpath is damaged or creates a tripping hazard.
+Poor Signage / Wayfinding
+Campus directions, building signs, or maps are missing or confusing.
+Overgrown Plants / Branches
+Vegetation obstructs paths, lights, signs, or access.
+Broken Bench / Outdoor Furniture
+Outdoor seating or fixtures are damaged.
+Sports Ground / Court Maintenance
+Playing surfaces or sports fixtures need maintenance.
+Open Manhole / Unsafe Cover
+A drain or utility opening is uncovered or unsafe.
+Construction Debris / Unsafe Work Zone
+Construction material or an active work area obstructs safe movement.
+Parking Allocation / Congestion
+Parking is insufficient, poorly organized, or blocks access.
+Bicycle / Two-Wheeler Parking Issue
+Cycle or two-wheeler parking is insufficient or unsafe.
+
+Cleanliness, Waste & Environment
+Problem / Issue
+Description
+Overflowing Dustbin
+Waste bins are full, damaged, or not emptied on time.
+Littering / Unclean Campus Area
+A campus area has litter or is not cleaned regularly.
+Waste Segregation Issue
+Waste is not separated or disposed of according to the campus system.
+Pest / Stray Animal Concern
+Pests or animals create a safety, hygiene, or access concern.
+Smoke / Dust / Air Quality Concern
+Dust, smoke, or fumes affect a campus area.
+Noise from Maintenance / Construction
+Work noise disrupts classes, study, or campus activities.
+Green Area / Garden Maintenance
+Lawns, gardens, or landscaped areas need care.
+
+Accessibility & Emergency Preparedness
+Problem / Issue
+Description
+Accessible Route Blocked
+A route needed by a person with mobility needs is obstructed.
+Ramp / Handrail Damage
+A ramp or handrail is broken or unsafe.
+Emergency Assembly Point Issue
+Assembly points are not clearly marked or accessible.
+Fire Alarm / Extinguisher Issue
+Emergency fire equipment is missing, damaged, or inaccessible.
+Emergency Signage Missing
+Exit signs or emergency instructions are unclear or missing.
+First-Aid Point / Equipment Issue
+First-aid equipment or its location is unavailable or unclear.
+
+7. CAMPUS IT, INTERNET & DIGITAL SERVICES
+Issues with campus connectivity, student accounts, portals, learning platforms, and digital services.
+Connectivity & Accounts
+Problem / Issue
+Description
+Campus Wi-Fi Not Working
+Campus Wi-Fi is unavailable, unstable, or too slow for normal use.
+Student Portal Login Issue
+A student cannot sign in to an official portal.
+Password Reset / Account Lockout
+A student is locked out or cannot reset account credentials.
+Email / University Account Issue
+Official email or university account access is disrupted.
+Network Access Permission Issue
+A student lacks access to an approved network or service.
+Multi-Factor Authentication Issue
+A verification step prevents legitimate access to an account.
+
+Learning Platforms & Digital Administration
+Problem / Issue
+Description
+LMS Course Missing
+A registered course or learning page is not visible.
+Online Assignment / Quiz Error
+A digital assessment does not load, save, or submit correctly.
+Fee Payment Portal Error
+An online fee payment fails or the record is not updated.
+Course Registration Portal Error
+Course selection or registration does not work as expected.
+Digital Attendance / Timetable Error
+Online academic records appear missing or incorrect.
+Library Portal / Database Access Issue
+Digital library services or subscriptions cannot be accessed.
+Website Information Outdated
+An official webpage contains outdated or incorrect information.
+Notification / Email Not Received
+An expected official notification is not delivered or is unclear.
+Student ID / Smart Card Issue
+A campus ID card or digital identity credential does not work.
+Data Privacy / Unauthorized Access Concern
+A student reports a possible exposure or misuse of personal data.
+
+8. LIBRARY, STUDY SPACES & ACADEMIC RESOURCES
+Issues related to library access, study areas, learning resources, and collaboration spaces.
+Library Services
+Problem / Issue
+Description
+Library Closed During Published Hours
+The library is unavailable during its announced operating hours.
+Insufficient Study Seats
+There are not enough quiet study seats during busy periods.
+Excessive Noise in Reading Area
+Noise disrupts concentration in a designated quiet zone.
+Book Issue / Return Problem
+A book cannot be issued, renewed, or returned correctly.
+Incorrect Fine / Library Record
+A fine, due date, or borrowing record appears incorrect.
+Book / Journal Not Available
+A required academic resource is missing or unavailable.
+Library Computer / Printer Issue
+Library computers, printers, or scanners are faulty.
+Poor Lighting / Ventilation in Library
+The study area has inadequate lighting or air circulation.
+Library Accessibility Concern
+Library shelves, desks, or routes are difficult to access.
+
+Study & Collaboration Spaces
+Problem / Issue
+Description
+Study Room Booking Issue
+A room cannot be booked, or the booking record is incorrect.
+Group Study Space Shortage
+There are insufficient spaces for collaborative study.
+Study Space Power / Wi-Fi Issue
+Charging points or internet access are unavailable in study areas.
+Discussion Area Noise Conflict
+Noise from group discussion affects nearby quiet study spaces.
+After-Hours Study Access Issue
+Published or approved access to a study area is unavailable.
+
+9. HEALTH, WELL-BEING & EMOTIONAL SUPPORT
+Requests and concerns related to physical health, counselling, emotional well-being, hygiene, and support access.
+Physical Health & Medical Access
+Problem / Issue
+Description
+Medical Room / Clinic Access Issue
+Campus medical support is unavailable or difficult to access.
+First Aid Not Available
+Basic first-aid supplies or trained assistance are not available when needed.
+Ambulance / Emergency Response Delay
+Emergency transport or response appears delayed.
+Medical Referral / Information Issue
+Students need clear information about available medical services.
+Sanitation-Related Health Concern
+A cleanliness or water issue may affect student health.
+Accessibility Support for Temporary Injury
+A student with an injury needs a temporary access arrangement.
+Health-Service Privacy Concern
+A student is concerned about privacy when seeking medical support.
+
+Emotional Well-Being & Counselling
+Problem / Issue
+Description
+Counselling Appointment Unavailable
+A student cannot access an advertised counselling appointment.
+Need for Emotional Support
+A student wants guidance or support for stress, adjustment, or personal difficulty.
+Academic Stress / Burnout Support
+A student seeks help managing excessive stress or exhaustion.
+Homesickness / Adjustment Difficulty
+A student struggles to adjust to living or studying away from home.
+Grief / Personal Crisis Support
+A student needs compassionate support following a difficult life event.
+Counselling Confidentiality Concern
+A student is concerned that private support information may not remain confidential.
+Well-Being Awareness Request
+Students request workshops or resources on stress management and well-being.
+
+Health, Hygiene & Personal Safety
+Problem / Issue
+Description
+Menstrual Hygiene Facility Issue
+Sanitary products, disposal bins, or related facilities are unavailable or poorly maintained.
+Accessible Toilet / Rest Space Issue
+A student needs an accessible toilet or suitable rest space.
+Heat / Cold Exposure Concern
+Campus conditions create discomfort or potential health risk.
+Food / Water Safety Concern
+A possible food or drinking-water safety issue needs review.
+Infectious Illness Prevention Concern
+A student reports a concern about hygiene, sanitation, or illness-prevention measures.
+
+10. SOCIAL LIFE, STUDENT COMMUNITY & INCLUSION
+Concerns about peer interactions, inclusion, clubs, events, student representation, and community life.
+Behaviour, Respect & Interpersonal Conflict
+Problem / Issue
+Description
+Bullying / Intimidation
+A student reports repeated bullying, intimidation, or hostile behaviour.
+Harassment / Unwanted Conduct
+A student reports unwanted conduct and needs a safe reporting route.
+Discrimination / Unequal Treatment
+A student reports unfair treatment linked to a personal characteristic or background.
+Roommate / Peer Conflict
+A disagreement between students affects comfort, study, or daily life.
+Group Project Conflict
+Unequal contribution, communication, or conflict affects a student project.
+Ragging / Hazing Concern
+A student reports coercive, humiliating, or threatening initiation behaviour.
+Online Harassment / Cyberbullying
+Abusive or threatening behaviour occurs through digital channels.
+Retaliation Fear After Reporting
+A student fears negative consequences for raising a concern.
+Inappropriate Public Behaviour
+Conduct in a shared campus space disrupts others or causes concern.
+
+Belonging, Inclusion & Accessibility
+Problem / Issue
+Description
+New Student Orientation Gap
+A new student lacks information needed to navigate campus life.
+International / Out-of-State Student Support
+A student needs help understanding campus services or local arrangements.
+Accessibility Accommodation Request
+A student requests an accessible arrangement for campus participation.
+Language / Communication Barrier
+Communication barriers prevent a student from accessing information or services.
+Cultural / Community Inclusion Concern
+A student reports exclusion from campus activities or community spaces.
+Unequal Access to Student Opportunities
+Access to clubs, activities, or opportunities appears unfair or unclear.
+Gender-Sensitive Facility Concern
+A student raises a concern about safety, privacy, or access to facilities.
+Peer Mentoring / Support Request
+Students request a peer-support or mentoring arrangement.
+
+Clubs, Events & Student Activities
+Problem / Issue
+Description
+Club Registration / Recognition Delay
+A student group is waiting for approval or clear registration instructions.
+Event Permission Delay
+An event proposal or required permission is not processed on time.
+Venue / Equipment Booking Conflict
+A club or student group cannot access an approved venue or equipment.
+Event Information Not Communicated
+Event timing, venue, eligibility, or changes are not clearly shared.
+Unequal Club Participation Opportunity
+Students report unclear or unfair selection for club activities.
+Student Election / Representation Concern
+A concern arises about student representation or election procedures.
+Cultural / Sports Event Accessibility
+An event is difficult to access or participate in because of arrangements.
+Volunteer / Event Duty Conflict
+Assigned duties conflict with classes or other approved responsibilities.
+
+11. SAFETY, SECURITY & EMERGENCY RESPONSE
+Safety incidents, security concerns, emergency equipment, and preparedness issues.
+Personal Safety & Campus Security
+Problem / Issue
+Description
+Unauthorized Person on Campus
+An unknown or unauthorized person is reported in a restricted area.
+Theft / Lost Property
+A student reports a theft or needs help locating lost property.
+Unsafe Campus Area
+A location feels unsafe due to lighting, access, visibility, or other conditions.
+Security Staff Response Concern
+A security concern was not handled promptly or appropriately.
+Gate / ID Check Issue
+Campus entry procedures or ID checks cause a legitimate access problem.
+Vehicle Safety / Traffic Concern
+Unsafe driving, speeding, or traffic behaviour creates a risk.
+Stalking / Threat Concern
+A student reports being followed, threatened, or made to feel unsafe.
+Emergency Contact Information Missing
+Students cannot easily find current emergency contact details.
+
+Emergency Preparedness
+Problem / Issue
+Description
+Fire Drill / Evacuation Information Missing
+Students need clear evacuation instructions or drill information.
+Emergency Alarm Not Working
+An alarm or alert system appears faulty.
+Blocked Emergency Route
+An exit, staircase, or evacuation route is blocked.
+Severe Weather Response Concern
+Instructions or facilities for severe weather are unclear or insufficient.
+Incident Reporting Procedure Unclear
+Students do not know how to report an urgent safety incident.
+Emergency Transport Access Issue
+Access for emergency vehicles is obstructed or unclear.
+
+12. ADMINISTRATION, FINANCE & STUDENT SERVICES
+Issues with student records, fees, documents, administrative processes, transport, and service desks.
+Student Records & Documentation
+Problem / Issue
+Description
+Student ID Card Delay / Error
+An ID card is delayed, incorrect, lost, or not functioning.
+Certificate / Transcript Delay
+An official certificate, transcript, or document is delayed.
+Name / Personal Details Correction
+A student record contains incorrect personal details.
+Bonafide / Enrollment Letter Delay
+A requested enrollment or bonafide document is not issued on time.
+Scholarship / Financial Aid Information Gap
+A student needs clear information about eligibility, status, or deadlines.
+Hostel / Course / Section Record Error
+An official record shows an incorrect room, course, or section.
+Document Submission Portal Issue
+A required document cannot be uploaded or is not acknowledged.
+
+Fees, Payments & Refunds
+Problem / Issue
+Description
+Fee Payment Not Reflected
+A completed payment is not shown in the student account.
+Incorrect Fee / Penalty
+A fee, penalty, or charge appears incorrect and needs review.
+Refund Delay
+An approved refund is not processed within the communicated timeframe.
+Payment Receipt Missing
+A receipt or confirmation for a payment is unavailable.
+Scholarship Disbursement Delay
+An approved scholarship or aid payment appears delayed.
+Financial Hardship Support Inquiry
+A student seeks information about available financial assistance.
+
+Communication & Service Desk
+Problem / Issue
+Description
+Office Counter Closed / Unavailable
+An office is unavailable during its published service hours.
+Query Not Answered
+A request sent to an administrative office remains unanswered.
+Conflicting Official Information
+Different offices or channels provide inconsistent instructions.
+Unclear Process / Required Documents
+Steps, eligibility, or required documents for a process are unclear.
+Long Queue / Appointment Issue
+Waiting times or appointment arrangements make a service difficult to access.
+Complaint Transferred Without Update
+A complaint is reassigned but the student receives no status update.
+No Status Tracking
+A student cannot see the progress or owner of an administrative request.
+Staff Behaviour / Service Concern
+A student requests review of an administrative service interaction.
+
+Transport, Parking & Access
+Problem / Issue
+Description
+Campus Shuttle / Bus Delay
+Campus transport is late, unavailable, or not following the published schedule.
+Transport Route / Timing Issue
+A route or timetable does not meet communicated student needs.
+Bus Overcrowding / Safety
+Transport is overcrowded or presents a safety concern.
+Parking Permit / Allocation Issue
+Parking permissions or allocations are unclear or incorrect.
+Accessible Transport Request
+A student needs an accessible transport arrangement.
+Campus Gate Access for Approved Visitors
+An approved visitor or service provider faces an access issue.
+
+13. FACULTY, STAFF & PROFESSIONAL CONDUCT
+Concerns about professional interactions, communication, availability, and service delivery.
+Communication & Professional Interaction
+Problem / Issue
+Description
+Inappropriate / Disrespectful Conduct
+A student reports a professional interaction that needs review.
+Unclear Academic or Administrative Instructions
+Instructions from staff are incomplete, conflicting, or difficult to follow.
+Repeated Unanswered Student Requests
+Multiple attempts to contact the relevant staff member receive no response.
+Unfair Treatment Concern
+A student believes a decision or interaction was inconsistent or unfair.
+Confidentiality Concern
+A student's personal or academic information may have been shared inappropriately.
+Conflict of Interest Concern
+A student wants an appropriate office to review a possible conflict of interest.
+
+Availability & Service Delivery
+Problem / Issue
+Description
+Office Hours Not Followed
+Published office hours are not followed or are not communicated.
+Delayed Approval / Signature
+An approval, signature, or routine decision is delayed.
+Poor Coordination Between Departments
+A request stalls because departments do not coordinate clearly.
+Staff Training / Service Quality Request
+A recurring service issue suggests a need for guidance or training.
+Repeated Failure to Resolve an Issue
+The same concern recurs despite previous reports or assurances.
+
+14. SPORTS, FITNESS & RECREATION
+Issues with sports grounds, equipment, gym facilities, bookings, coaching, and participation.
+Sports Facilities & Equipment
+Problem / Issue
+Description
+Damaged Sports Equipment
+Sports equipment is broken, unsafe, or unavailable.
+Court / Ground Booking Conflict
+Two groups are assigned the same space or an approved booking is not honoured.
+Poor Ground / Court Surface
+The playing surface is uneven, damaged, slippery, or poorly maintained.
+Gym Equipment Breakdown
+Gym equipment is faulty or unsafe to use.
+Gym Cleanliness / Hygiene Issue
+Fitness equipment or shared areas need cleaning.
+Changing Room / Shower Issue
+Changing rooms or showers are dirty, damaged, or unavailable.
+Insufficient Sports Equipment
+Students cannot access enough equipment for scheduled activities.
+Sports Facility Opening Hours Issue
+Facility access does not match published or approved hours.
+
+Participation & Scheduling
+Problem / Issue
+Description
+Sports Trial / Selection Process Concern
+Selection criteria or communication needs clarification.
+Practice Slot Conflict
+Practice timings conflict with classes or other approved activities.
+Coach / Instructor Availability
+Expected coaching or instruction is unavailable.
+Tournament / Team Registration Issue
+A team or student cannot complete registration or receive confirmation.
+Sports Event Information Missing
+Schedules, rules, venues, or eligibility are not communicated clearly.
+
+15. FINANCIAL, ACCESSIBILITY & STUDENT SUPPORT
+Requests related to essential support, affordability, accessibility, and reasonable adjustments.
+Financial and Essential Support
+Problem / Issue
+Description
+Emergency Financial Support Inquiry
+A student needs information about urgent assistance or available support.
+Meal Support / Food Insecurity Concern
+A student needs guidance about available meal assistance or essential support.
+Essential Supplies Access Issue
+A student has difficulty accessing required basic supplies or services.
+Affordable Service Concern
+A campus service cost or charge needs clarification or review.
+
+Accessibility & Reasonable Adjustments
+Problem / Issue
+Description
+Accessible Classroom Allocation
+A student needs a classroom that can be reached and used accessibly.
+Exam / Learning Adjustment Request
+A student requests an approved adjustment for a learning or assessment activity.
+Accessible Website / Portal Issue
+A digital service is difficult to use with assistive technology.
+Signage / Navigation Accessibility
+Directions or signs are not usable by students with access needs.
+Temporary Injury Support
+A temporary injury creates a need for practical campus adjustments.
+
+16. GENERAL, COMMON & OTHER ISSUES
+A catch-all for cross-department issues, suggestions, policy questions, missing categories, and complaint-tracking problems.
+General Service Problems
+Problem / Issue
+Description
+Issue Not Listed
+The student's problem does not match any available category; staff can review and classify it.
+Multiple Departments Involved
+A problem requires coordination between two or more departments.
+Repeated / Recurring Issue
+The same issue continues after being marked resolved.
+Incorrect Complaint Category
+A submitted issue needs reassignment to the correct category.
+No Acknowledgement After Submission
+The student receives no confirmation after filing a report.
+No Progress Update
+The student cannot see updates while a report is being handled.
+Complaint Marked Resolved Prematurely
+A report is marked resolved before the student confirms or the issue is fixed.
+Unclear Responsibility / Department
+It is unclear which office or team owns the problem.
+Suggestion / Improvement Request
+A student proposes an improvement that is not necessarily a fault or complaint.
+Policy / Rule Clarification
+A student needs an explanation of a campus rule, policy, or procedure.
+Service Unavailable During Published Hours
+A campus service is unavailable when it should be operating.
+Other Common Campus Concern
+Any other campus-related issue that does not fit existing categories.
+
+Communication, Notices & Transparency
+Problem / Issue
+Description
+Notice Board Information Outdated
+A physical or digital notice board contains outdated information.
+Important Notice Not Shared
+An important deadline, rule, or change was not communicated clearly.
+Unclear Complaint Escalation Path
+Students do not know how to escalate an unresolved issue.
+No Estimated Resolution Time
+The expected timeline for handling a report is not communicated.
+Lack of Anonymous Reporting Option
+A student needs guidance on whether confidential or anonymous reporting is available.
+Feedback on Campus Policy
+A student wishes to provide structured feedback on a policy or procedure.
+
+Implementation Notes for the Website
+Keep category and location separate. For example, “Building Maintenance” is a category, while “Academic Block / Hostel Block / Mess / Library / Sports Ground” is the location.
+Avoid duplicate reports where possible. When a student submits a report, the system can suggest similar open reports for the same issue and location.
+Use clear statuses. Suggested statuses: Submitted, Under Review, Assigned, In Progress, Awaiting Student, Resolved, Reopened, and Closed.
+Add urgency carefully. Suggested levels: Low, Normal, High, and Emergency. Emergency reports should display official campus emergency contacts and follow the college's actual response process.
+Protect sensitive reports. Health, emotional well-being, harassment, discrimination, safety, and staff-conduct reports should have restricted access and not be visible on a public feed.
+Let students add details. The catalogue should not replace a student's own description. Allow a custom description and “Other / Issue Not Listed” in every main category.
+Track accountability. Each report should have a unique ID, submission date, assigned department/person, status history, updates, and a resolution note.
+Use campus-approved terminology. Before launch, review the categories with hostel, mess, laundry, academic, facilities, IT, security, student-support, and administration teams.
