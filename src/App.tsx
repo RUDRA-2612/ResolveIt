@@ -270,7 +270,10 @@ export default function App() {
       setCurrentView(targetView);
     };
 
-    if (!window.history.state) {
+    if (!localStorage.getItem('resolveit_role')) {
+      window.history.replaceState({ view: 'dashboard' }, '', '/dashboard');
+      resolveView('dashboard');
+    } else if (!window.history.state) {
       const params = new URLSearchParams(window.location.search);
       const idFromUrl = params.get('id');
       const path = window.location.pathname.replace(/^\//, '') || 'dashboard';
@@ -300,6 +303,15 @@ export default function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
   
+  const handleLogout = () => {
+    localStorage.removeItem('resolveit_role');
+    setUserRole(null);
+    setHasSelectedRole(false);
+    setUserMenuOpen(false);
+    setSelectedIssue(null);
+    navigateTo('dashboard');
+  };
+
   const submitComment = () => {
     if(!newComment.trim()) return;
     const commentObj = {
@@ -376,6 +388,7 @@ export default function App() {
                   localStorage.setItem('resolveit_role', 'student');
                   setUserRole('student'); 
                   setHasSelectedRole(true); 
+                  navigateTo('dashboard');
                 }}
                 className="flex flex-col items-center justify-center p-6 border-2 border-slate-100 rounded-2xl hover:border-teal-500 hover:bg-teal-50 transition-all group"
               >
@@ -390,6 +403,7 @@ export default function App() {
                   localStorage.setItem('resolveit_role', 'authority');
                   setUserRole('authority'); 
                   setHasSelectedRole(true); 
+                  navigateTo('dashboard');
                   
                   // Notify authority of new unsolved problems
                   const newIssues = issues.filter(i => i.status === 'Not Started');
@@ -586,7 +600,7 @@ export default function App() {
                   <AlertCircle size={16} /> Report
                 </button>
                 <div className="h-px bg-slate-200 my-1"></div>
-                <button onClick={() => { localStorage.removeItem('resolveit_role'); window.location.reload(); }} className="w-full text-left px-3 py-2 flex items-center gap-3 hover:bg-red-50 text-red-600 rounded-lg text-sm font-medium">
+                <button onClick={handleLogout} className="w-full text-left px-3 py-2 flex items-center gap-3 hover:bg-red-50 text-red-600 rounded-lg text-sm font-medium">
                   <LogOut size={16} /> Log Out
                 </button>
               </div>
