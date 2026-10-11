@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { Menu, Search, Bell, PlusCircle, CheckCircle, ArrowUp, Clock, AlertCircle, Loader2, X, User, LogOut, MessageSquare, Camera, ShieldCheck, ThumbsUp, ChevronDown, Filter } from 'lucide-react';
-import { ISSUE_DATA, DEPARTMENT_BUILDINGS } from './taxonomy';
+import { Menu, Search, Bell, PlusCircle, CheckCircle, ArrowUp, Clock, AlertCircle, X, User, LogOut, MessageSquare, Camera, ShieldCheck, ThumbsUp, ChevronDown, Filter, Check, AlertTriangle, ArrowRight, Zap, RefreshCw, Send, CheckCheck, Heart } from 'lucide-react';
+import { ISSUE_DATA, DEPARTMENT_BUILDINGS, DEPARTMENT_LEVELS } from './taxonomy';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -137,8 +137,24 @@ export default function App() {
   const [userRole, setUserRole] = useState<string | null>(localStorage.getItem('resolveit_role'));
   const [hasSelectedRole, setHasSelectedRole] = useState(!!localStorage.getItem('resolveit_role'));
   const [selectedAuthorityDepartment, setSelectedAuthorityDepartment] = useState('All Departments');
+  const [selectedAuthorityLevel, setSelectedAuthorityLevel] = useState<'All' | '1' | '2' | '3' | '4'>('All');
+  const [selectedKpiFilter, setSelectedKpiFilter] = useState<'all' | 'overdue' | 'open' | 'escalated' | 'solved'>('all');
+  const [myTicketsTab, setMyTicketsTab] = useState<'reported' | 'upvoted' | 'resolved'>('reported');
+
+  // Authority & Modal Action States
+  const [postUpdateModalOpen, setPostUpdateModalOpen] = useState(false);
+  const [actionTicket, setActionTicket] = useState<any>(null);
+  const [postUpdateText, setPostUpdateText] = useState('');
+
+  const [escalateModalOpen, setEscalateModalOpen] = useState(false);
+  const [escalateTargetLevel, setEscalateTargetLevel] = useState<number>(2);
+  const [escalateReason, setEscalateReason] = useState('SLA Breached / Unresolved');
+  const [escalateNote, setEscalateNote] = useState('');
+
+  const [duplicateModalOpen, setDuplicateModalOpen] = useState(false);
+  const [matchedDuplicate, setMatchedDuplicate] = useState<any>(null);
   
-  const [issues, setIssues] = useState([
+  const [issues, setIssues] = useState<any[]>([
     {
       id: 'TKT-142',
       title: 'Mess food quality issue today',
@@ -153,7 +169,18 @@ export default function App() {
       specificIssue: 'Poor Food Hygiene',
       imageUrl: 'https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?auto=format&fit=crop&q=80&w=800',
       isLiked: false,
-      isMine: true
+      isMine: true,
+      currentLevel: 2,
+      assignedAuthority: 'Head Warden',
+      isEscalated: true,
+      escalatedFrom: 'L1: Warden',
+      escalationReason: 'Recurring quality complaints',
+      slaTimer: 'Solved in 18h',
+      isOverdue: false,
+      resolvedAt: 'Yesterday, 4:00 PM',
+      comments: [
+        { author: 'Head Warden (Official Update)', time: '1 day ago', text: 'Mess supervisor inspected the kitchen and food vendor was issued a penalty warning. New hygienic batch prepared.' }
+      ]
     },
     {
       id: 'TKT-134',
@@ -168,8 +195,16 @@ export default function App() {
       category: 'IT, Internet & Digital Services',
       specificIssue: 'Campus Wi-Fi Not Working',
       imageUrl: 'https://images.unsplash.com/photo-1621252179027-94459d278660?auto=format&fit=crop&q=80&w=800',
-      isLiked: false,
-      isMine: false
+      isLiked: true,
+      isMine: false,
+      currentLevel: 1,
+      assignedAuthority: 'Maintenance Supervisor',
+      isEscalated: false,
+      slaTimer: '2h remaining',
+      isOverdue: false,
+      comments: [
+        { author: 'Maintenance Supervisor', time: '2 hours ago', text: 'Network technician dispatched to inspect the LRC Floor 1 access points.' }
+      ]
     },
     {
       id: 'TKT-129',
@@ -185,7 +220,13 @@ export default function App() {
       specificIssue: 'AC / Cooler Issue',
       imageUrl: 'https://images.unsplash.com/photo-1558227691-41ea78d1f631?auto=format&fit=crop&q=80&w=800',
       isLiked: false,
-      isMine: true
+      isMine: true,
+      currentLevel: 1,
+      assignedAuthority: 'Warden',
+      isEscalated: false,
+      slaTimer: 'Overdue by 14h',
+      isOverdue: true,
+      comments: []
     },
     {
       id: 'TKT-128',
@@ -201,7 +242,13 @@ export default function App() {
       specificIssue: 'Projector Not Working',
       imageUrl: 'https://images.unsplash.com/photo-1585507851613-2df79612ba8a?auto=format&fit=crop&q=80&w=800',
       isLiked: false,
-      isMine: true
+      isMine: true,
+      currentLevel: 1,
+      assignedAuthority: 'Maintenance Supervisor',
+      isEscalated: false,
+      slaTimer: '5h remaining',
+      isOverdue: false,
+      comments: []
     }
   ]);
 
@@ -237,6 +284,13 @@ export default function App() {
   const navigateTo = (view: string) => {
     window.history.pushState({ view }, '', `/${view}`);
     setCurrentView(view);
+    if (view === 'authority-dashboard') {
+      setUserRole('authority');
+      localStorage.setItem('resolveit_role', 'authority');
+      setSelectedAuthorityDepartment('All Departments');
+      setSelectedAuthorityLevel('All');
+      setSelectedKpiFilter('all');
+    }
     if (view !== 'issue-details') {
       setSelectedIssue(null);
     }
@@ -253,10 +307,19 @@ export default function App() {
       let targetView = stateView;
       if (!targetView) {
         if (path === 'report') targetView = 'report';
-        else if (path === 'authority-dashboard') targetView = 'authority-dashboard';
+        else if (path === 'authority-dashboard') {
+          targetView = 'authority-dashboard';
+          setUserRole('authority');
+          localStorage.setItem('resolveit_role', 'authority');
+        }
         else if (path === 'recent-reported') targetView = 'recent-reported';
         else if (path.startsWith('issue') || idFromUrl) targetView = 'issue-details';
         else targetView = 'dashboard';
+      }
+
+      if (targetView === 'authority-dashboard') {
+        setUserRole('authority');
+        localStorage.setItem('resolveit_role', 'authority');
       }
 
       if (targetView === 'issue-details') {
@@ -293,6 +356,9 @@ export default function App() {
       setReportBugOpen(false);
       setCameraActive(false);
       setSearchOpen(false);
+      setPostUpdateModalOpen(false);
+      setEscalateModalOpen(false);
+      setDuplicateModalOpen(false);
 
       const stateView = e.state?.view;
       const stateIssueId = e.state?.issueId || new URLSearchParams(window.location.search).get('id');
@@ -302,6 +368,14 @@ export default function App() {
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
+
+  // Sync role automatically if currently on Authority Dashboard
+  useEffect(() => {
+    if (currentView === 'authority-dashboard' && userRole !== 'authority') {
+      setUserRole('authority');
+      localStorage.setItem('resolveit_role', 'authority');
+    }
+  }, [currentView, userRole]);
   
   const handleLogout = () => {
     localStorage.removeItem('resolveit_role');
@@ -312,10 +386,20 @@ export default function App() {
     navigateTo('dashboard');
   };
 
+  const getAuthorityTitle = (dept: string, level: number = 1): string => {
+    if (DEPARTMENT_LEVELS && DEPARTMENT_LEVELS[dept] && DEPARTMENT_LEVELS[dept][level]) {
+      return DEPARTMENT_LEVELS[dept][level];
+    }
+    if (level === 4) return "VC (Vice-Chancellor)";
+    if (level === 3) return "Department Head / Dean";
+    if (level === 2) return "Assistant In-Charge";
+    return "Department Representative";
+  };
+
   const submitComment = () => {
     if(!newComment.trim()) return;
     const commentObj = {
-      author: userRole === 'authority' ? 'Authority Representative' : 'Rudrapal (You)',
+      author: userRole === 'authority' ? 'Authority Representative' : 'Hritvika (You)',
       time: 'Just now',
       text: newComment
     };
@@ -348,27 +432,283 @@ export default function App() {
     setNewComment('');
     setIsCommenting(false);
   };
-  
-  const handleUpdateStatus = (newStatus: string) => {
-    if (!selectedIssue) return;
-    
-    let statusColor = 'amber';
-    if (newStatus === 'Solved') statusColor = 'emerald';
-    if (newStatus === 'In Progress') statusColor = 'blue';
-    if (newStatus === 'Not Started') statusColor = 'rose';
-    
-    const updatedIssue = {...selectedIssue, status: newStatus, statusColor};
-    setSelectedIssue(updatedIssue);
-    setIssues(prevIssues => prevIssues.map(i => i.id === updatedIssue.id ? updatedIssue : i));
-    
-    const newNotification = {
+
+  // Authority Action 1: Acknowledge Ticket
+  const handleAcknowledge = (ticketId: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setIssues(prevIssues => prevIssues.map(issue => {
+      if (issue.id === ticketId) {
+        const handlerTitle = getAuthorityTitle(issue.department, issue.currentLevel || 1);
+        const updateNote = {
+          author: handlerTitle,
+          time: 'Just now',
+          text: `Ticket acknowledged by ${handlerTitle}. Investigation and remediation have commenced.`
+        };
+        const updated = {
+          ...issue,
+          status: 'In Progress',
+          statusColor: 'blue',
+          comments: [...(issue.comments || []), updateNote]
+        };
+        if (selectedIssue && selectedIssue.id === ticketId) {
+          setSelectedIssue(updated);
+        }
+        return updated;
+      }
+      return issue;
+    }));
+
+    const notif = {
       id: Date.now(),
-      title: `Status Updated: ${updatedIssue.title}`,
-      message: `The authority changed the ticket status to "${newStatus}".`,
+      title: `Ticket Acknowledged`,
+      message: `Ticket #${ticketId} was acknowledged and moved to In Progress.`,
       time: 'Just now',
       unread: true
     };
-    setNotifications(prev => [newNotification, ...prev]);
+    setNotifications(prev => [notif, ...prev]);
+  };
+
+  // Authority Action 2: Open Post Update Modal
+  const handleOpenPostUpdate = (ticket: any, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setActionTicket(ticket);
+    setPostUpdateText('');
+    setPostUpdateModalOpen(true);
+    pushModalState();
+  };
+
+  const handlePostUpdateSubmit = () => {
+    if (!actionTicket || !postUpdateText.trim()) return;
+    const handlerTitle = getAuthorityTitle(actionTicket.department, actionTicket.currentLevel || 1);
+    const updateNote = {
+      author: `${handlerTitle} (Official Update)`,
+      time: 'Just now',
+      text: postUpdateText.trim()
+    };
+    
+    setIssues(prevIssues => prevIssues.map(issue => {
+      if (issue.id === actionTicket.id) {
+        const updated = {
+          ...issue,
+          comments: [...(issue.comments || []), updateNote]
+        };
+        if (selectedIssue && selectedIssue.id === actionTicket.id) {
+          setSelectedIssue(updated);
+        }
+        return updated;
+      }
+      return issue;
+    }));
+
+    const notif = {
+      id: Date.now(),
+      title: `Update Posted`,
+      message: `Progress update posted for ticket #${actionTicket.id}.`,
+      time: 'Just now',
+      unread: true
+    };
+    setNotifications(prev => [notif, ...prev]);
+
+    setPostUpdateModalOpen(false);
+    setActionTicket(null);
+    setPostUpdateText('');
+  };
+
+  // Authority Action 3: Open Escalate Modal
+  const handleOpenEscalate = (ticket: any, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setActionTicket(ticket);
+    const current = ticket.currentLevel || 1;
+    const nextLvl = Math.min(4, current + 1);
+    setEscalateTargetLevel(nextLvl);
+    setEscalateReason('');
+    setEscalateNote('');
+    setEscalateModalOpen(true);
+    pushModalState();
+  };
+
+  const handleEscalateSubmit = () => {
+    if (!actionTicket) return;
+    const prevLvl = actionTicket.currentLevel || 1;
+    const prevTitle = getAuthorityTitle(actionTicket.department, prevLvl);
+    const newTitle = getAuthorityTitle(actionTicket.department, escalateTargetLevel);
+    const finalReason = escalateReason.trim() || 'SLA Breached / Administrative Escalation';
+    
+    const escalateLog = {
+      author: 'Hierarchy Escalation Engine',
+      time: 'Just now',
+      text: `Level ${prevLvl} (${prevTitle}) was unable to resolve this issue within the SLA timeframe and escalated it to Level ${escalateTargetLevel} (${newTitle}). Reason: ${finalReason}${escalateNote ? ` - Note: "${escalateNote}"` : ''}. Responsibility is now actively transferred to ${newTitle}.`
+    };
+
+    setIssues(prevIssues => prevIssues.map(issue => {
+      if (issue.id === actionTicket.id) {
+        const updated = {
+          ...issue,
+          currentLevel: escalateTargetLevel,
+          assignedAuthority: newTitle,
+          isEscalated: true,
+          escalatedFrom: `L${prevLvl}: ${prevTitle}`,
+          escalationReason: finalReason,
+          comments: [...(issue.comments || []), escalateLog]
+        };
+        if (selectedIssue && selectedIssue.id === actionTicket.id) {
+          setSelectedIssue(updated);
+        }
+        return updated;
+      }
+      return issue;
+    }));
+
+    const notif = {
+      id: Date.now(),
+      title: `Ticket Escalated to Level ${escalateTargetLevel}`,
+      message: `Ticket #${actionTicket.id} escalated to Level ${escalateTargetLevel} (${newTitle}).`,
+      time: 'Just now',
+      unread: true
+    };
+    setNotifications(prev => [notif, ...prev]);
+
+    setEscalateModalOpen(false);
+    setActionTicket(null);
+  };
+
+  // Authority Action 4: One-Click Solve
+  const handleOneClickSolve = (ticketId: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setIssues(prevIssues => prevIssues.map(issue => {
+      if (issue.id === ticketId) {
+        const handlerTitle = getAuthorityTitle(issue.department, issue.currentLevel || 1);
+        const resolvedLog = {
+          author: `${handlerTitle} (Resolution)`,
+          time: 'Just now',
+          text: `Ticket marked as Solved and verified by ${handlerTitle}.`
+        };
+        const updated = {
+          ...issue,
+          status: 'Solved',
+          statusColor: 'emerald',
+          isOverdue: false,
+          slaTimer: 'Solved',
+          resolvedAt: 'Just now',
+          comments: [...(issue.comments || []), resolvedLog]
+        };
+        if (selectedIssue && selectedIssue.id === ticketId) {
+          setSelectedIssue(updated);
+        }
+        return updated;
+      }
+      return issue;
+    }));
+
+    const notif = {
+      id: Date.now(),
+      title: `Ticket Solved`,
+      message: `Ticket #${ticketId} was resolved successfully.`,
+      time: 'Just now',
+      unread: true
+    };
+    setNotifications(prev => [notif, ...prev]);
+  };
+
+  // Duplicate Check and Submission Engine
+  const handleCheckDuplicateAndSubmit = () => {
+    const effectiveDept = department || 'Campus Infrastructure & IT';
+
+    // Duplicate detection criteria:
+    // Any existing issue in same department matching specificIssue OR category & building OR matching title
+    const duplicate = issues.find(i => 
+      i.department === effectiveDept &&
+      (
+        (specificIssue && i.specificIssue === specificIssue) ||
+        (category && i.category === category && building && i.location.toLowerCase().includes(building.toLowerCase())) ||
+        (issueTitle.trim().length > 3 && i.title.toLowerCase().includes(issueTitle.trim().toLowerCase()))
+      )
+    );
+
+    if (duplicate) {
+      setMatchedDuplicate(duplicate);
+      setDuplicateModalOpen(true);
+      pushModalState();
+    } else {
+      executeSubmitTicket();
+    }
+  };
+
+  const handleUpvoteDuplicateAndOpen = () => {
+    if (!matchedDuplicate) return;
+    const dupId = matchedDuplicate.id;
+    setIssues(prevIssues => prevIssues.map(issue => {
+      if (issue.id === dupId) {
+        return {
+          ...issue,
+          upvotes: issue.isLiked ? issue.upvotes : issue.upvotes + 1,
+          isLiked: true
+        };
+      }
+      return issue;
+    }));
+    
+    setDuplicateModalOpen(false);
+    const target = issues.find(i => i.id === dupId) || matchedDuplicate;
+    openIssueDetails({ ...target, isLiked: true, upvotes: target.isLiked ? target.upvotes : target.upvotes + 1 });
+  };
+
+  const executeSubmitTicket = () => {
+    const effectiveDept = department || 'Campus Infrastructure & IT';
+    const effectiveTitle = issueTitle.trim() || specificIssue || 'Campus grievance report';
+    const effectiveLocation = building ? (exactLocation ? `${building} - ${exactLocation}` : building) : (exactLocation || 'Campus premises');
+    const newId = `TKT-${143 + issues.length}`;
+
+    const newTicket = {
+      id: newId,
+      title: effectiveTitle,
+      location: effectiveLocation,
+      description: detailedDescription.trim() || `Reported issue regarding ${specificIssue || category || 'campus facilities'}.`,
+      upvotes: 1,
+      status: 'Not Started',
+      statusColor: 'rose',
+      time: 'Just now',
+      department: effectiveDept,
+      category: category || 'General / Other Issues',
+      specificIssue: specificIssue || 'General Issue',
+      imageUrl: capturedImage || undefined,
+      isLiked: true,
+      isMine: true,
+      currentLevel: 1,
+      assignedAuthority: getAuthorityTitle(effectiveDept, 1),
+      isEscalated: false,
+      slaTimer: '24h remaining',
+      isOverdue: false,
+      comments: []
+    };
+
+    setIssues(prev => [newTicket, ...prev]);
+
+    // reset form
+    setDepartment('');
+    setCategory('');
+    setSpecificIssue('');
+    setBuilding('');
+    setIssueTitle('');
+    setExactLocation('');
+    setDetailedDescription('');
+    setIncidentDate('');
+    setIsConfidential(false);
+    setCapturedImage(null);
+    setPhotoTaken(false);
+    setDuplicateModalOpen(false);
+
+    // Notify authority of new ticket
+    const newNotif = {
+      id: Date.now(),
+      title: `New Ticket Submitted: #${newId}`,
+      message: `"${effectiveTitle}" in ${effectiveDept} is now queued for Level 1 action.`,
+      time: 'Just now',
+      unread: true
+    };
+    setNotifications(prev => [newNotif, ...prev]);
+
+    navigateTo('dashboard');
   };
   
   return (
@@ -388,6 +728,9 @@ export default function App() {
                   localStorage.setItem('resolveit_role', 'student');
                   setUserRole('student'); 
                   setHasSelectedRole(true); 
+                  setSelectedAuthorityDepartment('All Departments');
+                  setSelectedAuthorityLevel('All');
+                  setSelectedKpiFilter('all');
                   navigateTo('dashboard');
                 }}
                 className="flex flex-col items-center justify-center p-6 border-2 border-slate-100 rounded-2xl hover:border-teal-500 hover:bg-teal-50 transition-all group"
@@ -403,6 +746,9 @@ export default function App() {
                   localStorage.setItem('resolveit_role', 'authority');
                   setUserRole('authority'); 
                   setHasSelectedRole(true); 
+                  setSelectedAuthorityDepartment('All Departments');
+                  setSelectedAuthorityLevel('All');
+                  setSelectedKpiFilter('all');
                   navigateTo('dashboard');
                   
                   // Notify authority of new unsolved problems
@@ -442,23 +788,37 @@ export default function App() {
             <button onClick={() => setProfileOpen(false)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
               <X size={20} />
             </button>
-            <h3 className="text-xl font-bold text-teal-800 mb-6 border-b pb-2">Student Profile</h3>
+            <h3 className="text-xl font-bold text-teal-800 mb-6 border-b pb-2">
+              {userRole === 'authority' ? 'Authority Profile' : 'Student Profile'}
+            </h3>
             <div className="space-y-4">
               <div>
                 <p className="text-xs text-slate-400 font-bold tracking-wider mb-1">FULL NAME</p>
-                <p className="font-semibold text-slate-700">Rudrapal Singh Shekhawat</p>
+                <p className="font-semibold text-slate-700">
+                  {userRole === 'authority' ? 'Authority Representative' : 'Hritvika Vashistha'}
+                </p>
               </div>
               <div>
-                <p className="text-xs text-slate-400 font-bold tracking-wider mb-1">ROLL NUMBER</p>
-                <p className="font-semibold text-slate-700">2025btech105</p>
+                <p className="text-xs text-slate-400 font-bold tracking-wider mb-1">
+                  {userRole === 'authority' ? 'DEPARTMENT' : 'ROLL NUMBER'}
+                </p>
+                <p className="font-semibold text-slate-700">
+                  {userRole === 'authority' ? 'Campus Administration' : '2025BTECH259'}
+                </p>
               </div>
               <div>
-                <p className="text-xs text-slate-400 font-bold tracking-wider mb-1">COURSE</p>
-                <p className="font-semibold text-slate-700"><span className="text-sm">B.Tech</span> CSE (2nd Year)</p>
+                <p className="text-xs text-slate-400 font-bold tracking-wider mb-1">
+                  {userRole === 'authority' ? 'AUTHORITY LEVEL' : 'COURSE'}
+                </p>
+                <p className="font-semibold text-slate-700">
+                  {userRole === 'authority' ? 'Designated Authority (Multi-Level)' : 'B.Tech CSE Core'}
+                </p>
               </div>
               <div>
-                <p className="text-xs text-slate-400 font-bold tracking-wider mb-1">EMAIL ID</p>
-                <p className="font-semibold text-slate-700">rudrapalsinghshekhawat@jklu.edu.in</p>
+                <p className="text-xs text-slate-400 font-bold tracking-wider mb-1">EMAIL ID / LOGIN ID</p>
+                <p className="font-semibold text-slate-700">
+                  {userRole === 'authority' ? 'authority@jklu.edu.in' : 'hritvikavashistha@jklu.edu.in'}
+                </p>
               </div>
             </div>
           </div>
@@ -506,6 +866,7 @@ export default function App() {
           <button onClick={() => { navigateTo('dashboard'); setSidebarOpen(false); }} className={`p-3 font-medium rounded-lg text-left transition-colors ${currentView === 'dashboard' ? 'bg-teal-50 text-teal-700' : 'text-slate-600 hover:bg-teal-50 hover:text-teal-700'}`}>Home</button>
           <div className="h-px bg-teal-100/60 my-1 mx-2"></div>
           <button onClick={() => { navigateTo('recent-reported'); setSidebarOpen(false); }} className={`p-3 font-medium rounded-lg text-left transition-colors ${currentView === 'recent-reported' ? 'bg-teal-50 text-teal-700' : 'text-slate-600 hover:bg-teal-50 hover:text-teal-700'}`}>My Tickets</button>
+          <button onClick={() => { navigateTo('authority-dashboard'); setSidebarOpen(false); }} className={`p-3 font-medium rounded-lg text-left transition-colors ${currentView === 'authority-dashboard' ? 'bg-teal-50 text-teal-700' : 'text-slate-600 hover:bg-teal-50 hover:text-teal-700'}`}>Authority Workspace</button>
         </div>
       </div>
 
@@ -528,9 +889,26 @@ export default function App() {
             <span className="text-white font-bold text-xl tracking-tight flex items-center gap-2">
               Resolvelt
               {userRole && (
-                <span className="hidden sm:flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-white/20 text-white border border-white/10 uppercase tracking-wider">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const nextRole = userRole === 'authority' ? 'student' : 'authority';
+                    setUserRole(nextRole);
+                    localStorage.setItem('resolveit_role', nextRole);
+                    if (nextRole === 'authority') {
+                      navigateTo('authority-dashboard');
+                    } else {
+                      navigateTo('dashboard');
+                    }
+                  }}
+                  title="Click to toggle between Student and Authority"
+                  className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-white/20 hover:bg-white/30 text-white border border-white/20 uppercase tracking-wider transition-colors cursor-pointer"
+                >
+                  <span className={`w-1.5 h-1.5 rounded-full ${userRole === 'authority' ? 'bg-amber-400' : 'bg-emerald-400'}`}></span>
                   {userRole}
-                </span>
+                  <RefreshCw size={10} className="opacity-75" />
+                </button>
               )}
             </span>
           </div>
@@ -556,7 +934,7 @@ export default function App() {
           </button>
 
           <button onClick={() => { if(!userMenuOpen) pushModalState(); setUserMenuOpen(true); setNotificationsOpen(false); setSearchOpen(false); }} className="w-9 h-9 rounded-full bg-teal-700 flex items-center justify-center font-bold text-sm border-2 border-teal-600 hover:bg-teal-600 transition-colors">
-            RS
+            {userRole === 'authority' ? 'AO' : 'HV'}
           </button>
 
           {/* Notifications Dropdown */}
@@ -587,9 +965,32 @@ export default function App() {
           {userMenuOpen && (
             <div className="absolute top-12 right-0 w-64 bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden smooth-enter-up">
               <div className="p-4 border-b">
-                <p className="font-bold text-slate-800">Rudrapal Singh Shekhawat</p>
+                <p className="font-bold text-slate-800">{userRole === 'authority' ? 'Authority Representative' : 'Hritvika Vashistha'}</p>
+                <p className="text-xs text-slate-500">{userRole === 'authority' ? 'authority@jklu.edu.in' : 'hritvikavashistha@jklu.edu.in'}</p>
               </div>
               <div className="p-2 text-slate-700">
+                <button 
+                  onClick={() => { 
+                    const nextRole = userRole === 'authority' ? 'student' : 'authority';
+                    setUserRole(nextRole); 
+                    localStorage.setItem('resolveit_role', nextRole);
+                    setUserMenuOpen(false);
+                    if (nextRole === 'authority') {
+                      navigateTo('authority-dashboard');
+                    } else {
+                      navigateTo('dashboard');
+                    }
+                  }} 
+                  className="w-full text-left px-3 py-2 flex items-center justify-between hover:bg-teal-50 hover:text-teal-700 transition-colors rounded-lg text-sm font-medium"
+                >
+                  <span className="flex items-center gap-2.5">
+                    <RefreshCw size={15} /> Switch Role
+                  </span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700 uppercase">
+                    {userRole === 'authority' ? 'To Student' : 'To Authority'}
+                  </span>
+                </button>
+                <div className="h-px bg-slate-200 my-1"></div>
                 <button onClick={() => { pushModalState(); setProfileOpen(true); setUserMenuOpen(false); }} className="w-full text-left px-3 py-2 flex items-center gap-3 hover:bg-teal-50 hover:text-teal-700 transition-colors rounded-lg text-sm font-medium">
                   <User size={16} /> Profile
                 </button>
@@ -611,8 +1012,38 @@ export default function App() {
 
       {/* View Rendering */}
       {currentView === 'dashboard' ? (
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-20 smooth-enter">
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-20 smooth-enter">
           
+          {/* Welcome Greeting Banner (Lightish Teal Aesthetic Theme) */}
+          <div className="max-w-4xl mx-auto mb-8 bg-gradient-to-r from-teal-50 via-[#e0f5f2] to-teal-50/80 rounded-3xl p-6 sm:p-7 text-slate-800 shadow-sm border border-teal-200/90 relative overflow-hidden backdrop-blur-xs">
+            <div className="absolute -right-8 -top-8 w-48 h-48 bg-teal-200/30 rounded-full blur-3xl pointer-events-none"></div>
+            <div className="absolute right-1/4 -bottom-10 w-40 h-40 bg-emerald-100/40 rounded-full blur-2xl pointer-events-none"></div>
+            <div className="flex items-center gap-4 sm:gap-5 relative z-10">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-teal-500 to-teal-600 text-white flex items-center justify-center font-extrabold text-xl shadow-md shadow-teal-500/20 ring-4 ring-white/90 shrink-0">
+                {userRole === 'authority' ? 'AO' : 'HV'}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className="text-[11px] font-bold uppercase tracking-wider px-3 py-0.5 rounded-full bg-white/90 text-teal-800 border border-teal-200/90 shadow-2xs">
+                    {userRole === 'authority' ? 'Official Authority Portal' : 'Student Portal'}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 text-xs text-teal-900/75 font-semibold bg-white/60 px-2.5 py-0.5 rounded-full border border-teal-200/60">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    Campus Live
+                  </span>
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-800">
+                  Welcome, {userRole === 'authority' ? 'Authority Representative' : 'Hritvika'}
+                </h2>
+                <p className="text-slate-600 text-sm mt-0.5 font-medium leading-relaxed max-w-2xl">
+                  {userRole === 'authority' 
+                    ? 'Review department queues, manage 4-level escalations, and meet resolution SLAs.'
+                    : 'Track your reported complaints or submit a new grievance below.'}
+                </p>
+              </div>
+            </div>
+          </div>
+
           <div className="text-center mb-10 max-w-3xl mx-auto">
             <p className="text-slate-500 font-medium mb-1">Welcome to</p>
             <h1 className="text-6xl md:text-7xl font-extrabold text-[#0d9488] tracking-tighter mb-2 logo-text">
@@ -790,139 +1221,494 @@ export default function App() {
           </div>
         </main>
       ) : currentView === 'authority-dashboard' ? (
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-20 smooth-enter">
-          <div className="flex items-center gap-3 mb-8">
-            <button onClick={() => { if (window.history.length > 1) window.history.back(); else navigateTo('dashboard'); }} className="text-teal-600 hover:text-teal-800 p-2 rounded-full hover:bg-teal-50 transition-colors">
-              &larr; Back
-            </button>
-            <h1 className="text-3xl font-bold text-slate-800">Authority Workspace</h1>
-          </div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-10">
-            {['All Departments', 'Hostel, Mess & Laundry', 'Campus Infrastructure & IT', 'Academics & Library', 'Health & Safety'].map(dept => {
-              const count = dept === 'All Departments' ? issues.length : issues.filter(i => i.department === dept).length;
-              
-              const departmentColors: Record<string, string> = {
-                'All Departments': 'from-slate-100 to-slate-200 text-slate-800 border-slate-300',
-                'Hostel, Mess & Laundry': 'from-blue-50 to-indigo-100 text-indigo-900 border-indigo-200',
-                'Campus Infrastructure & IT': 'from-teal-50 to-emerald-100 text-teal-900 border-teal-200',
-                'Academics & Library': 'from-purple-50 to-fuchsia-100 text-purple-900 border-purple-200',
-                'Health & Safety': 'from-rose-50 to-orange-100 text-rose-900 border-rose-200'
-              };
-              
-              const colorClass = departmentColors[dept] || 'from-sky-50 to-cyan-100 text-cyan-900 border-cyan-200';
-              const isSelected = selectedAuthorityDepartment === dept;
-              
-              return (
-                <div 
-                  key={dept} 
-                  onClick={() => setSelectedAuthorityDepartment(dept)}
-                  className={`relative p-5 rounded-2xl border bg-gradient-to-br cursor-pointer transition-all duration-300 transform ${colorClass} ${isSelected ? 'ring-2 ring-offset-2 ring-teal-500 scale-105 shadow-md z-10' : 'hover:scale-[1.02] hover:shadow-sm opacity-90'}`}
-                >
-                  {isSelected && <div className="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-teal-500 shadow-[0_0_8px_rgba(20,184,166,0.8)]"></div>}
-                  <h3 className="font-bold text-sm leading-tight mb-4 pr-4 h-10">{dept}</h3>
-                  <div className="flex items-end justify-between">
-                    <span className="text-4xl font-black opacity-80">{count}</span>
-                    <span className="text-[10px] font-bold uppercase tracking-wider opacity-60">Tickets</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-            <div className="bg-slate-50 border-b border-slate-200 px-6 py-5 flex items-center justify-between">
-              <h2 className="text-xl font-extrabold text-slate-800">
-                Issues: {selectedAuthorityDepartment}
-              </h2>
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-20 smooth-enter">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+            <div className="flex items-center gap-3">
+              <button onClick={() => { if (window.history.length > 1) window.history.back(); else navigateTo('dashboard'); }} className="text-teal-700 hover:text-teal-900 p-2 rounded-full hover:bg-teal-50 transition-colors border border-slate-200 bg-white shadow-sm">
+                &larr; Back
+              </button>
+              <div>
+                <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">Authority Workspace</h1>
+                <p className="text-slate-500 text-sm mt-0.5">Department Grievance Queue, 4-Level Escalations & Resolution</p>
+              </div>
             </div>
-            
-            <div className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                {issues
-                  .filter(i => selectedAuthorityDepartment === 'All Departments' || i.department === selectedAuthorityDepartment)
-                  .map(issue => (
-                  <Card key={issue.id} className="hover:border-teal-300 transition-colors cursor-pointer group flex flex-col h-full shadow-sm hover:shadow-md" onClick={() => openIssueDetails(issue)}>
-                    <CardHeader className="flex-none pb-3">
-                      <div className="flex justify-between items-start gap-4">
-                        <div>
-                          <CardTitle className="text-lg text-slate-800 group-hover:text-teal-700 transition-colors leading-tight mb-2">{issue.title}</CardTitle>
-                          <CardDescription className="flex flex-col gap-1.5 font-medium text-xs">
-                            <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></div> <span className="truncate">{issue.category}</span></span>
-                            <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></div> <span className="truncate">{issue.specificIssue}</span></span>
-                          </CardDescription>
-                        </div>
-                        <Badge variant="outline" className={`shrink-0 gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold border ${
-                          issue.statusColor === 'emerald' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 
-                          issue.statusColor === 'blue' ? 'bg-blue-50 text-blue-600 border-blue-200' : 
-                          issue.statusColor === 'amber' ? 'bg-amber-50 text-amber-600 border-amber-200' : 
-                          'bg-rose-50 text-rose-600 border-rose-200'
-                        }`}>
-                          {issue.status === 'Solved' && <CheckCircle size={12} />}
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-teal-50 text-teal-700 border border-teal-200">
+                <ShieldCheck size={14} /> Official Officer View
+              </span>
+            </div>
+          </div>
 
-                          {issue.status === 'Seen' && <CheckCircle size={12} className="opacity-70" />}
-                          {issue.status === 'Not Started' && <AlertCircle size={12} />}
-                          {issue.status}
-                        </Badge>
+          {/* Interactive KPI Quick-Filter Cards */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 mb-6">
+            {/* 1. Overdue SLA */}
+            <div 
+              onClick={() => setSelectedKpiFilter(prev => prev === 'overdue' ? 'all' : 'overdue')}
+              className={`p-4 rounded-2xl border transition-all cursor-pointer relative ${
+                selectedKpiFilter === 'overdue'
+                  ? 'bg-rose-50/90 border-rose-400 ring-2 ring-rose-400/50 shadow-sm'
+                  : 'bg-white border-slate-200 hover:border-rose-300 hover:shadow-xs'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[11px] font-bold text-rose-600 uppercase tracking-wider">Overdue SLA</p>
+                  <p className="text-2xl font-black text-rose-700 mt-0.5">
+                    {issues.filter(i => i.isOverdue && i.status !== 'Solved').length}
+                  </p>
+                  <p className="text-[10px] text-rose-500 mt-0.5">Requires Immediate Action</p>
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-rose-100/70 flex items-center justify-center text-rose-600 shrink-0">
+                  <AlertTriangle size={20} />
+                </div>
+              </div>
+              {selectedKpiFilter === 'overdue' && (
+                <span className="absolute -top-2 right-3 text-[10px] font-bold bg-rose-600 text-white px-2 py-0.5 rounded-full shadow-xs">
+                  Active Filter
+                </span>
+              )}
+            </div>
+
+            {/* 2. Open / In Progress */}
+            <div 
+              onClick={() => setSelectedKpiFilter(prev => prev === 'open' ? 'all' : 'open')}
+              className={`p-4 rounded-2xl border transition-all cursor-pointer relative ${
+                selectedKpiFilter === 'open'
+                  ? 'bg-blue-50/90 border-blue-400 ring-2 ring-blue-400/50 shadow-sm'
+                  : 'bg-white border-slate-200 hover:border-blue-300 hover:shadow-xs'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[11px] font-bold text-blue-600 uppercase tracking-wider">Open / In Progress</p>
+                  <p className="text-2xl font-black text-slate-800 mt-0.5">
+                    {issues.filter(i => i.status !== 'Solved').length}
+                  </p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">Active department tickets</p>
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-blue-100/70 flex items-center justify-center text-blue-600 shrink-0">
+                  <Clock size={20} />
+                </div>
+              </div>
+              {selectedKpiFilter === 'open' && (
+                <span className="absolute -top-2 right-3 text-[10px] font-bold bg-blue-600 text-white px-2 py-0.5 rounded-full shadow-xs">
+                  Active Filter
+                </span>
+              )}
+            </div>
+
+            {/* 3. Escalated In */}
+            <div 
+              onClick={() => setSelectedKpiFilter(prev => prev === 'escalated' ? 'all' : 'escalated')}
+              className={`p-4 rounded-2xl border transition-all cursor-pointer relative ${
+                selectedKpiFilter === 'escalated'
+                  ? 'bg-amber-50/90 border-amber-400 ring-2 ring-amber-400/50 shadow-sm'
+                  : 'bg-white border-slate-200 hover:border-amber-300 hover:shadow-xs'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[11px] font-bold text-amber-600 uppercase tracking-wider">Escalated In</p>
+                  <p className="text-2xl font-black text-amber-700 mt-0.5">
+                    {issues.filter(i => i.isEscalated && i.status !== 'Solved').length}
+                  </p>
+                  <p className="text-[10px] text-amber-600 mt-0.5">Handled at L2, L3 or L4</p>
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-amber-100/70 flex items-center justify-center text-amber-600 shrink-0">
+                  <Zap size={20} />
+                </div>
+              </div>
+              {selectedKpiFilter === 'escalated' && (
+                <span className="absolute -top-2 right-3 text-[10px] font-bold bg-amber-600 text-white px-2 py-0.5 rounded-full shadow-xs">
+                  Active Filter
+                </span>
+              )}
+            </div>
+
+            {/* 4. Solved Tickets */}
+            <div 
+              onClick={() => setSelectedKpiFilter(prev => prev === 'solved' ? 'all' : 'solved')}
+              className={`p-4 rounded-2xl border transition-all cursor-pointer relative ${
+                selectedKpiFilter === 'solved'
+                  ? 'bg-emerald-50/90 border-emerald-400 ring-2 ring-emerald-400/50 shadow-sm'
+                  : 'bg-white border-slate-200 hover:border-emerald-300 hover:shadow-xs'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[11px] font-bold text-emerald-600 uppercase tracking-wider">Solved Tickets</p>
+                  <p className="text-2xl font-black text-emerald-700 mt-0.5">
+                    {issues.filter(i => i.status === 'Solved').length}
+                  </p>
+                  <p className="text-[10px] text-emerald-600 mt-0.5">Resolution verified</p>
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-emerald-100/70 flex items-center justify-center text-emerald-600 shrink-0">
+                  <CheckCircle size={20} />
+                </div>
+              </div>
+              {selectedKpiFilter === 'solved' && (
+                <span className="absolute -top-2 right-3 text-[10px] font-bold bg-emerald-600 text-white px-2 py-0.5 rounded-full shadow-xs">
+                  Active Filter
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Unified Compact Filter Bar (Minimalist & De-cluttered) */}
+          <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200 shadow-sm mb-6 flex flex-col md:flex-row md:items-center justify-between gap-3.5">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 flex-1">
+              {/* Department Selector */}
+              <div className="w-full sm:w-64 shrink-0">
+                <CustomSelect
+                  value={selectedAuthorityDepartment}
+                  onChange={(val: string) => setSelectedAuthorityDepartment(val)}
+                  options={['All Departments', 'Hostel, Mess & Laundry', 'Campus Infrastructure & IT', 'Academics & Library', 'Student Life & Sports', 'Health, Well-being & Safety', 'Administration & Support']}
+                  placeholder="Select Department..."
+                />
+              </div>
+
+              {/* Hierarchy Level Pills */}
+              <div className="flex flex-wrap items-center gap-1 bg-slate-50 p-1 rounded-xl border border-slate-200/80">
+                {[
+                  { key: 'All', label: 'All Levels' },
+                  { key: '1', label: 'L1: Frontline' },
+                  { key: '2', label: 'L2: Mid-Level' },
+                  { key: '3', label: 'L3: Senior' },
+                  { key: '4', label: 'L4: VC' }
+                ].map(lvl => {
+                  const deptScoped = issues.filter(i => selectedAuthorityDepartment === 'All Departments' || i.department === selectedAuthorityDepartment);
+                  const count = lvl.key === 'All' ? deptScoped.length : deptScoped.filter(i => (i.currentLevel || 1) === parseInt(lvl.key)).length;
+                  const isSelected = selectedAuthorityLevel === lvl.key;
+                  return (
+                    <button
+                      key={lvl.key}
+                      onClick={() => setSelectedAuthorityLevel(lvl.key as any)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                        isSelected
+                          ? 'bg-white text-teal-800 shadow-xs border border-slate-200'
+                          : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                      }`}
+                    >
+                      {lvl.label}
+                      <span className="ml-1 text-[10px] opacity-75 font-semibold">({count})</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Filter Reset & Counter */}
+            <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0">
+              {(selectedAuthorityDepartment !== 'All Departments' || selectedAuthorityLevel !== 'All' || selectedKpiFilter !== 'all') && (
+                <button
+                  onClick={() => {
+                    setSelectedAuthorityDepartment('All Departments');
+                    setSelectedAuthorityLevel('All');
+                    setSelectedKpiFilter('all');
+                  }}
+                  className="text-xs font-bold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-xl border border-rose-200 transition-colors flex items-center gap-1"
+                >
+                  <X size={13} /> Clear Filters
+                </button>
+              )}
+              <span className="text-xs font-bold text-slate-500">
+                Showing {
+                  issues
+                    .filter(i => selectedAuthorityDepartment === 'All Departments' || i.department === selectedAuthorityDepartment)
+                    .filter(i => selectedAuthorityLevel === 'All' || (i.currentLevel || 1) === parseInt(selectedAuthorityLevel))
+                    .filter(i => {
+                      if (selectedKpiFilter === 'overdue') return i.isOverdue && i.status !== 'Solved';
+                      if (selectedKpiFilter === 'open') return i.status !== 'Solved';
+                      if (selectedKpiFilter === 'escalated') return i.isEscalated && i.status !== 'Solved';
+                      if (selectedKpiFilter === 'solved') return i.status === 'Solved';
+                      return true;
+                    })
+                    .length
+                } tickets
+              </span>
+            </div>
+          </div>
+
+          {/* Authority Queue Cards */}
+          <div className="space-y-4">
+            {issues
+              .filter(i => selectedAuthorityDepartment === 'All Departments' || i.department === selectedAuthorityDepartment)
+              .filter(i => selectedAuthorityLevel === 'All' || (i.currentLevel || 1) === parseInt(selectedAuthorityLevel))
+              .filter(i => {
+                if (selectedKpiFilter === 'overdue') return i.isOverdue && i.status !== 'Solved';
+                if (selectedKpiFilter === 'open') return i.status !== 'Solved';
+                if (selectedKpiFilter === 'escalated') return i.isEscalated && i.status !== 'Solved';
+                if (selectedKpiFilter === 'solved') return i.status === 'Solved';
+                return true;
+              })
+              .map(issue => {
+                const handlerTitle = issue.assignedAuthority || getAuthorityTitle(issue.department, issue.currentLevel || 1);
+                
+                return (
+                  <Card 
+                    key={issue.id} 
+                    onClick={() => openIssueDetails(issue)}
+                    className="hover:border-teal-400 hover:shadow-md transition-all bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden group cursor-pointer"
+                  >
+                    <CardHeader className="pb-3 pt-5 px-6">
+                      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2 mb-2">
+                            <span className="font-mono text-xs font-bold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-md">{issue.id}</span>
+                            
+                            {/* Hierarchy Level Badge */}
+                            <span className={`inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-extrabold border ${
+                              (issue.currentLevel || 1) === 4 
+                                ? 'bg-purple-100 text-purple-800 border-purple-200'
+                                : (issue.currentLevel || 1) === 3
+                                ? 'bg-indigo-100 text-indigo-800 border-indigo-200'
+                                : (issue.currentLevel || 1) === 2
+                                ? 'bg-sky-100 text-sky-800 border-sky-200'
+                                : 'bg-teal-50 text-teal-800 border-teal-200'
+                            }`}>
+                              <span>L{issue.currentLevel || 1}: {handlerTitle}</span>
+                            </span>
+
+                            {/* SLA Chip */}
+                            {issue.isOverdue && issue.status !== 'Solved' ? (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-rose-100 text-rose-700 border border-rose-200 animate-pulse">
+                                <AlertTriangle size={12} /> {issue.slaTimer || 'Overdue'}
+                              </span>
+                            ) : issue.slaTimer ? (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
+                                <Clock size={12} /> {issue.slaTimer}
+                              </span>
+                            ) : null}
+
+                            <span className="text-xs text-slate-400 font-medium ml-auto sm:ml-0">{issue.time}</span>
+                          </div>
+
+                          <CardTitle className="text-lg font-bold text-slate-800 group-hover:text-teal-700 transition-colors">
+                            {issue.title}
+                          </CardTitle>
+
+                          <div className="flex flex-wrap items-center gap-2 mt-1.5 text-xs text-slate-500">
+                            <span className="font-semibold text-slate-600">{issue.department}</span>
+                            <span>•</span>
+                            <span>{issue.category}</span>
+                            <span>•</span>
+                            <span className="font-medium text-slate-500">{issue.location}</span>
+                          </div>
+                        </div>
+
+                        {/* Status Badge */}
+                        <div className="flex items-center gap-2 self-start lg:self-center">
+                          <Badge variant="outline" className={`gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${
+                            issue.statusColor === 'emerald' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 
+                            issue.statusColor === 'blue' ? 'bg-blue-50 text-blue-700 border-blue-200' : 
+                            issue.statusColor === 'amber' ? 'bg-amber-50 text-amber-700 border-amber-200' : 
+                            'bg-rose-50 text-rose-700 border-rose-200'
+                          }`}>
+                            {issue.status === 'Solved' && <CheckCircle size={14} />}
+                            {issue.status === 'In Progress' && <Clock size={14} />}
+                            {issue.status === 'Seen' && <CheckCircle size={14} className="opacity-70" />}
+                            {issue.status === 'Not Started' && <AlertCircle size={14} />}
+                            {issue.status}
+                          </Badge>
+                        </div>
                       </div>
                     </CardHeader>
-                    <CardContent className="flex-1 flex flex-col pt-0">
-                      <p className="text-slate-600 text-sm line-clamp-2 mb-4 flex-1">{issue.description}</p>
-                      <div className="text-xs font-bold tracking-wide flex items-center justify-between border-t border-slate-100 pt-3 mt-auto">
-                        <span className="flex items-center gap-1 text-slate-400"><Clock size={14} /> {issue.time.toUpperCase()}</span>
-                        <span className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-colors ${issue.isLiked ? 'bg-teal-50 text-teal-700' : 'bg-slate-50 text-slate-500 group-hover:bg-orange-50 group-hover:text-orange-600'}`}>
-                          <ArrowUp size={14} className={issue.isLiked ? 'text-teal-600' : ''} /> {issue.upvotes}
+
+                    {/* Escalation Alert Badge if escalated */}
+                    {issue.isEscalated && (
+                      <div className="mx-6 mb-3 px-3.5 py-2 rounded-xl bg-amber-50 border border-amber-200/80 text-amber-900 text-xs font-semibold flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Zap size={15} className="text-amber-600 fill-amber-500 shrink-0" />
+                          <span>Escalated from <strong>{issue.escalatedFrom}</strong> • Reason: {issue.escalationReason}</span>
+                        </div>
+                        <span className="text-[10px] font-bold bg-amber-200/70 text-amber-900 px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0">
+                          Priority Escalation
+                        </span>
+                      </div>
+                    )}
+
+                    <CardContent className="px-6 pb-5 pt-0">
+                      <p className="text-slate-600 text-sm line-clamp-2 leading-relaxed mb-4">
+                        {issue.description}
+                      </p>
+
+                      <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                        <span className="font-medium text-slate-400">Click ticket to view full investigation and take authority action</span>
+                        <span className="font-bold text-teal-700 group-hover:text-teal-800 flex items-center gap-1 group-hover:translate-x-1 transition-all">
+                          Manage Ticket &rarr;
                         </span>
                       </div>
                     </CardContent>
                   </Card>
-                ))}
+                );
+              })}
+
+            {issues
+              .filter(i => selectedAuthorityDepartment === 'All Departments' || i.department === selectedAuthorityDepartment)
+              .filter(i => selectedAuthorityLevel === 'All' || (i.currentLevel || 1) === parseInt(selectedAuthorityLevel))
+              .filter(i => {
+                if (selectedKpiFilter === 'overdue') return i.isOverdue && i.status !== 'Solved';
+                if (selectedKpiFilter === 'open') return i.status !== 'Solved';
+                if (selectedKpiFilter === 'escalated') return i.isEscalated && i.status !== 'Solved';
+                if (selectedKpiFilter === 'solved') return i.status === 'Solved';
+                return true;
+              })
+              .length === 0 && (
+              <div className="text-center p-14 bg-white rounded-2xl border border-slate-200 border-dashed">
+                <ShieldCheck size={36} className="mx-auto text-slate-300 mb-3" />
+                <p className="text-slate-700 font-bold text-base">No tickets match active filters</p>
+                <p className="text-slate-400 text-sm mt-1 mb-4">There are no tickets matching your active department, hierarchy level, and KPI filters.</p>
+                <Button 
+                  variant="outline"
+                  onClick={() => {
+                    setSelectedAuthorityDepartment('All Departments');
+                    setSelectedAuthorityLevel('All');
+                    setSelectedKpiFilter('all');
+                  }}
+                  className="rounded-xl font-bold text-xs text-teal-700 border-teal-200 hover:bg-teal-50"
+                >
+                  Reset All Filters
+                </Button>
               </div>
-            </div>
+            )}
           </div>
         </main>
       ) : currentView === 'recent-reported' ? (
-        <main className="max-w-4xl mx-auto px-4 pt-10 pb-20 smooth-enter">
-          <div className="flex items-center gap-3 mb-8">
-            <button onClick={() => { if (window.history.length > 1) window.history.back(); else navigateTo('dashboard'); }} className="text-teal-600 hover:text-teal-800 p-2 rounded-full hover:bg-teal-50 transition-colors">
+        <main className="max-w-4xl mx-auto px-4 pt-8 pb-20 smooth-enter">
+          <div className="flex items-center gap-3 mb-6">
+            <button onClick={() => { if (window.history.length > 1) window.history.back(); else navigateTo('dashboard'); }} className="text-teal-700 hover:text-teal-900 p-2 rounded-full hover:bg-teal-50 transition-colors border border-slate-200 bg-white shadow-sm">
               &larr; Back
             </button>
-            <h1 className="text-3xl font-bold text-slate-800">My Tickets</h1>
+            <div>
+              <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">My Tickets</h1>
+              <p className="text-slate-500 text-sm mt-0.5">Track your filed grievances, upvoted campus issues & resolutions.</p>
+            </div>
           </div>
-          <div className="space-y-4">
-            {issues.filter(issue => issue.isMine).reverse().map(issue => (
-              <Card key={issue.id} className="hover:border-teal-300 transition-colors cursor-pointer group" onClick={() => openIssueDetails(issue)}>
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle className="text-lg text-slate-800 group-hover:text-teal-700 transition-colors">{issue.title}</CardTitle>
-                      <CardDescription className="flex gap-2 mt-1 items-center font-medium">
-                        <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-slate-400"></div> {issue.category}</span>
-                        <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-slate-400"></div> {issue.department}</span>
-                      </CardDescription>
-                    </div>
-                    <Badge variant="outline" className={`gap-1.5 px-3 py-1 rounded-full text-sm font-bold border ${
-                      issue.statusColor === 'emerald' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 
-                      issue.statusColor === 'blue' ? 'bg-blue-50 text-blue-600 border-blue-200' : 
-                      issue.statusColor === 'amber' ? 'bg-amber-50 text-amber-600 border-amber-200' : 
-                      'bg-rose-50 text-rose-600 border-rose-200'
-                    }`}>
-                      {issue.status === 'Solved' && <CheckCircle size={14} />}
 
-                      {issue.status === 'Seen' && <CheckCircle size={14} className="opacity-70" />}
-                      {issue.status === 'Not Started' && <AlertCircle size={14} />}
-                      {issue.status}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-slate-600 text-sm line-clamp-2">{issue.description}</p>
-                  <div className="text-xs text-slate-400 font-bold tracking-wide mt-3 flex items-center gap-1">
-                    <Clock size={14} /> REPORTED {issue.time.toUpperCase()}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+          {/* 3 Filter Tabs (Reported by Me, Upvoted by Me, Resolved) */}
+          <div className="flex items-center gap-2 p-1.5 bg-slate-100 rounded-2xl border border-slate-200 mb-6 max-w-xl">
+            <button
+              onClick={() => setMyTicketsTab('reported')}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                myTicketsTab === 'reported' 
+                  ? 'bg-white text-teal-800 shadow-sm border border-slate-200' 
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <span>Reported by Me</span>
+              <span className={`text-[11px] px-2 py-0.5 rounded-full font-extrabold ${myTicketsTab === 'reported' ? 'bg-teal-100 text-teal-800' : 'bg-slate-200 text-slate-600'}`}>
+                {issues.filter(i => i.isMine).length}
+              </span>
+            </button>
+            <button
+              onClick={() => setMyTicketsTab('upvoted')}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                myTicketsTab === 'upvoted' 
+                  ? 'bg-white text-teal-800 shadow-sm border border-slate-200' 
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <span>Upvoted by Me</span>
+              <span className={`text-[11px] px-2 py-0.5 rounded-full font-extrabold ${myTicketsTab === 'upvoted' ? 'bg-teal-100 text-teal-800' : 'bg-slate-200 text-slate-600'}`}>
+                {issues.filter(i => i.isLiked).length}
+              </span>
+            </button>
+            <button
+              onClick={() => setMyTicketsTab('resolved')}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                myTicketsTab === 'resolved' 
+                  ? 'bg-white text-emerald-800 shadow-sm border border-slate-200' 
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <span>Resolved</span>
+              <span className={`text-[11px] px-2 py-0.5 rounded-full font-extrabold ${myTicketsTab === 'resolved' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'}`}>
+                {issues.filter(i => (i.isMine || i.isLiked) && i.status === 'Solved').length}
+              </span>
+            </button>
+          </div>
+
+          {/* Tickets List */}
+          <div className="space-y-4">
+            {issues
+              .filter(issue => {
+                if (myTicketsTab === 'reported') return issue.isMine;
+                if (myTicketsTab === 'upvoted') return issue.isLiked;
+                if (myTicketsTab === 'resolved') return (issue.isMine || issue.isLiked) && issue.status === 'Solved';
+                return issue.isMine;
+              })
+              .map(issue => (
+                <Card key={issue.id} className="hover:border-teal-300 transition-all cursor-pointer group bg-white rounded-2xl border border-slate-200 shadow-sm" onClick={() => openIssueDetails(issue)}>
+                  <CardHeader className="pb-2">
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <span className="font-mono text-xs font-bold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-md">{issue.id}</span>
+                          <span className="text-xs font-semibold text-slate-500">
+                            Current: <strong className="text-teal-700">L{issue.currentLevel || 1} ({issue.assignedAuthority || getAuthorityTitle(issue.department, issue.currentLevel || 1)})</strong>
+                          </span>
+                        </div>
+                        <CardTitle className="text-lg font-bold text-slate-800 group-hover:text-teal-700 transition-colors">{issue.title}</CardTitle>
+                        <CardDescription className="flex flex-wrap gap-2 mt-1.5 items-center font-medium text-xs">
+                          <span className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-teal-500"></div> {issue.category}</span>
+                          <span className="text-slate-300">•</span>
+                          <span className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-slate-400"></div> {issue.department}</span>
+                          <span className="text-slate-300">•</span>
+                          <span>{issue.location}</span>
+                        </CardDescription>
+                      </div>
+
+                      <Badge variant="outline" className={`shrink-0 gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${
+                        issue.statusColor === 'emerald' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 
+                        issue.statusColor === 'blue' ? 'bg-blue-50 text-blue-700 border-blue-200' : 
+                        issue.statusColor === 'amber' ? 'bg-amber-50 text-amber-700 border-amber-200' : 
+                        'bg-rose-50 text-rose-700 border-rose-200'
+                      }`}>
+                        {issue.status === 'Solved' && <CheckCircle size={13} />}
+                        {issue.status === 'In Progress' && <Clock size={13} />}
+                        {issue.status === 'Seen' && <CheckCircle size={13} className="opacity-70" />}
+                        {issue.status === 'Not Started' && <AlertCircle size={13} />}
+                        {issue.status}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-slate-600 text-sm line-clamp-2">{issue.description}</p>
+                    <div className="text-xs text-slate-400 font-bold tracking-wide mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+                      <span className="flex items-center gap-1.5">
+                        <Clock size={14} /> REPORTED {issue.time.toUpperCase()}
+                      </span>
+                      <span className="flex items-center gap-1 text-slate-500">
+                        <ThumbsUp size={14} className={issue.isLiked ? 'text-teal-600 fill-teal-600' : ''} /> {issue.upvotes} Upvotes
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+
+            {issues.filter(issue => {
+              if (myTicketsTab === 'reported') return issue.isMine;
+              if (myTicketsTab === 'upvoted') return issue.isLiked;
+              if (myTicketsTab === 'resolved') return (issue.isMine || issue.isLiked) && issue.status === 'Solved';
+              return issue.isMine;
+            }).length === 0 && (
+              <div className="text-center p-14 bg-white rounded-2xl border border-slate-200 border-dashed">
+                <CheckCircle size={36} className="mx-auto text-slate-300 mb-3" />
+                <p className="text-slate-700 font-bold text-base">No tickets in this tab</p>
+                <p className="text-slate-400 text-sm mt-1 mb-4">
+                  {myTicketsTab === 'reported' 
+                    ? "You haven't submitted any grievances yet." 
+                    : myTicketsTab === 'upvoted' 
+                    ? "You haven't upvoted any tickets yet." 
+                    : "No tickets in your list have been resolved yet."}
+                </p>
+                {myTicketsTab === 'reported' && (
+                  <Button onClick={() => navigateTo('report')} className="bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl">
+                    Report a Problem
+                  </Button>
+                )}
+              </div>
+            )}
           </div>
         </main>
       ) : currentView === 'issue-details' ? (
@@ -952,30 +1738,128 @@ export default function App() {
             </div>
             
             <h1 className="text-3xl md:text-4xl font-bold text-slate-800 mb-6">{selectedIssue.title}</h1>
+
+            {/* 4-Level Authority Hierarchy Pipeline */}
+            <div className="mb-8 p-6 bg-slate-50/90 border border-slate-200 rounded-3xl shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-teal-700 uppercase tracking-wider">Hierarchy Escalation Pipeline</span>
+                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-200 text-slate-700 font-bold">{selectedIssue.department}</span>
+                  </div>
+                  <p className="text-sm font-semibold text-slate-800 mt-1">
+                    Current Assigned Authority: <strong className="text-teal-700 font-extrabold text-base">
+                      {selectedIssue.assignedAuthority || getAuthorityTitle(selectedIssue.department, selectedIssue.currentLevel || 1)}
+                    </strong>
+                    <span className="text-xs font-bold text-slate-500 ml-2">(Level {selectedIssue.currentLevel || 1})</span>
+                  </p>
+                </div>
+                {selectedIssue.isEscalated && (
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-amber-100/80 text-amber-900 border border-amber-300 text-xs font-bold shadow-sm self-start sm:self-auto">
+                    <Zap size={14} className="text-amber-600 fill-amber-500" />
+                    <span>Escalated from {selectedIssue.escalatedFrom} • {selectedIssue.escalationReason}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Step Flow Nodes */}
+              <div className="grid grid-cols-4 gap-2 sm:gap-4 relative pt-2">
+                {[1, 2, 3, 4].map((lvl) => {
+                  const levelTitle = getAuthorityTitle(selectedIssue.department, lvl);
+                  const curLvl = selectedIssue.currentLevel || 1;
+                  const isPast = lvl < curLvl;
+                  const isCurrent = lvl === curLvl;
+
+                  return (
+                    <div key={lvl} className="flex flex-col items-center text-center relative group">
+                      <div className={`w-9 h-9 sm:w-11 sm:h-11 rounded-2xl flex items-center justify-center font-extrabold text-xs sm:text-sm mb-2 transition-all ${
+                        isCurrent
+                          ? 'bg-teal-600 text-white ring-4 ring-teal-200 shadow-md scale-105'
+                          : isPast
+                          ? 'bg-emerald-500 text-white shadow-sm'
+                          : 'bg-white text-slate-400 border border-slate-200'
+                      }`}>
+                        {isPast ? <Check size={18} strokeWidth={2.5} /> : `L${lvl}`}
+                      </div>
+                      <span className={`text-[11px] sm:text-xs font-bold leading-tight max-w-[120px] ${
+                        isCurrent ? 'text-teal-900 font-extrabold' : isPast ? 'text-slate-700' : 'text-slate-400'
+                      }`}>
+                        {levelTitle}
+                      </span>
+                      <span className={`text-[10px] mt-1 font-semibold ${
+                        isCurrent ? 'text-teal-600 uppercase tracking-wider' : 'text-slate-400'
+                      }`}>
+                        {lvl === 4 ? 'Supreme' : isCurrent ? 'Active Now' : `Level ${lvl}`}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
             
             {userRole === 'authority' && (
               <div className="mb-8 p-6 bg-slate-50 border border-slate-200 rounded-2xl shadow-sm">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                   <div>
                     <h3 className="font-bold text-slate-800 text-lg flex items-center gap-2">
                       <ShieldCheck className="text-teal-600" size={20} /> Authority Actions
                     </h3>
-                    <p className="text-slate-500 text-sm mt-1">Update the current status of this ticket.</p>
+                    <p className="text-slate-500 text-sm mt-0.5">Take immediate official action on this ticket.</p>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
-                    {['Not Started', 'Seen', 'In Progress', 'Solved'].map(status => (
-                      <button
-                        key={status}
-                        onClick={() => handleUpdateStatus(status)}
-                        className={`px-4 py-2 rounded-xl text-sm font-bold transition-all border ${
-                          selectedIssue.status === status 
-                            ? 'bg-teal-600 text-white border-teal-600 shadow-md scale-105'
-                            : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100 hover:border-slate-300'
-                        }`}
-                      >
-                        {status}
-                      </button>
-                    ))}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={(e) => handleAcknowledge(selectedIssue.id, e)}
+                      disabled={selectedIssue.status === 'In Progress' || selectedIssue.status === 'Solved'}
+                      className={`rounded-xl text-xs font-bold gap-1.5 ${
+                        selectedIssue.status === 'In Progress' || selectedIssue.status === 'Solved'
+                          ? 'bg-slate-100 text-slate-400 border-slate-200'
+                          : 'bg-white text-teal-700 border-teal-200 hover:bg-teal-50 shadow-sm'
+                      }`}
+                    >
+                      <CheckCircle size={14} />
+                      {selectedIssue.status === 'In Progress' ? 'Acknowledged' : 'Acknowledge'}
+                    </Button>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={(e) => handleOpenPostUpdate(selectedIssue, e)}
+                      className="bg-white hover:bg-blue-50 text-blue-700 border-blue-200 rounded-xl text-xs font-bold gap-1.5 shadow-sm"
+                    >
+                      <MessageSquare size={14} />
+                      Post Update
+                    </Button>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={(e) => handleOpenEscalate(selectedIssue, e)}
+                      disabled={(selectedIssue.currentLevel || 1) >= 4 || selectedIssue.status === 'Solved'}
+                      className={`rounded-xl text-xs font-bold gap-1.5 ${
+                        (selectedIssue.currentLevel || 1) >= 4 || selectedIssue.status === 'Solved'
+                          ? 'bg-slate-100 text-slate-400 border-slate-200 opacity-60'
+                          : 'bg-white hover:bg-amber-50 text-amber-800 border-amber-300 shadow-sm'
+                      }`}
+                    >
+                      <Zap size={14} className="text-amber-600" />
+                      Escalate Level
+                    </Button>
+
+                    <Button
+                      size="sm"
+                      onClick={(e) => handleOneClickSolve(selectedIssue.id, e)}
+                      disabled={selectedIssue.status === 'Solved'}
+                      className={`rounded-xl text-xs font-extrabold gap-1.5 shadow-sm ${
+                        selectedIssue.status === 'Solved'
+                          ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-100 cursor-default border border-emerald-200'
+                          : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                      }`}
+                    >
+                      <CheckCheck size={15} />
+                      {selectedIssue.status === 'Solved' ? 'Resolved' : 'Mark Solved'}
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -1301,7 +2185,7 @@ export default function App() {
             {/* Submit Button Area */}
             <div className="bg-slate-50 border-t border-slate-100 p-6 flex justify-end">
               <Button 
-                onClick={() => navigateTo('dashboard')}
+                onClick={handleCheckDuplicateAndSubmit}
                 className="bg-teal-600 hover:bg-teal-700 text-white font-bold text-lg py-6 px-10 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center gap-2"
               >
                 <CheckCircle size={20} />
@@ -1314,6 +2198,214 @@ export default function App() {
 
       )}
 
+      {/* MODAL 1: Authority Post Update Modal */}
+      {postUpdateModalOpen && actionTicket && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 smooth-overlay" onClick={() => setPostUpdateModalOpen(false)}>
+          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-slate-200 relative smooth-enter" onClick={e => e.stopPropagation()}>
+            <button onClick={() => setPostUpdateModalOpen(false)} className="absolute top-5 right-5 text-slate-400 hover:text-slate-600 p-1.5 rounded-full hover:bg-slate-100">
+              <X size={20} />
+            </button>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                <MessageSquare size={20} />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-slate-800">Post Official Update</h3>
+                <p className="text-xs text-slate-500 font-mono font-medium">{actionTicket.id} • {actionTicket.title}</p>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-600 mb-4 bg-slate-50 p-3 rounded-xl border border-slate-100">
+              Posting as: <strong className="text-teal-700 font-bold">{getAuthorityTitle(actionTicket.department, actionTicket.currentLevel || 1)}</strong> (Level {actionTicket.currentLevel || 1})
+            </p>
+
+            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Update Message</label>
+            <Textarea
+              value={postUpdateText}
+              onChange={(e) => setPostUpdateText(e.target.value)}
+              placeholder="e.g. Technician dispatched with replacement parts. Expected resolution in 2 hours..."
+              className="w-full mb-6 min-h-[120px] rounded-xl border-slate-200 text-slate-700 font-medium"
+            />
+
+            <div className="flex items-center justify-end gap-3">
+              <Button variant="outline" onClick={() => setPostUpdateModalOpen(false)} className="rounded-xl font-bold">
+                Cancel
+              </Button>
+              <Button onClick={handlePostUpdateSubmit} disabled={!postUpdateText.trim()} className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold gap-2">
+                <Send size={15} />
+                Publish Update
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 2: Authority Escalate Ticket Modal (Clean, Simple & Modern) */}
+      {escalateModalOpen && actionTicket && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 smooth-overlay" onClick={() => setEscalateModalOpen(false)}>
+          <div className="bg-white rounded-3xl p-6 sm:p-7 max-w-md w-full shadow-2xl border border-slate-200/80 relative smooth-enter" onClick={e => e.stopPropagation()}>
+            <button onClick={() => setEscalateModalOpen(false)} className="absolute top-5 right-5 text-slate-400 hover:text-slate-600 p-1.5 rounded-full hover:bg-slate-100 transition-colors">
+              <X size={18} />
+            </button>
+
+            {/* Header */}
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                <Zap size={20} className="fill-amber-500" />
+              </div>
+              <div className="min-w-0 pr-6">
+                <h3 className="text-lg font-bold text-slate-900">Escalate Ticket</h3>
+                <p className="text-xs text-slate-500 font-medium truncate">{actionTicket.id} • {actionTicket.title}</p>
+              </div>
+            </div>
+
+            {/* Simple Step Progression Strip */}
+            {(() => {
+              const currentLvl = actionTicket.currentLevel || 1;
+              const nextLvl = Math.min(4, currentLvl + 1);
+              const prevTitle = getAuthorityTitle(actionTicket.department, currentLvl);
+              const nextTitle = getAuthorityTitle(actionTicket.department, nextLvl);
+              return (
+                <div className="bg-slate-50/90 border border-slate-200/90 rounded-2xl p-3.5 mb-5 flex items-center justify-between gap-2.5">
+                  <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                    <span className="w-8 h-8 rounded-xl bg-slate-200/80 text-slate-700 font-extrabold text-xs flex items-center justify-center shrink-0">
+                      L{currentLvl}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Current</p>
+                      <p className="text-xs font-semibold text-slate-700 truncate">{prevTitle}</p>
+                    </div>
+                  </div>
+
+                  <div className="w-6 h-6 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                    <ArrowRight size={13} className="stroke-[2.5]" />
+                  </div>
+
+                  <div className="flex items-center gap-2.5 min-w-0 flex-1 justify-end">
+                    <div className="min-w-0 text-right">
+                      <p className="text-[10px] uppercase font-bold text-amber-700 tracking-wider">Escalate To</p>
+                      <p className="text-xs font-bold text-slate-900 truncate">{nextTitle}</p>
+                    </div>
+                    <span className="w-8 h-8 rounded-xl bg-amber-500 text-white font-extrabold text-xs flex items-center justify-center shrink-0 shadow-xs">
+                      L{nextLvl}
+                    </span>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Reason Selection (Typable Input) */}
+            <div className="mb-4">
+              <label className="block text-xs font-bold text-slate-600 mb-1.5">
+                Reason for Escalation
+              </label>
+              <Input
+                type="text"
+                value={escalateReason}
+                onChange={(e) => setEscalateReason(e.target.value)}
+                placeholder="Type reason for escalation (e.g. SLA breached, budget approval required)..."
+                className="w-full h-10 rounded-xl text-sm text-slate-800 border-slate-200 focus-visible:ring-amber-500"
+              />
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {['SLA Breached', 'Budget Approval Required', 'Staff Shortage', 'Campus Emergency'].map(tag => (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => setEscalateReason(tag)}
+                    className="text-[11px] font-medium px-2.5 py-0.5 rounded-md bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-600 border border-slate-200/60 transition-colors"
+                  >
+                    + {tag}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Additional Note */}
+            <div className="mb-6">
+              <label className="block text-xs font-bold text-slate-600 mb-1.5">Note (Optional)</label>
+              <Input
+                type="text"
+                value={escalateNote}
+                onChange={(e) => setEscalateNote(e.target.value)}
+                placeholder="Add brief remarks or context..."
+                className="w-full h-10 rounded-xl text-sm text-slate-800 border-slate-200 focus-visible:ring-amber-500"
+              />
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center justify-end gap-2.5">
+              <Button variant="outline" onClick={() => setEscalateModalOpen(false)} className="rounded-xl font-semibold h-10 px-4 text-slate-600">
+                Cancel
+              </Button>
+              <Button onClick={handleEscalateSubmit} className="bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold h-10 px-4 gap-2 shadow-sm shadow-amber-600/20">
+                <Zap size={14} className="fill-white" />
+                Escalate to L{escalateTargetLevel}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 3: AI Duplicate Detection Dialog */}
+      {duplicateModalOpen && matchedDuplicate && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 smooth-overlay" onClick={() => setDuplicateModalOpen(false)}>
+          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl border border-slate-200 relative smooth-enter" onClick={e => e.stopPropagation()}>
+            <button onClick={() => setDuplicateModalOpen(false)} className="absolute top-5 right-5 text-slate-400 hover:text-slate-600 p-1.5 rounded-full hover:bg-slate-100">
+              <X size={20} />
+            </button>
+
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center shrink-0">
+                <AlertTriangle size={24} />
+              </div>
+              <div>
+                <h3 className="text-xl font-extrabold text-slate-900">Similar Active Issue Detected!</h3>
+                <p className="text-xs text-orange-700 font-semibold">Help prevent duplicate tickets in the queue</p>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-600 mb-4 leading-relaxed">
+              We found an open ticket matching your report in <strong className="text-slate-800">{matchedDuplicate.department}</strong>. Upvoting an existing complaint helps aggregate student priority rather than dividing authority attention:
+            </p>
+
+            {/* Matched Issue Card */}
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-6">
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <span className="font-mono text-xs font-bold text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">{matchedDuplicate.id}</span>
+                <Badge variant="outline" className="text-xs font-bold bg-white text-teal-700 border-teal-200">
+                  {matchedDuplicate.status}
+                </Badge>
+              </div>
+              <h4 className="font-bold text-slate-800 text-sm mb-1">{matchedDuplicate.title}</h4>
+              <p className="text-xs text-slate-500 mb-2 font-medium">{matchedDuplicate.location} • {matchedDuplicate.category}</p>
+              <div className="flex items-center justify-between text-xs text-slate-400 font-semibold pt-2 border-t border-slate-200/60">
+                <span>Reported {matchedDuplicate.time}</span>
+                <span className="text-teal-700 font-bold flex items-center gap-1">
+                  <ArrowUp size={13} /> {matchedDuplicate.upvotes} Students Upvoted
+                </span>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center gap-3 justify-end">
+              <Button
+                variant="outline"
+                onClick={executeSubmitTicket}
+                className="w-full sm:w-auto rounded-xl font-bold text-slate-600 hover:text-slate-800"
+              >
+                Submit New Ticket Anyway
+              </Button>
+              <Button
+                onClick={handleUpvoteDuplicateAndOpen}
+                className="w-full sm:w-auto bg-[#ea580c] hover:bg-[#c2410c] text-white font-extrabold rounded-xl shadow-lg shadow-orange-500/20 gap-2"
+              >
+                <ThumbsUp size={16} />
+                Upvote Existing Ticket ({matchedDuplicate.upvotes + 1})
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Footer (Only on Dashboard) */}
       {currentView === 'dashboard' && (
         <footer className="mt-auto bg-[#f8fafc] flex flex-col items-center pb-8 pt-8">
@@ -1321,7 +2413,7 @@ export default function App() {
           <div className="mb-4 hover:-rotate-6 transition-transform cursor-pointer">
             <img src="/logo.png" alt="Resolvelt Logo" className="h-16 w-auto object-contain" />
           </div>
-          <p className="text-slate-500 text-sm mb-1">Website crafted with <span className="text-rose-500">♥</span> by</p>
+          <p className="text-slate-500 text-sm mb-1">Website crafted with <Heart size={14} className="text-rose-500 fill-rose-500 inline mx-1" /> by</p>
           <p className="text-teal-700 font-bold mb-6">Rudrapal Singh Shekhawat <span className="text-slate-500 font-normal">(2nd Year)</span></p>
           <p className="text-xs text-slate-500">© 2026 All rights reserved</p>
         </footer>

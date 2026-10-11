@@ -106,3 +106,42 @@ export const DEPARTMENT_ISSUE_TYPES: Record<string, string[]> = {
     "Suggestion / Feedback"
   ]
 };
+
+export const DEPARTMENT_LEVELS: Record<string, Record<number, string>> = {
+  "Hostel, Mess & Laundry": {
+    1: "Warden",
+    2: "Head Warden",
+    3: "Chief Warden",
+    4: "VC (Vice-Chancellor)"
+  },
+  "Campus Infrastructure & IT": {
+    1: "Maintenance Supervisor",
+    2: "Estate & IT Officer",
+    3: "Director of Infrastructure",
+    4: "VC (Vice-Chancellor)"
+  },
+  "Academics & Library": {
+    1: "Course Coordinator",
+    2: "Head of Department (HOD)",
+    3: "Dean of Academics",
+    4: "VC (Vice-Chancellor)"
+  },
+  "Student Life & Sports": {
+    1: "Sports & Activity Officer",
+    2: "Head of Student Affairs",
+    3: "Dean of Student Affairs (DSA)",
+    4: "VC (Vice-Chancellor)"
+  },
+  "Health, Well-being & Safety": {
+    1: "Campus Medical & Security Officer",
+    2: "Chief Medical & Security In-charge",
+    3: "Chief Proctor",
+    4: "VC (Vice-Chancellor)"
+  },
+  "Administration & Support": {
+    1: "Administrative Officer",
+    2: "Assistant Registrar",
+    3: "Registrar",
+    4: "VC (Vice-Chancellor)"
+  }
+};
