@@ -30,6 +30,44 @@
   }
 }
 
+@layer utilities {
+  .smooth-enter {
+    animation: smoothFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .smooth-enter-up {
+    animation: smoothFadeInUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .smooth-overlay {
+    animation: fadeOverlay 0.25s ease-out forwards;
+  }
+}
+
+@keyframes smoothFadeIn {
+  0% { opacity: 0; transform: scale(0.96); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes smoothFadeInUp {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOverlay {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+button, a, [role="button"], select {
+  cursor: pointer !important;
+}
+
+button:active:not(:disabled), 
+a:active, 
+[role="button"]:active:not(:disabled) {
+  transform: scale(0.97);
+  transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 /* Custom class for the big logo text */
 .logo-text {
   font-family: 'Arial Black', Impact, sans-serif;
