@@ -42,7 +42,7 @@ export const DEPARTMENT_BUILDINGS: Record<string, string[]> = {
   "Hostel, Mess & Laundry": ["GH1 (Girls Hostel 1)", "GH2 (Girls Hostel 2)", "BH1 (Boys Hostel 1)", "BH2 (Boys Hostel 2)", "Additional Girls Residence", "Mess Building", "Laundry Facility", "Faculty Quarters", "VC Quarters"],
   "Academics & Library": ["EB1 Academic Building", "EB2 Academic Building", "TB1 / Technical Block", "HSB Academic Building", "LRC / Library", "LRC Labs"],
   "Campus Infrastructure & IT": ["GH1 (Girls Hostel 1)", "GH2 (Girls Hostel 2)", "BH1 (Boys Hostel 1)", "BH2 (Boys Hostel 2)", "Mess Building", "Laundry Facility", "EB1 Academic Building", "EB2 Academic Building", "TB1 / Technical Block", "HSB Academic Building", "Admin Block", "LRC / Library", "Outdoor Common Areas", "Campus Roads", "Main Gate"],
-  "Student Life & Sports": ["Football Ground", "Volleyball Court", "Badminton Court", "Table Tennis Area", "Billiards / Pool Area", "Squash Court", "Gym + Activity Centre", "Student Activity Center (SAC)", "Outdoor Common Areas"],
+  "Student Life & Sports": ["Football Ground", "Basketball Court", "Volleyball Court", "Badminton Court", "Table Tennis Area", "Billiards / Pool Area", "Squash Court", "Gym + Activity Centre", "Student Activity Center (SAC)", "Outdoor Common Areas"],
   "Health, Well-being & Safety": ["Medical Centre / Clinic", "Counselling Centre", "Main Gate / Security Office", "GH1 (Girls Hostel 1)", "GH2 (Girls Hostel 2)", "BH1 (Boys Hostel 1)", "BH2 (Boys Hostel 2)", "Academic Buildings", "Sports Grounds"],
   "Administration & Support": ["Admin Block", "Transport / Bus Stand", "Account / Fee Section", "Student Services Center", "Main Gate"]
 };
