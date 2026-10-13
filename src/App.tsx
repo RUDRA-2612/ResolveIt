@@ -720,65 +720,74 @@ export default function App() {
   };
   
   return (
-    <div className={`min-h-screen bg-[#f8fafc] font-sans text-slate-800 flex flex-col ${!hasSelectedRole ? 'overflow-hidden h-screen' : ''}`}>
+    <div className={`min-h-screen bg-[#f8fafc] font-[Inter,system-ui,sans-serif] text-slate-800 flex flex-col ${!hasSelectedRole ? 'overflow-hidden h-screen' : ''}`}>
       
       {/* Role Selection Overlay (Post-Login) */}
       {!hasSelectedRole && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-md smooth-enter">
-          <div className="bg-white rounded-3xl p-8 max-w-md w-full mx-4 shadow-2xl border border-slate-200 text-center relative overflow-hidden smooth-enter-up">
-            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-teal-400 to-teal-600"></div>
-            <h2 className="text-2xl font-extrabold text-slate-800 mb-2">Welcome to Resolvelt</h2>
-            <p className="text-slate-500 mb-8 font-medium">Please select your account type to continue.</p>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <button 
-                onClick={() => { 
-                  localStorage.setItem('resolveit_role', 'student');
-                  setUserRole('student'); 
-                  setHasSelectedRole(true); 
-                  setSelectedAuthorityDepartment('All Departments');
-                  setSelectedAuthorityLevel('All');
-                  setSelectedKpiFilter('all');
-                  navigateTo('dashboard');
-                }}
-                className="flex flex-col items-center justify-center p-6 border-2 border-slate-100 rounded-2xl hover:border-teal-500 hover:bg-teal-50 transition-all group"
-              >
-                <div className="w-12 h-12 bg-slate-100 group-hover:bg-teal-200 rounded-full flex items-center justify-center mb-4 transition-colors">
-                  <User size={24} className="text-slate-600 group-hover:text-teal-700" />
-                </div>
-                <span className="font-bold text-slate-700 group-hover:text-teal-800">Student</span>
-              </button>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-md smooth-enter">
+          <div className="bg-white/95 rounded-3xl p-8 max-w-md w-full mx-4 shadow-2xl border border-white/60 text-center relative overflow-hidden smooth-enter-up">
+            <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-teal-400 via-teal-500 to-teal-600"></div>
+            <div className="absolute -top-16 -right-16 w-48 h-48 bg-teal-100/40 rounded-full blur-3xl pointer-events-none"></div>
+            <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-orange-100/30 rounded-full blur-3xl pointer-events-none"></div>
+            <div className="relative z-10">
+              <div className="w-14 h-14 bg-gradient-to-br from-teal-500 to-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-teal-500/25">
+                <ShieldCheck size={28} className="text-white" />
+              </div>
+              <h2 className="text-2xl font-extrabold text-slate-900 mb-1.5 tracking-tight">Welcome to Resolvelt</h2>
+              <p className="text-slate-500 mb-8 font-medium text-sm">Select your account type to continue.</p>
               
-              <button 
-                onClick={() => { 
-                  localStorage.setItem('resolveit_role', 'authority');
-                  setUserRole('authority'); 
-                  setHasSelectedRole(true); 
-                  setSelectedAuthorityDepartment('All Departments');
-                  setSelectedAuthorityLevel('All');
-                  setSelectedKpiFilter('all');
-                  navigateTo('dashboard');
-                  
-                  // Notify authority of new unsolved problems
-                  const newIssues = issues.filter(i => i.status === 'Not Started');
-                  if (newIssues.length > 0) {
-                    const newNotifs = newIssues.map(issue => ({
-                      id: Date.now() + Math.random(),
-                      title: `New Ticket Alert`,
-                      message: `"${issue.title}" needs attention in ${issue.department}.`,
-                      time: issue.time,
-                      unread: true
-                    }));
-                    setNotifications(prev => [...newNotifs, ...prev]);
-                  }
-                }}
-                className="flex flex-col items-center justify-center p-6 border-2 border-slate-100 rounded-2xl hover:border-orange-500 hover:bg-orange-50 transition-all group"
-              >
-                <div className="w-12 h-12 bg-slate-100 group-hover:bg-orange-200 rounded-full flex items-center justify-center mb-4 transition-colors">
-                  <ShieldCheck size={24} className="text-slate-600 group-hover:text-orange-700" />
-                </div>
-                <span className="font-bold text-slate-700 group-hover:text-orange-800">Authority</span>
-              </button>
+              <div className="grid grid-cols-2 gap-4">
+                <button 
+                  onClick={() => { 
+                    localStorage.setItem('resolveit_role', 'student');
+                    setUserRole('student'); 
+                    setHasSelectedRole(true); 
+                    setSelectedAuthorityDepartment('All Departments');
+                    setSelectedAuthorityLevel('All');
+                    setSelectedKpiFilter('all');
+                    navigateTo('dashboard');
+                  }}
+                  className="flex flex-col items-center justify-center p-6 border-2 border-slate-100 rounded-2xl hover:border-teal-400 hover:bg-teal-50/80 hover:shadow-md hover:shadow-teal-100 transition-all duration-200 group"
+                >
+                  <div className="w-13 h-13 bg-slate-100 group-hover:bg-teal-100 rounded-2xl flex items-center justify-center mb-3.5 transition-all duration-200 group-hover:scale-110">
+                    <User size={26} className="text-slate-500 group-hover:text-teal-700" />
+                  </div>
+                  <span className="font-bold text-slate-700 group-hover:text-teal-800 text-sm">Student</span>
+                  <span className="text-[11px] text-slate-400 mt-0.5">Report &amp; track issues</span>
+                </button>
+                
+                <button 
+                  onClick={() => { 
+                    localStorage.setItem('resolveit_role', 'authority');
+                    setUserRole('authority'); 
+                    setHasSelectedRole(true); 
+                    setSelectedAuthorityDepartment('All Departments');
+                    setSelectedAuthorityLevel('All');
+                    setSelectedKpiFilter('all');
+                    navigateTo('dashboard');
+                    
+                    // Notify authority of new unsolved problems
+                    const newIssues = issues.filter(i => i.status === 'Not Started');
+                    if (newIssues.length > 0) {
+                      const newNotifs = newIssues.map(issue => ({
+                        id: Date.now() + Math.random(),
+                        title: `New Ticket Alert`,
+                        message: `"${issue.title}" needs attention in ${issue.department}.`,
+                        time: issue.time,
+                        unread: true
+                      }));
+                      setNotifications(prev => [...newNotifs, ...prev]);
+                    }
+                  }}
+                  className="flex flex-col items-center justify-center p-6 border-2 border-slate-100 rounded-2xl hover:border-orange-400 hover:bg-orange-50/80 hover:shadow-md hover:shadow-orange-100 transition-all duration-200 group"
+                >
+                  <div className="w-13 h-13 bg-slate-100 group-hover:bg-orange-100 rounded-2xl flex items-center justify-center mb-3.5 transition-all duration-200 group-hover:scale-110">
+                    <ShieldCheck size={26} className="text-slate-500 group-hover:text-orange-600" />
+                  </div>
+                  <span className="font-bold text-slate-700 group-hover:text-orange-800 text-sm">Authority</span>
+                  <span className="text-[11px] text-slate-400 mt-0.5">Manage &amp; resolve</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -865,21 +874,38 @@ export default function App() {
 
 
       {/* Sidebar */}
-      <div className={`fixed top-0 left-0 h-full w-64 bg-white z-50 transform transition-transform duration-300 ease-in-out shadow-2xl ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="bg-[#115e59] h-16 flex items-center justify-between px-4 text-white">
-          <span className="font-bold text-lg">Menu</span>
-          <button onClick={() => setSidebarOpen(false)}><X size={24} /></button>
+      <div className={`fixed top-0 left-0 h-full w-72 bg-white z-50 transform transition-transform duration-300 ease-in-out shadow-2xl ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="bg-gradient-to-b from-[#115e59] to-[#0f4f4a] h-16 flex items-center justify-between px-5 text-white">
+          <div className="flex items-center gap-2.5">
+            <img src="/logo.png" alt="Logo" className="h-7 w-7 object-contain" />
+            <span className="font-extrabold text-lg tracking-tight">Resolvelt</span>
+          </div>
+          <button onClick={() => setSidebarOpen(false)} className="w-8 h-8 rounded-full hover:bg-white/15 flex items-center justify-center transition-colors"><X size={20} /></button>
         </div>
-        <div className="p-4 flex flex-col gap-2">
-          <button onClick={() => { navigateTo('dashboard'); setSidebarOpen(false); }} className={`p-3 font-medium rounded-lg text-left transition-colors ${currentView === 'dashboard' ? 'bg-teal-50 text-teal-700' : 'text-slate-600 hover:bg-teal-50 hover:text-teal-700'}`}>Home</button>
-          <div className="h-px bg-teal-100/60 my-1 mx-2"></div>
-          <button onClick={() => { navigateTo('recent-reported'); setSidebarOpen(false); }} className={`p-3 font-medium rounded-lg text-left transition-colors ${currentView === 'recent-reported' ? 'bg-teal-50 text-teal-700' : 'text-slate-600 hover:bg-teal-50 hover:text-teal-700'}`}>My Tickets</button>
-          <button onClick={() => { navigateTo('authority-dashboard'); setSidebarOpen(false); }} className={`p-3 font-medium rounded-lg text-left transition-colors ${currentView === 'authority-dashboard' ? 'bg-teal-50 text-teal-700' : 'text-slate-600 hover:bg-teal-50 hover:text-teal-700'}`}>Authority Workspace</button>
+        <div className="p-4 flex flex-col gap-1.5">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 px-3 pt-2 pb-1">Navigation</p>
+          <button onClick={() => { navigateTo('dashboard'); setSidebarOpen(false); }} className={`p-3 font-semibold rounded-xl text-left transition-all flex items-center gap-3 ${currentView === 'dashboard' ? 'bg-teal-50 text-teal-700 shadow-sm' : 'text-slate-600 hover:bg-slate-50 hover:text-teal-700'}`}>
+            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${currentView === 'dashboard' ? 'bg-teal-100' : 'bg-slate-100'}`}><ArrowUp size={16} className="rotate-90" /></div>
+            Home
+          </button>
+          <button onClick={() => { navigateTo('recent-reported'); setSidebarOpen(false); }} className={`p-3 font-semibold rounded-xl text-left transition-all flex items-center gap-3 ${currentView === 'recent-reported' ? 'bg-teal-50 text-teal-700 shadow-sm' : 'text-slate-600 hover:bg-slate-50 hover:text-teal-700'}`}>
+            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${currentView === 'recent-reported' ? 'bg-teal-100' : 'bg-slate-100'}`}><Clock size={16} /></div>
+            My Tickets
+          </button>
+          {userRole === 'authority' && (
+            <>
+              <div className="h-px bg-slate-100 my-1 mx-2"></div>
+              <button onClick={() => { navigateTo('authority-dashboard'); setSidebarOpen(false); }} className={`p-3 font-semibold rounded-xl text-left transition-all flex items-center gap-3 ${currentView === 'authority-dashboard' ? 'bg-teal-50 text-teal-700 shadow-sm' : 'text-slate-600 hover:bg-slate-50 hover:text-teal-700'}`}>
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${currentView === 'authority-dashboard' ? 'bg-teal-100' : 'bg-slate-100'}`}><ShieldCheck size={16} /></div>
+                Authority Workspace
+              </button>
+            </>
+          )}
         </div>
       </div>
 
       {/* Navbar */}
-      <nav className="bg-[#115e59] h-16 flex items-center justify-between px-4 sticky top-0 z-30 shadow-md">
+      <nav className="bg-[#115e59] h-16 flex items-center justify-between px-4 sticky top-0 z-30 shadow-lg shadow-teal-900/20" style={{backgroundImage: 'linear-gradient(135deg, #115e59 0%, #0d4f4a 100%)'}}>
         
         {/* Dropdown Overlay */}
         {(notificationsOpen || userMenuOpen || searchOpen) && (
@@ -918,6 +944,15 @@ export default function App() {
                   <RefreshCw size={10} className="opacity-75" />
                 </button>
               )}
+              {userRole === 'authority' && currentView === 'authority-dashboard' && (
+                <span
+                  title="Authority Workspace"
+                  className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-400/20 text-amber-200 border border-amber-300/30 shadow-xs ml-1"
+                >
+                  <ShieldCheck size={14} className="text-amber-300" />
+                  Workspace
+                </span>
+              )}
             </span>
           </div>
         </div>
@@ -938,11 +973,11 @@ export default function App() {
           
           <button className="hover:text-teal-200 transition-colors relative" onClick={() => { if(!notificationsOpen) pushModalState(); setNotificationsOpen(true); setUserMenuOpen(false); setSearchOpen(false); }}>
             <Bell size={22} />
-            {notifications.length > 0 && <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-orange-500 rounded-full border-2 border-[#115e59]"></span>}
+            {notifications.length > 0 && <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-orange-500 rounded-full border-2 border-[#115e59] pulse-ring"></span>}
           </button>
 
-          <button onClick={() => { if(!userMenuOpen) pushModalState(); setUserMenuOpen(true); setNotificationsOpen(false); setSearchOpen(false); }} className="w-9 h-9 rounded-full bg-teal-700 flex items-center justify-center font-bold text-sm border-2 border-teal-600 hover:bg-teal-600 transition-colors">
-            {userRole === 'authority' ? 'AO' : 'HV'}
+          <button onClick={() => { if(!userMenuOpen) pushModalState(); setUserMenuOpen(true); setNotificationsOpen(false); setSearchOpen(false); }} className="w-9 h-9 rounded-full bg-gradient-to-br from-teal-500 to-teal-700 flex items-center justify-center font-bold text-sm border-2 border-teal-500/50 hover:from-teal-400 hover:to-teal-600 transition-all shadow-md shadow-teal-900/30">
+            {userRole === 'authority' ? 'RS' : 'HV'}
           </button>
 
           {/* Notifications Dropdown */}
@@ -973,8 +1008,8 @@ export default function App() {
           {userMenuOpen && (
             <div className="absolute top-12 right-0 w-64 bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden smooth-enter-up">
               <div className="p-4 border-b">
-                <p className="font-bold text-slate-800">{userRole === 'authority' ? 'Authority Representative' : 'Hritvika Vashistha'}</p>
-                <p className="text-xs text-slate-500">{userRole === 'authority' ? 'authority@jklu.edu.in' : 'hritvikavashistha@jklu.edu.in'}</p>
+                <p className="font-bold text-slate-800">{userRole === 'authority' ? 'Rohit Sir' : 'Hritvika Vashistha'}</p>
+                <p className="text-xs text-slate-500">{userRole === 'authority' ? 'rohit@jklu.edu.in' : 'hritvikavashistha@jklu.edu.in'}</p>
               </div>
               <div className="p-2 text-slate-700">
                 <button 
@@ -1020,140 +1055,169 @@ export default function App() {
 
       {/* View Rendering */}
       {currentView === 'dashboard' ? (
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-20 smooth-enter">
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-20 view-slide-in">
           
-          {/* Welcome Greeting Banner (Lightish Teal Aesthetic Theme) */}
-          <div className="max-w-4xl mx-auto mb-8 bg-gradient-to-r from-teal-50 via-[#e0f5f2] to-teal-50/80 rounded-3xl p-6 sm:p-7 text-slate-800 shadow-sm border border-teal-200/90 relative overflow-hidden backdrop-blur-xs">
-            <div className="absolute -right-8 -top-8 w-48 h-48 bg-teal-200/30 rounded-full blur-3xl pointer-events-none"></div>
-            <div className="absolute right-1/4 -bottom-10 w-40 h-40 bg-emerald-100/40 rounded-full blur-2xl pointer-events-none"></div>
-            <div className="flex items-center gap-4 sm:gap-5 relative z-10">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-teal-500 to-teal-600 text-white flex items-center justify-center font-extrabold text-xl shadow-md shadow-teal-500/20 ring-4 ring-white/90 shrink-0">
-                {userRole === 'authority' ? 'AO' : 'HV'}
+          {/* Welcome Greeting Card */}
+          <div className="w-full bg-gradient-to-r from-teal-50/70 via-emerald-50/30 to-teal-50/40 border border-teal-200/90 rounded-3xl p-6 sm:p-7 shadow-xs mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="flex items-center gap-4 sm:gap-5">
+              <div className="w-14 h-14 rounded-2xl bg-teal-600 text-white flex items-center justify-center font-extrabold text-xl shadow-sm shrink-0">
+                {userRole === 'authority' ? 'RS' : 'HV'}
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <span className="text-[11px] font-bold uppercase tracking-wider px-3 py-0.5 rounded-full bg-white/90 text-teal-800 border border-teal-200/90 shadow-2xs">
-                    {userRole === 'authority' ? 'Official Authority Portal' : 'Student Portal'}
+              <div>
+                <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-white/80 text-teal-800 border border-teal-200/80">
+                    {userRole === 'authority' ? 'Authority Portal' : 'Student Portal'}
                   </span>
-                  <span className="inline-flex items-center gap-1.5 text-xs text-teal-900/75 font-semibold bg-white/60 px-2.5 py-0.5 rounded-full border border-teal-200/60">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span className="inline-flex items-center gap-1.5 text-xs text-teal-700 font-semibold bg-white/80 px-2.5 py-0.5 rounded-full border border-teal-200/80">
+                    <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse"></span>
                     Campus Live
                   </span>
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-800">
-                  Welcome, {userRole === 'authority' ? 'Authority Representative' : 'Hritvika'}
+                  {userRole === 'authority' ? 'Good to see you, Rohit Sir.' : 'Welcome back, Hritvika'}
                 </h2>
-                <p className="text-slate-600 text-sm mt-0.5 font-medium leading-relaxed max-w-2xl">
-                  {userRole === 'authority' 
-                    ? 'Review department queues, manage 4-level escalations, and meet resolution SLAs.'
+                <p className="text-slate-500 text-sm mt-0.5 font-medium">
+                  {userRole === 'authority'
+                    ? 'Review queues, manage escalations, and meet SLAs.'
                     : 'Track your reported complaints or submit a new grievance below.'}
                 </p>
               </div>
             </div>
+
+            {userRole === 'authority' && (
+              <div className="flex flex-wrap gap-2.5 md:shrink-0">
+                <div className="bg-white/90 border border-teal-100 rounded-2xl px-4 py-2 text-center min-w-[76px] shadow-xs">
+                  <p className="text-xl font-black text-teal-800">{issues.filter(i => i.status !== 'Solved').length}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-teal-600/80">Active</p>
+                </div>
+                <div className="bg-white/90 border border-teal-100 rounded-2xl px-4 py-2 text-center min-w-[76px] shadow-xs">
+                  <p className="text-xl font-black text-teal-800">{issues.filter(i => i.status === 'Solved').length}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-teal-600/80">Solved</p>
+                </div>
+                <div className="bg-white/90 border border-teal-100 rounded-2xl px-4 py-2 text-center min-w-[76px] shadow-xs">
+                  <p className="text-xl font-black text-teal-800">{issues.filter(i => i.isEscalated).length}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-teal-600/80">Escalated</p>
+                </div>
+              </div>
+            )}
           </div>
 
-          <div className="text-center mb-10 max-w-3xl mx-auto">
-            <p className="text-slate-500 font-medium mb-1">Welcome to</p>
-            <h1 className="text-6xl md:text-7xl font-extrabold text-[#0d9488] tracking-tighter mb-2 logo-text">
-              Resolvelt
-            </h1>
-            <p className="text-slate-500 italic">Built by the students, for the students.</p>
-          </div>
-
-          {userRole === 'authority' ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-16">
-              {/* Left Box: Resolve Issues */}
-              <div className="bg-teal-50/50 border border-teal-100 rounded-2xl shadow-sm p-8 text-left relative overflow-hidden group cursor-pointer" onClick={() => navigateTo('authority-dashboard')}>
-                <div className="absolute top-0 right-0 w-32 h-32 bg-teal-100/50 rounded-bl-full transition-transform group-hover:scale-110"></div>
-                <ShieldCheck size={40} className="text-teal-600 mb-4" />
-                <h2 className="text-2xl font-bold text-teal-900 mb-2 relative z-10">Authority Workspace</h2>
-                <p className="text-teal-700/80 mb-6 relative z-10 text-sm leading-relaxed">
-                  Review, manage, and resolve student complaints assigned to your department.
-                </p>
-                <Button 
-                  size="lg"
-                  className="bg-teal-600 text-white hover:bg-teal-700 font-bold py-6 px-8 rounded-xl shadow-sm flex items-center gap-2 transition-all transform hover:-translate-y-0.5 relative z-10 text-lg w-full sm:w-auto"
-                >
-                  <CheckCircle size={22} />
-                  Manage Tickets
-                </Button>
-              </div>
-
-              {/* Right Box: Report Issue */}
-              <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-left relative overflow-hidden group cursor-pointer" onClick={() => navigateTo('report')}>
-                <div className="absolute top-0 right-0 w-32 h-32 bg-slate-50 rounded-bl-full transition-transform group-hover:scale-110"></div>
-                <AlertCircle size={40} className="text-orange-500/80 mb-4" />
-                <h2 className="text-2xl font-bold text-slate-800 mb-2 relative z-10">Report an Issue</h2>
-                <p className="text-slate-500 mb-6 relative z-10 text-sm leading-relaxed">
-                  Notice a problem around campus? Report it quickly to get it resolved.
-                </p>
-                <Button 
-                  size="lg"
-                  className="bg-[#ea580c] hover:bg-[#c2410c] text-white font-bold py-6 px-8 rounded-xl shadow-lg shadow-orange-500/30 flex items-center gap-2 transition-all transform hover:-translate-y-0.5 relative z-10 text-lg w-full sm:w-auto"
-                >
-                  <PlusCircle size={22} />
-                  Report a Problem
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-center max-w-3xl mx-auto mb-16 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-slate-50 rounded-bl-full"></div>
-              <h2 className="text-2xl font-bold text-slate-800 mb-3 relative z-10">Facing an Issue?</h2>
-              <p className="text-slate-500 mb-6 relative z-10">
-                Report problems across the campus quickly and track them until they are resolved.
-              </p>
-              <Button 
-                size="lg"
-                onClick={() => navigateTo('report')} 
-                className="bg-[#ea580c] hover:bg-[#c2410c] text-white font-bold py-6 px-8 rounded-xl shadow-lg shadow-orange-500/30 flex items-center gap-2 mx-auto transition-all transform hover:-translate-y-0.5 relative z-10 text-lg"
+          {/* ── Authority Workspace Card (Visible on Home Page for Authority) ── */}
+          {userRole === 'authority' && (
+            <div className="mb-8 smooth-enter-up">
+              <div
+                onClick={() => navigateTo('authority-dashboard')}
+                className="card-hover bg-gradient-to-r from-teal-50/90 via-emerald-50/40 to-teal-50/70 border border-teal-300/80 hover:border-teal-400 rounded-3xl p-6 sm:p-7 shadow-xs hover:shadow-md transition-all cursor-pointer group relative overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between gap-5"
               >
-                <PlusCircle size={22} />
-                Report a Problem
-              </Button>
+                <div className="absolute top-0 right-0 w-80 h-full bg-gradient-to-l from-teal-100/50 via-emerald-50/30 to-transparent pointer-events-none"></div>
+                <div className="absolute -right-8 -bottom-8 w-36 h-36 bg-teal-300/20 rounded-full blur-2xl pointer-events-none"></div>
+
+                <div className="flex items-center gap-4 relative z-10">
+                  <div className="w-[52px] h-[52px] rounded-2xl bg-teal-600 text-white shadow-md shadow-teal-700/20 flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-teal-700 transition-all">
+                    <ShieldCheck size={26} strokeWidth={2.2} />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-md bg-teal-700 text-white">
+                        Official Officer Workspace
+                      </span>
+                      <span className="text-xs font-bold text-teal-800 bg-white/80 px-2.5 py-0.5 rounded-full border border-teal-200">
+                        {issues.filter(i => i.status !== 'Solved').length} Active Tickets
+                      </span>
+                    </div>
+                    <h2 className="text-lg sm:text-xl font-extrabold text-slate-800 tracking-tight group-hover:text-teal-700 transition-colors">
+                      Authority Workspace
+                    </h2>
+                    <p className="text-slate-600 text-xs sm:text-sm font-medium mt-0.5 leading-relaxed">
+                      Review department queues, manage 4-level escalations, acknowledge tickets, and resolve student complaints.
+                    </p>
+                  </div>
+                </div>
+
+                <Button
+                  size="lg"
+                  className="bg-teal-700 hover:bg-teal-800 text-white font-bold text-sm px-6 py-2.5 rounded-xl shadow-md shadow-teal-700/20 hover:shadow-teal-700/30 hover:scale-[1.02] active:scale-[0.98] transition-all ml-auto shrink-0 relative z-10 flex items-center gap-2 cursor-pointer border-0"
+                >
+                  <ShieldCheck size={17} /> Go to Workspace &rarr;
+                </Button>
+              </div>
             </div>
           )}
 
+          {/* ── CTA Section: Facing a Campus Issue? ──────────────── */}
+          <div className="mb-8">
+            <div
+              onClick={() => navigateTo('report')}
+              className="card-hover bg-white border border-orange-200/90 hover:border-orange-300 rounded-3xl p-6 sm:p-7 shadow-xs hover:shadow-md transition-all cursor-pointer group relative overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between gap-5"
+            >
+              <div className="absolute top-0 right-0 w-80 h-full bg-gradient-to-l from-orange-50/80 via-amber-50/30 to-transparent pointer-events-none"></div>
+              <div className="absolute -right-8 -bottom-8 w-36 h-36 bg-orange-200/25 rounded-full blur-2xl pointer-events-none"></div>
+
+              <div className="flex items-center gap-4 relative z-10">
+                <div className="w-13 h-13 w-[52px] h-[52px] rounded-2xl bg-orange-50 text-orange-600 border border-orange-200/70 flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-orange-100 transition-all shadow-xs">
+                  <PlusCircle size={26} strokeWidth={2.2} />
+                </div>
+                <div>
+                  <h2 className="text-lg sm:text-xl font-extrabold text-slate-800 tracking-tight group-hover:text-orange-600 transition-colors">
+                    Facing a Campus Issue?
+                  </h2>
+                  <p className="text-slate-500 text-xs sm:text-sm font-medium mt-0.5 leading-relaxed">
+                    Report it now — your ticket will be routed to the right authority automatically.
+                  </p>
+                </div>
+              </div>
+
+              <Button
+                size="lg"
+                className="bg-orange-600 hover:bg-orange-700 text-white font-bold text-sm px-6 py-2.5 rounded-xl shadow-md shadow-orange-600/20 hover:shadow-orange-600/30 hover:scale-[1.02] active:scale-[0.98] transition-all ml-auto shrink-0 relative z-10 flex items-center gap-2 cursor-pointer border-0"
+              >
+                <PlusCircle size={17} /> Report a Problem
+              </Button>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             {/* Left Sidebar: Categories */}
-            <div className="lg:col-span-1 space-y-6">
-              <div>
-                <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                  <Filter size={18} className="text-teal-600" /> Departments
+            <div className="lg:col-span-1">
+              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 sticky top-20">
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                  <Filter size={14} className="text-teal-500" /> Filter by Dept.
                 </h3>
-                <div className="flex flex-col gap-2">
-                  {['All Departments', 'Hostel, Mess & Laundry', 'Campus Infrastructure & IT', 'Academics & Library', 'Health & Safety'].map(dept => (
-                    <button 
+                <div className="flex flex-col gap-1.5 max-h-[260px] overflow-y-auto pr-1.5">
+                  {['All Departments', ...Object.keys(ISSUE_DATA)].map(dept => (
+                    <button
                       key={dept}
                       onClick={() => setSelectedDepartmentFilter(dept)}
-                      className={`text-left px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${selectedDepartmentFilter === dept ? 'bg-teal-600 text-white shadow-md shadow-teal-500/20' : 'text-slate-600 hover:bg-teal-50 hover:text-teal-700 bg-transparent'}`}
+                      className={`text-left px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2.5 shrink-0 ${
+                        selectedDepartmentFilter === dept
+                          ? 'bg-teal-600 text-white shadow-md shadow-teal-500/20'
+                          : 'text-slate-600 hover:bg-slate-50 hover:text-teal-700'
+                      }`}
                     >
-                      {dept}
+                      <span className={`w-2 h-2 rounded-full shrink-0 ${
+                        selectedDepartmentFilter === dept ? 'bg-white' :
+                        dept === 'All Departments' ? 'bg-slate-400' :
+                        dept.includes('Hostel') ? 'bg-teal-400' :
+                        dept.includes('Infrastructure') ? 'bg-blue-400' :
+                        dept.includes('Academics') ? 'bg-violet-400' :
+                        dept.includes('Sports') || dept.includes('Student Life') ? 'bg-amber-400' :
+                        dept.includes('Health') ? 'bg-rose-400' :
+                        'bg-emerald-400'
+                      }`}></span>
+                      <span className="truncate">{dept}</span>
                     </button>
                   ))}
                 </div>
               </div>
             </div>
 
-            {/* Right Content: Issues Grid */}
+            {/* Right Content: Issues Feed */}
             <div className="lg:col-span-3">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
                 <div>
                   <h3 className="text-xl font-bold text-slate-800">
                     {selectedDepartmentFilter === 'All Departments' ? 'Recent Campus Issues' : selectedDepartmentFilter}
                   </h3>
-                  {userRole === 'authority' && (
-                    <p className="text-xs text-slate-500 mt-1 flex items-center gap-1.5 font-medium">
-                      <span className="w-2 h-2 rounded-full bg-teal-500"></span>
-                      Viewing student grievance feed (Read-Only) • Take official action in{' '}
-                      <button 
-                        onClick={() => navigateTo('authority-dashboard')} 
-                        className="text-teal-700 font-bold hover:underline inline-flex items-center gap-0.5 cursor-pointer"
-                      >
-                        Authority Workspace &rarr;
-                      </button>
-                    </p>
-                  )}
                 </div>
                 <div className="bg-slate-200 p-1 rounded-lg flex text-sm font-bold w-fit">
                   <button onClick={() => setFilterTab('Top')} className={`px-5 py-1.5 rounded-md transition-all ${filterTab === 'Top' ? 'bg-white text-teal-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>Trending</button>
@@ -1163,7 +1227,7 @@ export default function App() {
 
               <div className="flex flex-col gap-4">
                 {[...issues]
-                  .filter(issue => selectedDepartmentFilter === 'All Departments' || issue.department === selectedDepartmentFilter)
+                  .filter(issue => selectedDepartmentFilter === 'All Departments' || issue.department === selectedDepartmentFilter || (selectedDepartmentFilter.includes('Health') && issue.department?.includes('Health')))
                   .filter(issue => 
                     issue.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
                     issue.description.toLowerCase().includes(searchQuery.toLowerCase())
@@ -1182,42 +1246,52 @@ export default function App() {
                     }
                   })
                   .map(issue => (
-                    <Card key={issue.id} className="hover:border-teal-300 transition-all cursor-pointer group shadow-sm hover:shadow-md bg-white rounded-2xl border border-slate-200" onClick={() => openIssueDetails(issue, 'dashboard')}>
+                    <Card key={issue.id} onClick={() => openIssueDetails(issue, 'dashboard')}
+                      className={`card-hover cursor-pointer group bg-white rounded-2xl border border-slate-200 overflow-hidden transition-all duration-200 hover:border-teal-300 ${
+                        issue.statusColor === 'emerald' ? 'card-accent-emerald' :
+                        issue.statusColor === 'blue'    ? 'card-accent-blue' :
+                        issue.statusColor === 'amber'   ? 'card-accent-amber' :
+                        'card-accent-rose'
+                      }`}
+                    >
                       <CardHeader className="pb-2">
                         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                           <div className="flex-1 min-w-0">
-                            <CardTitle className="text-lg font-bold text-slate-800 group-hover:text-teal-700 transition-colors leading-snug mb-2">
+                            <CardTitle className="text-base font-bold text-slate-800 group-hover:text-teal-700 transition-colors leading-snug mb-2">
                               {issue.title}
                             </CardTitle>
                             <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-slate-500">
-                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-100 text-slate-700">
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600">
                                 <div className="w-1.5 h-1.5 rounded-full bg-teal-500 shrink-0"></div>
                                 <span className="truncate">{issue.category}</span>
                               </span>
-                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-100 text-slate-700">
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600">
                                 <div className="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0"></div>
                                 <span className="truncate">{issue.department}</span>
                               </span>
                             </div>
                           </div>
-                          <Badge variant="outline" className={`shrink-0 self-start gap-1 px-3 py-1 rounded-full text-xs font-bold border ${
-                            issue.statusColor === 'emerald' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 
-                            issue.statusColor === 'blue' ? 'bg-blue-50 text-blue-600 border-blue-200' : 
-                            issue.statusColor === 'amber' ? 'bg-amber-50 text-amber-600 border-amber-200' : 
-                            'bg-rose-50 text-rose-600 border-rose-200'
-                          }`}>
-                            {issue.status === 'Solved' && <CheckCircle size={12} />}
-                            {issue.status === 'Seen' && <CheckCircle size={12} className="opacity-70" />}
-                            {issue.status === 'Not Started' && <AlertCircle size={12} />}
-                            {issue.status}
-                          </Badge>
+                          <div className="flex items-start gap-2 shrink-0">
+                            {issue.imageUrl && <img src={issue.imageUrl} alt="" className="w-14 h-14 rounded-xl object-cover border border-slate-100 hidden sm:block" />}
+                            <Badge variant="outline" className={`shrink-0 self-start gap-1 px-3 py-1 rounded-full text-xs font-bold border ${
+                              issue.statusColor === 'emerald' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 
+                              issue.statusColor === 'blue' ? 'bg-blue-50 text-blue-600 border-blue-200' : 
+                              issue.statusColor === 'amber' ? 'bg-amber-50 text-amber-600 border-amber-200' : 
+                              'bg-rose-50 text-rose-600 border-rose-200'
+                            }`}>
+                              {issue.status === 'Solved' && <CheckCircle size={12} />}
+                              {issue.status === 'Seen' && <CheckCircle size={12} className="opacity-70" />}
+                              {issue.status === 'Not Started' && <AlertCircle size={12} />}
+                              {issue.status}
+                            </Badge>
+                          </div>
                         </div>
                       </CardHeader>
                       <CardContent className="pt-1">
-                        <p className="text-slate-600 text-sm line-clamp-2 leading-relaxed mb-4">{issue.description}</p>
+                        <p className="text-slate-500 text-sm line-clamp-2 leading-relaxed mb-4">{issue.description}</p>
                         <div className="text-xs font-bold tracking-wide flex items-center justify-between border-t border-slate-100 pt-3">
                           <span className="flex items-center gap-1.5 text-slate-400">
-                            <Clock size={14} /> {issue.time.toUpperCase()}
+                            <Clock size={13} /> {issue.time.toUpperCase()}
                           </span>
                           <div className="flex items-center gap-3">
                             {issue.comments && issue.comments.length > 0 && (
@@ -1225,16 +1299,42 @@ export default function App() {
                                 <MessageSquare size={13} /> {issue.comments.length}
                               </span>
                             )}
-                            <span className={`flex items-center gap-1.5 px-3 py-1 rounded-lg transition-colors ${issue.isLiked ? 'bg-teal-50 text-teal-700 border border-teal-200' : 'bg-slate-50 text-slate-600 border border-slate-200 group-hover:bg-orange-50 group-hover:text-orange-600 group-hover:border-orange-200'}`}>
-                              <ArrowUp size={14} className={issue.isLiked ? 'text-teal-600' : ''} /> {issue.upvotes}
-                            </span>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (issue.status === 'Solved') return;
+                                setIssues(prev => prev.map(item => {
+                                  if (item.id === issue.id) {
+                                    const nextLiked = !item.isLiked;
+                                    return {
+                                      ...item,
+                                      isLiked: nextLiked,
+                                      upvotes: item.upvotes + (nextLiked ? 1 : -1)
+                                    };
+                                  }
+                                  return item;
+                                }));
+                              }}
+                              disabled={issue.status === 'Solved'}
+                              title={issue.status === 'Solved' ? 'Issue solved · Upvotes closed' : issue.isLiked ? 'Remove upvote' : 'Upvote problem'}
+                              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold transition-all ${
+                                issue.status === 'Solved'
+                                  ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-default'
+                                  : issue.isLiked 
+                                    ? 'bg-teal-50 text-teal-700 border border-teal-200 shadow-2xs hover:bg-teal-100 cursor-pointer' 
+                                    : 'bg-slate-50 text-slate-600 border border-slate-200 hover:bg-teal-50 hover:text-teal-700 hover:border-teal-200 cursor-pointer'
+                              }`}
+                            >
+                              <ArrowUp size={13} className={issue.isLiked ? 'text-teal-600 font-extrabold' : ''} /> {issue.upvotes}
+                            </button>
                           </div>
                         </div>
                       </CardContent>
                     </Card>
                   ))}
               </div>
-              {issues.filter(issue => selectedDepartmentFilter === 'All Departments' || issue.department === selectedDepartmentFilter).length === 0 && (
+              {issues.filter(issue => selectedDepartmentFilter === 'All Departments' || issue.department === selectedDepartmentFilter || (selectedDepartmentFilter.includes('Health') && issue.department?.includes('Health'))).length === 0 && (
                 <div className="text-center p-12 bg-white rounded-2xl border border-slate-200 border-dashed mt-4">
                   <p className="text-slate-500 font-medium">No issues found for {selectedDepartmentFilter}.</p>
                 </div>
@@ -1243,7 +1343,7 @@ export default function App() {
           </div>
         </main>
       ) : currentView === 'authority-dashboard' ? (
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-20 smooth-enter">
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-20 view-slide-in">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <div className="flex items-center gap-3">
               <button onClick={() => { if (window.history.length > 1) window.history.back(); else navigateTo('dashboard'); }} className="text-teal-700 hover:text-teal-900 p-2 rounded-full hover:bg-teal-50 transition-colors border border-slate-200 bg-white shadow-sm">
@@ -1470,7 +1570,12 @@ export default function App() {
                   <Card 
                     key={issue.id} 
                     onClick={() => openIssueDetails(issue, 'authority-dashboard')}
-                    className="hover:border-teal-400 hover:shadow-md transition-all bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden group cursor-pointer"
+                    className={`card-hover cursor-pointer group bg-white rounded-2xl border border-slate-200 overflow-hidden transition-all duration-200 hover:border-teal-300 ${
+                      issue.statusColor === 'emerald' ? 'card-accent-emerald' :
+                      issue.statusColor === 'blue'    ? 'card-accent-blue' :
+                      issue.statusColor === 'amber'   ? 'card-accent-amber' :
+                      'card-accent-rose'
+                    }`}
                   >
                     <CardHeader className="pb-3 pt-5 px-6">
                       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
@@ -1554,66 +1659,23 @@ export default function App() {
                         {issue.description}
                       </p>
 
-                      <div className="pt-3 border-t border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
-                        {/* Direct Authority Quick Actions inside Workspace */}
-                        <div className="flex flex-wrap items-center gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={(e) => handleAcknowledge(issue.id, e)}
-                            disabled={issue.status === 'In Progress' || issue.status === 'Solved'}
-                            className={`rounded-xl text-xs font-bold gap-1.5 h-8 px-3 ${
-                              issue.status === 'In Progress' || issue.status === 'Solved'
-                                ? 'bg-slate-100 text-slate-400 border-slate-200'
-                                : 'bg-white text-teal-700 border-teal-200 hover:bg-teal-50 shadow-xs'
-                            }`}
-                          >
-                            <CheckCircle size={13} />
-                            {issue.status === 'In Progress' ? 'Acknowledged' : 'Acknowledge'}
-                          </Button>
-
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={(e) => handleOpenPostUpdate(issue, e)}
-                            className="bg-white hover:bg-blue-50 text-blue-700 border-blue-200 rounded-xl text-xs font-bold gap-1.5 h-8 px-3 shadow-xs"
-                          >
-                            <MessageSquare size={13} />
-                            Post Update
-                          </Button>
-
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={(e) => handleOpenEscalate(issue, e)}
-                            disabled={(issue.currentLevel || 1) >= 4 || issue.status === 'Solved'}
-                            className={`rounded-xl text-xs font-bold gap-1.5 h-8 px-3 ${
-                              (issue.currentLevel || 1) >= 4 || issue.status === 'Solved'
-                                ? 'bg-slate-100 text-slate-400 border-slate-200 opacity-60'
-                                : 'bg-white hover:bg-amber-50 text-amber-800 border-amber-300 shadow-xs'
-                            }`}
-                          >
-                            <Zap size={13} className="text-amber-600" />
-                            Escalate
-                          </Button>
-
-                          <Button
-                            size="sm"
-                            onClick={(e) => handleOneClickSolve(issue.id, e)}
-                            disabled={issue.status === 'Solved'}
-                            className={`rounded-xl text-xs font-extrabold gap-1.5 h-8 px-3 shadow-xs ${
-                              issue.status === 'Solved'
-                                ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-100 cursor-default border border-emerald-200'
-                                : 'bg-emerald-600 hover:bg-emerald-700 text-white'
-                            }`}
-                          >
-                            <CheckCheck size={14} />
-                            {issue.status === 'Solved' ? 'Resolved' : 'Mark Solved'}
-                          </Button>
+                      <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-3 text-xs">
+                        <div className="flex flex-wrap items-center gap-4 text-slate-500 font-medium">
+                          <span className="flex items-center gap-1.5 text-slate-500">
+                            <Clock size={13} className="text-slate-400" /> Reported {issue.time}
+                          </span>
+                          <span className="flex items-center gap-1 text-slate-600 font-semibold">
+                            <ArrowUp size={13} className="text-teal-600" /> {issue.upvotes} Upvotes
+                          </span>
+                          {issue.comments && issue.comments.length > 0 && (
+                            <span className="flex items-center gap-1 text-slate-500">
+                              <MessageSquare size={13} className="text-slate-400" /> {issue.comments.length} Comments
+                            </span>
+                          )}
                         </div>
 
-                        <div className="flex items-center justify-end">
-                          <span className="font-bold text-teal-700 group-hover:text-teal-800 flex items-center gap-1 group-hover:translate-x-1 transition-all">
+                        <div className="flex items-center justify-end shrink-0">
+                          <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-bold text-xs text-teal-700 bg-teal-50 border border-teal-200/80 group-hover:bg-teal-600 group-hover:text-white group-hover:border-teal-600 transition-all shadow-xs">
                             Manage Ticket &rarr;
                           </span>
                         </div>
@@ -1654,7 +1716,7 @@ export default function App() {
           </div>
         </main>
       ) : currentView === 'recent-reported' ? (
-        <main className="max-w-4xl mx-auto px-4 pt-8 pb-20 smooth-enter">
+        <main className="max-w-4xl mx-auto px-4 pt-8 pb-20 view-slide-in">
           <div className="flex items-center gap-3 mb-6">
             <button onClick={() => { if (window.history.length > 1) window.history.back(); else navigateTo('dashboard'); }} className="text-teal-700 hover:text-teal-900 p-2 rounded-full hover:bg-teal-50 transition-colors border border-slate-200 bg-white shadow-sm">
               &larr; Back
@@ -1718,7 +1780,13 @@ export default function App() {
                 return issue.isMine;
               })
               .map(issue => (
-                <Card key={issue.id} className="hover:border-teal-300 transition-all cursor-pointer group bg-white rounded-2xl border border-slate-200 shadow-sm" onClick={() => openIssueDetails(issue, 'recent-reported')}>
+                <Card key={issue.id} onClick={() => openIssueDetails(issue, 'recent-reported')}
+                  className={`card-hover cursor-pointer group bg-white rounded-2xl border border-slate-200 overflow-hidden transition-all duration-200 hover:border-teal-300 ${
+                    issue.statusColor === 'emerald' ? 'card-accent-emerald' :
+                    issue.statusColor === 'blue'    ? 'card-accent-blue' :
+                    issue.statusColor === 'amber'   ? 'card-accent-amber' :
+                    'card-accent-rose'
+                  }`}>
                   <CardHeader className="pb-2">
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                       <div>
@@ -1758,9 +1826,35 @@ export default function App() {
                       <span className="flex items-center gap-1.5">
                         <Clock size={14} /> REPORTED {issue.time.toUpperCase()}
                       </span>
-                      <span className="flex items-center gap-1 text-slate-500">
-                        <ThumbsUp size={14} className={issue.isLiked ? 'text-teal-600 fill-teal-600' : ''} /> {issue.upvotes} Upvotes
-                      </span>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (issue.status === 'Solved') return;
+                          setIssues(prev => prev.map(item => {
+                            if (item.id === issue.id) {
+                              const nextLiked = !item.isLiked;
+                              return {
+                                ...item,
+                                isLiked: nextLiked,
+                                upvotes: item.upvotes + (nextLiked ? 1 : -1)
+                              };
+                            }
+                            return item;
+                          }));
+                        }}
+                        disabled={issue.status === 'Solved'}
+                        title={issue.status === 'Solved' ? 'Issue solved · Upvotes closed' : issue.isLiked ? 'Remove upvote' : 'Upvote problem'}
+                        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+                          issue.status === 'Solved'
+                            ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-default'
+                            : issue.isLiked 
+                              ? 'bg-teal-50 text-teal-700 border border-teal-200 hover:bg-teal-100 cursor-pointer' 
+                              : 'bg-slate-50 text-slate-600 border border-slate-200 hover:bg-teal-50 hover:text-teal-700 cursor-pointer'
+                        }`}
+                      >
+                        <ArrowUp size={13} className={issue.isLiked ? 'text-teal-600 font-extrabold' : ''} /> {issue.upvotes}
+                      </button>
                     </div>
                   </CardContent>
                 </Card>
@@ -1793,8 +1887,8 @@ export default function App() {
         </main>
       ) : currentView === 'issue-details' ? (
         selectedIssue ? (
-        <main className="max-w-5xl mx-auto px-4 pt-10 pb-20 smooth-enter">
-          <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-6 md:p-10 mb-8">
+        <main className="max-w-5xl mx-auto px-4 pt-10 pb-20 view-slide-in">
+          <div className="bg-white border border-slate-200 shadow-md shadow-slate-100/60 rounded-2xl p-6 md:p-10 mb-8">
             <button 
               onClick={() => { 
                 if (issueSourceView === 'authority-dashboard') {
@@ -1839,10 +1933,13 @@ export default function App() {
                     <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-200 text-slate-700 font-bold">{selectedIssue.department}</span>
                   </div>
                   <p className="text-sm font-semibold text-slate-800 mt-1">
-                    Current Assigned Authority: <strong className="text-teal-700 font-extrabold text-base">
+                    {selectedIssue.status === 'Solved' ? 'Resolved by Authority: ' : 'Current Assigned Authority: '}
+                    <strong className="text-teal-700 font-extrabold text-base">
                       {selectedIssue.assignedAuthority || getAuthorityTitle(selectedIssue.department, selectedIssue.currentLevel || 1)}
                     </strong>
-                    <span className="text-xs font-bold text-slate-500 ml-2">(Level {selectedIssue.currentLevel || 1})</span>
+                    <span className="text-xs font-bold text-slate-500 ml-2">
+                      ({selectedIssue.status === 'Solved' ? `Resolved at Level ${selectedIssue.currentLevel || 1}` : `Level ${selectedIssue.currentLevel || 1}`})
+                    </span>
                   </p>
                 </div>
                 {selectedIssue.isEscalated && (
@@ -1860,27 +1957,40 @@ export default function App() {
                   const curLvl = selectedIssue.currentLevel || 1;
                   const isPast = lvl < curLvl;
                   const isCurrent = lvl === curLvl;
+                  const isSolved = selectedIssue.status === 'Solved';
 
                   return (
                     <div key={lvl} className="flex flex-col items-center text-center relative group">
                       <div className={`w-9 h-9 sm:w-11 sm:h-11 rounded-2xl flex items-center justify-center font-extrabold text-xs sm:text-sm mb-2 transition-all ${
                         isCurrent
-                          ? 'bg-teal-600 text-white ring-4 ring-teal-200 shadow-md scale-105'
+                          ? isSolved
+                            ? 'bg-emerald-600 text-white ring-4 ring-emerald-200 shadow-md scale-105'
+                            : 'bg-teal-600 text-white ring-4 ring-teal-200 shadow-md scale-105'
                           : isPast
                           ? 'bg-emerald-500 text-white shadow-sm'
                           : 'bg-white text-slate-400 border border-slate-200'
                       }`}>
-                        {isPast ? <Check size={18} strokeWidth={2.5} /> : `L${lvl}`}
+                        {isPast || (isCurrent && isSolved) ? <Check size={18} strokeWidth={2.5} /> : `L${lvl}`}
                       </div>
                       <span className={`text-[11px] sm:text-xs font-bold leading-tight max-w-[120px] ${
-                        isCurrent ? 'text-teal-900 font-extrabold' : isPast ? 'text-slate-700' : 'text-slate-400'
+                        isCurrent 
+                          ? (isSolved ? 'text-emerald-900 font-extrabold' : 'text-teal-900 font-extrabold') 
+                          : isPast 
+                          ? 'text-slate-700' 
+                          : 'text-slate-400'
                       }`}>
                         {levelTitle}
                       </span>
                       <span className={`text-[10px] mt-1 font-semibold ${
-                        isCurrent ? 'text-teal-600 uppercase tracking-wider' : 'text-slate-400'
+                        isCurrent 
+                          ? (isSolved ? 'text-emerald-600 font-bold uppercase tracking-wider' : 'text-teal-600 uppercase tracking-wider') 
+                          : 'text-slate-400'
                       }`}>
-                        {lvl === 4 ? 'Supreme' : isCurrent ? 'Active Now' : `Level ${lvl}`}
+                        {isCurrent 
+                          ? (isSolved ? 'Resolved Here' : 'Active Now') 
+                          : lvl === 4 
+                          ? 'Supreme' 
+                          : `Level ${lvl}`}
                       </span>
                     </div>
                   );
@@ -1983,32 +2093,32 @@ export default function App() {
                 </div>
                 <Button
                   onClick={() => {
-                    navigateTo('authority-dashboard');
+                    setIssueSourceView('authority-dashboard');
                   }}
                   className="bg-[#115e59] hover:bg-[#0f524e] text-white text-xs font-bold px-4 py-2.5 rounded-xl shrink-0 flex items-center gap-2 shadow-sm transition-transform active:scale-95 cursor-pointer"
                 >
                   <ShieldCheck size={14} />
-                  Go to Authority Workspace &rarr;
+                  Take Official Action on Ticket &rarr;
                 </Button>
               </div>
             )}
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-              <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                <p className="text-xs text-slate-400 font-bold tracking-wider mb-1">DEPARTMENT</p>
-                <p className="font-medium text-slate-700">{selectedIssue.department}</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+              <div className="bg-gradient-to-br from-slate-50 to-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                <p className="text-[10px] text-slate-400 font-bold tracking-widest mb-1.5 uppercase">Department</p>
+                <p className="font-semibold text-slate-800 text-sm leading-tight">{selectedIssue.department}</p>
               </div>
-              <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                <p className="text-xs text-slate-400 font-bold tracking-wider mb-1">CATEGORY</p>
-                <p className="font-medium text-slate-700">{selectedIssue.category}</p>
+              <div className="bg-gradient-to-br from-slate-50 to-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                <p className="text-[10px] text-slate-400 font-bold tracking-widest mb-1.5 uppercase">Category</p>
+                <p className="font-semibold text-slate-800 text-sm leading-tight">{selectedIssue.category}</p>
               </div>
-              <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                <p className="text-xs text-slate-400 font-bold tracking-wider mb-1">SPECIFIC ISSUE</p>
-                <p className="font-medium text-slate-700">{selectedIssue.specificIssue}</p>
+              <div className="bg-gradient-to-br from-slate-50 to-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                <p className="text-[10px] text-slate-400 font-bold tracking-widest mb-1.5 uppercase">Specific Issue</p>
+                <p className="font-semibold text-slate-800 text-sm leading-tight">{selectedIssue.specificIssue}</p>
               </div>
-              <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                <p className="text-xs text-slate-400 font-bold tracking-wider mb-1">EXACT LOCATION</p>
-                <p className="font-medium text-slate-700">{selectedIssue.location}</p>
+              <div className="bg-gradient-to-br from-slate-50 to-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                <p className="text-[10px] text-slate-400 font-bold tracking-widest mb-1.5 uppercase">Location</p>
+                <p className="font-semibold text-slate-800 text-sm leading-tight">{selectedIssue.location}</p>
               </div>
             </div>
             
@@ -2033,7 +2143,7 @@ export default function App() {
             )}
             
             <div className="flex flex-col sm:flex-row gap-4 border-t border-slate-100 pt-8">
-              {!selectedIssue.isMine && (
+              {selectedIssue.status !== 'Solved' ? (
                 <button 
                   onClick={() => {
                     setIssues(prevIssues => prevIssues.map(issue => {
@@ -2050,14 +2160,23 @@ export default function App() {
                       return issue;
                     }));
                   }}
-                  className={`flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl font-bold transition-all border ${selectedIssue.isLiked ? 'bg-teal-50 text-teal-700 border-teal-200' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`}
+                  className={`flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl font-bold transition-all border cursor-pointer ${
+                    selectedIssue.isLiked 
+                      ? 'bg-teal-50 text-teal-700 border-teal-200 shadow-sm' 
+                      : 'bg-white text-slate-700 border-slate-200 hover:bg-teal-50 hover:text-teal-700 hover:border-teal-200'
+                  }`}
                 >
-                  <ThumbsUp size={20} className={selectedIssue.isLiked ? 'fill-teal-700' : ''} /> {selectedIssue.isLiked ? 'Upvoted' : 'Upvote'} ({selectedIssue.upvotes})
+                  <ThumbsUp size={20} className={selectedIssue.isLiked ? 'fill-teal-700 text-teal-700' : ''} /> 
+                  {selectedIssue.isLiked ? 'Upvoted' : 'Upvote'} ({selectedIssue.upvotes})
                 </button>
+              ) : (
+                <div className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-bold bg-slate-100 text-slate-500 border border-slate-200">
+                  <CheckCircle size={18} className="text-emerald-600" /> Solved • Upvotes Closed ({selectedIssue.upvotes})
+                </div>
               )}
               <button 
                 onClick={() => setIsCommenting(true)}
-                className="flex items-center justify-center gap-2 bg-slate-100 text-slate-700 hover:bg-slate-200 border border-transparent px-8 py-3.5 rounded-xl font-bold transition-colors"
+                className="flex items-center justify-center gap-2 bg-slate-100 text-slate-700 hover:bg-slate-200 border border-transparent px-8 py-3.5 rounded-xl font-bold transition-colors cursor-pointer"
               >
                 <MessageSquare size={20} /> Add Comment
               </button>
@@ -2066,21 +2185,28 @@ export default function App() {
             {/* Communication Thread */}
             <div className="mt-10 border-t border-slate-100 pt-8 smooth-enter-up">
               <div className="flex items-center justify-between mb-6">
-                <p className="text-sm text-slate-400 font-bold tracking-wider">PRIVATE THREAD</p>
-                <span className="text-xs font-bold text-teal-600 bg-teal-50 px-2.5 py-1 rounded-full flex items-center gap-1.5"><ShieldCheck size={14} /> Only visible to you and Authority</span>
+                <p className="text-sm text-slate-400 font-bold tracking-wider uppercase">Comments & Official Updates</p>
+                <span className="text-xs font-bold text-teal-700 bg-teal-50 px-3 py-1 rounded-full flex items-center gap-1.5 border border-teal-200/80">
+                  <MessageSquare size={13} /> Public Campus Thread
+                </span>
               </div>
               
-              <div className="space-y-4 mb-6">
+              <div className="space-y-3 mb-6">
                  {selectedIssue.comments && selectedIssue.comments.map((c: any, i: number) => (
-                    <div key={i} className="bg-slate-50 p-5 rounded-xl border border-slate-100">
-                       <p className="text-sm font-bold text-slate-800 mb-2">{c.author} <span className="text-slate-400 font-medium text-xs ml-2">{c.time}</span></p>
-                       <p className="text-slate-700 text-[15px]">{c.text}</p>
+                    <div key={i} className="bg-gradient-to-br from-slate-50 to-white p-5 rounded-2xl border border-slate-100 shadow-sm smooth-enter-up">
+                       <div className="flex items-center gap-2 mb-2">
+                         <div className="w-7 h-7 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center font-bold text-xs shrink-0">{c.author[0]}</div>
+                         <p className="text-sm font-bold text-slate-800">{c.author}</p>
+                         <span className="text-slate-400 font-medium text-xs ml-auto">{c.time}</span>
+                       </div>
+                       <p className="text-slate-600 text-sm leading-relaxed pl-9">{c.text}</p>
                     </div>
                  ))}
                  {(!selectedIssue.comments || selectedIssue.comments.length === 0) && (
-                    <div className="text-center p-8 bg-slate-50 rounded-xl border border-slate-100 border-dashed">
-                      <p className="text-slate-500 font-medium">No messages yet.</p>
-                      <p className="text-slate-400 text-sm mt-1">Use this thread to communicate directly with the handling authority.</p>
+                    <div className="text-center p-10 bg-slate-50 rounded-2xl border border-slate-100 border-dashed">
+                      <MessageSquare size={28} className="mx-auto text-slate-300 mb-3" />
+                      <p className="text-slate-500 font-semibold">No messages yet.</p>
+                      <p className="text-slate-400 text-sm mt-1">This thread is open to all students and authorities to post updates and comments.</p>
                     </div>
                  )}
               </div>
@@ -2090,12 +2216,12 @@ export default function App() {
                     <Textarea 
                       value={newComment}
                       onChange={(e) => setNewComment(e.target.value)}
-                      placeholder="Type your message to the authority here..."
+                      placeholder="Type your comment or update here..."
                       className="w-full mb-4 resize-none h-24"
                     />
                     <div className="flex gap-3 justify-end">
                        <button onClick={() => setIsCommenting(false)} className="px-5 py-2 font-bold text-slate-500 hover:bg-slate-100 rounded-lg transition-colors">Cancel</button>
-                       <Button onClick={submitComment} className="bg-teal-600 hover:bg-teal-700 text-white font-bold px-6 py-2 rounded-lg">Send Message</Button>
+                       <Button onClick={submitComment} className="bg-teal-600 hover:bg-teal-700 text-white font-bold px-6 py-2 rounded-lg">Post Comment</Button>
                     </div>
                  </div>
               )}
@@ -2111,18 +2237,18 @@ export default function App() {
         )
       ) : (
         /* Report a Problem View */
-        <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-300">
+        <main className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-20 view-slide-in">
           
-          <div className="bg-white border border-slate-200 shadow-xl shadow-slate-200/40 rounded-3xl overflow-hidden">
+          <div className="bg-white border border-slate-200 shadow-xl shadow-slate-100/60 rounded-3xl overflow-hidden">
             
             {/* Header */}
-            <div className="bg-slate-50/80 border-b border-slate-100 p-8 flex items-center gap-4">
-              <div className="p-3.5 bg-white rounded-2xl text-orange-500 shadow-sm border border-slate-100">
-                <AlertCircle size={28} strokeWidth={2.5} />
+            <div className="bg-gradient-to-r from-slate-50 to-orange-50/30 border-b border-slate-100 p-7 flex items-center gap-4">
+              <div className="p-3.5 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl text-white shadow-lg shadow-orange-500/25">
+                <AlertCircle size={26} strokeWidth={2.5} />
               </div>
               <div>
-                <h2 className="text-2xl font-extrabold text-slate-800 tracking-tight">Report a Problem</h2>
-                <p className="text-slate-500 text-sm font-medium mt-1">Submit an official ticket for fast resolution.</p>
+                <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">Report a Problem</h2>
+                <p className="text-slate-500 text-sm font-medium mt-0.5">Submit an official ticket for fast resolution.</p>
               </div>
             </div>
             
@@ -2536,14 +2662,14 @@ export default function App() {
 
       {/* Footer (Only on Dashboard) */}
       {currentView === 'dashboard' && (
-        <footer className="mt-auto bg-[#f8fafc] flex flex-col items-center pb-8 pt-8">
-          <div className="w-full h-px bg-teal-200 mb-8 max-w-4xl mx-auto"></div>
-          <div className="mb-4 hover:-rotate-6 transition-transform cursor-pointer">
-            <img src="/logo.png" alt="Resolvelt Logo" className="h-16 w-auto object-contain" />
+        <footer className="mt-auto bg-gradient-to-b from-[#f8fafc] to-teal-50/30 flex flex-col items-center pb-10 pt-10">
+          <div className="w-full h-px bg-gradient-to-r from-transparent via-teal-200 to-transparent mb-10 max-w-4xl mx-auto"></div>
+          <div className="mb-5 hover:-rotate-6 hover:scale-110 transition-all duration-300 cursor-pointer">
+            <img src="/logo.png" alt="Resolvelt Logo" className="h-14 w-auto object-contain drop-shadow-md" />
           </div>
-          <p className="text-slate-500 text-sm mb-2 flex items-center justify-center gap-1 font-medium">
-            Website crafted with <Heart size={14} className="text-rose-500 fill-rose-500 inline mx-0.5 animate-pulse" /> by :{' '}
-            <span className="font-extrabold tracking-wider ml-1 text-base inline-flex">
+          <p className="text-slate-500 text-sm mb-4 flex items-center justify-center gap-1.5 font-medium">
+            Crafted with <Heart size={14} className="text-rose-500 fill-rose-500 inline mx-0.5 animate-pulse" /> by
+            <span className="font-extrabold tracking-wider ml-0.5 text-base inline-flex">
               <span className="text-rose-500">H</span>
               <span className="text-teal-600">R</span>
               <span className="text-amber-500">T</span>
@@ -2551,20 +2677,12 @@ export default function App() {
             </span>
           </p>
           <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 mb-6 text-xs sm:text-sm font-bold">
-            <span className="px-3 py-1 rounded-full bg-rose-50 text-rose-500 border border-rose-200/70 shadow-2xs hover:scale-105 transition-transform">
-              Hritvika
-            </span>
-            <span className="px-3 py-1 rounded-full bg-teal-50 text-teal-600 border border-teal-200/70 shadow-2xs hover:scale-105 transition-transform">
-              Rudra
-            </span>
-            <span className="px-3 py-1 rounded-full bg-amber-50 text-amber-500 border border-amber-200/70 shadow-2xs hover:scale-105 transition-transform">
-              Tanishq
-            </span>
-            <span className="px-3 py-1 rounded-full bg-violet-50 text-violet-500 border border-violet-200/70 shadow-2xs hover:scale-105 transition-transform">
-              Tvesha
-            </span>
+            <span className="px-4 py-1.5 rounded-full bg-rose-50 text-rose-500 border border-rose-200/70 hover:scale-105 hover:shadow-sm transition-all">Hritvika</span>
+            <span className="px-4 py-1.5 rounded-full bg-teal-50 text-teal-600 border border-teal-200/70 hover:scale-105 hover:shadow-sm transition-all">Rudra</span>
+            <span className="px-4 py-1.5 rounded-full bg-amber-50 text-amber-500 border border-amber-200/70 hover:scale-105 hover:shadow-sm transition-all">Tanishq</span>
+            <span className="px-4 py-1.5 rounded-full bg-violet-50 text-violet-500 border border-violet-200/70 hover:scale-105 hover:shadow-sm transition-all">Tvesha</span>
           </div>
-          <p className="text-xs text-slate-500">© 2026 All rights reserved</p>
+          <p className="text-xs text-slate-400 font-medium">© 2026 Resolvelt · All rights reserved</p>
         </footer>
       )}
     </div>
