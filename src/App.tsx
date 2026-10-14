@@ -23,14 +23,14 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled = false,
 
   return (
     <div className={`relative ${disabled ? 'opacity-50 pointer-events-none' : ''}`} ref={ref}>
-      <div 
+      <div
         onClick={() => setOpen(!open)}
         className="w-full p-4 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 outline-none text-slate-700 font-medium cursor-pointer flex justify-between items-center transition-all shadow-sm hover:border-teal-300"
       >
         <span className={!value ? "text-slate-400" : "truncate pr-2"}>{value || placeholder}</span>
         <ChevronDown size={18} className={`text-slate-400 shrink-0 transform transition-transform ${open ? 'rotate-180' : ''}`} />
       </div>
-      
+
       {open && (
         <div className="absolute z-50 w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-xl max-h-64 overflow-y-auto smooth-enter-up">
           {grouped ? (
@@ -38,7 +38,7 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled = false,
               <div key={group}>
                 <div className="px-4 py-2.5 text-xs font-bold text-slate-500 uppercase tracking-wider bg-slate-50/80 sticky top-0 backdrop-blur-sm z-10 border-y border-slate-100 first:border-t-0">{group}</div>
                 {options[group].map((opt: string) => (
-                  <div 
+                  <div
                     key={opt}
                     onClick={() => { onChange(opt); setOpen(false); }}
                     className={`px-4 py-3 cursor-pointer text-sm font-medium transition-colors ${value === opt ? 'bg-teal-100 text-teal-800' : 'text-slate-700 hover:bg-teal-100 hover:text-teal-900'}`}
@@ -50,7 +50,7 @@ const CustomSelect = ({ value, onChange, options, placeholder, disabled = false,
             ))
           ) : (
             options.map((opt: string) => (
-              <div 
+              <div
                 key={opt}
                 onClick={() => { onChange(opt); setOpen(false); }}
                 className={`px-4 py-3 cursor-pointer text-sm font-medium transition-colors ${value === opt ? 'bg-teal-100 text-teal-800' : 'text-slate-700 hover:bg-teal-100 hover:text-teal-900'}`}
@@ -79,7 +79,7 @@ export default function App() {
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  
+
   const startCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
@@ -118,7 +118,7 @@ export default function App() {
       }
     }
   };
-  
+
   useEffect(() => {
     if (cameraActive) {
       startCamera();
@@ -154,7 +154,7 @@ export default function App() {
 
   const [duplicateModalOpen, setDuplicateModalOpen] = useState(false);
   const [matchedDuplicate, setMatchedDuplicate] = useState<any>(null);
-  
+
   const [issues, setIssues] = useState<any[]>([
     {
       id: 'TKT-142',
@@ -384,7 +384,7 @@ export default function App() {
       localStorage.setItem('resolveit_role', 'authority');
     }
   }, [currentView, userRole]);
-  
+
   const handleLogout = () => {
     localStorage.removeItem('resolveit_role');
     setUserRole(null);
@@ -405,21 +405,21 @@ export default function App() {
   };
 
   const submitComment = () => {
-    if(!newComment.trim()) return;
+    if (!newComment.trim()) return;
     const commentObj = {
       author: userRole === 'authority' ? 'Authority Representative' : 'Hritvika (You)',
       time: 'Just now',
       text: newComment
     };
-    
+
     setIssues(prevIssues => prevIssues.map(issue => {
-      if(issue.id === selectedIssue.id) {
+      if (issue.id === selectedIssue.id) {
         const updatedIssue = {
           ...issue,
           comments: [...(issue.comments || []), commentObj]
         };
         setSelectedIssue(updatedIssue);
-        
+
         // Notify student if authority comments
         if (userRole === 'authority') {
           const newNotification = {
@@ -431,12 +431,12 @@ export default function App() {
           };
           setNotifications(prev => [newNotification, ...prev]);
         }
-        
+
         return updatedIssue;
       }
       return issue;
     }));
-    
+
     setNewComment('');
     setIsCommenting(false);
   };
@@ -493,7 +493,7 @@ export default function App() {
       time: 'Just now',
       text: postUpdateText.trim()
     };
-    
+
     setIssues(prevIssues => prevIssues.map(issue => {
       if (issue.id === actionTicket.id) {
         const updated = {
@@ -541,7 +541,7 @@ export default function App() {
     const prevTitle = getAuthorityTitle(actionTicket.department, prevLvl);
     const newTitle = getAuthorityTitle(actionTicket.department, escalateTargetLevel);
     const finalReason = escalateReason.trim() || 'SLA Breached / Administrative Escalation';
-    
+
     const escalateLog = {
       author: 'Hierarchy Escalation Engine',
       time: 'Just now',
@@ -624,7 +624,7 @@ export default function App() {
 
     // Duplicate detection criteria:
     // Any existing issue in same department matching specificIssue OR category & building OR matching title
-    const duplicate = issues.find(i => 
+    const duplicate = issues.find(i =>
       i.department === effectiveDept &&
       (
         (specificIssue && i.specificIssue === specificIssue) ||
@@ -655,7 +655,7 @@ export default function App() {
       }
       return issue;
     }));
-    
+
     setDuplicateModalOpen(false);
     const target = issues.find(i => i.id === dupId) || matchedDuplicate;
     openIssueDetails({ ...target, isLiked: true, upvotes: target.isLiked ? target.upvotes : target.upvotes + 1 }, 'dashboard');
@@ -718,10 +718,10 @@ export default function App() {
 
     navigateTo('dashboard');
   };
-  
+
   return (
     <div className={`min-h-screen bg-[#f8fafc] font-[Inter,system-ui,sans-serif] text-slate-800 flex flex-col ${!hasSelectedRole ? 'overflow-hidden h-screen' : ''}`}>
-      
+
       {/* Role Selection Overlay (Post-Login) */}
       {!hasSelectedRole && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-md smooth-enter">
@@ -735,13 +735,13 @@ export default function App() {
               </div>
               <h2 className="text-2xl font-extrabold text-slate-900 mb-1.5 tracking-tight">Welcome to Resolvelt</h2>
               <p className="text-slate-500 mb-8 font-medium text-sm">Select your account type to continue.</p>
-              
+
               <div className="grid grid-cols-2 gap-4">
-                <button 
-                  onClick={() => { 
+                <button
+                  onClick={() => {
                     localStorage.setItem('resolveit_role', 'student');
-                    setUserRole('student'); 
-                    setHasSelectedRole(true); 
+                    setUserRole('student');
+                    setHasSelectedRole(true);
                     setSelectedAuthorityDepartment('All Departments');
                     setSelectedAuthorityLevel('All');
                     setSelectedKpiFilter('all');
@@ -755,17 +755,17 @@ export default function App() {
                   <span className="font-bold text-slate-700 group-hover:text-teal-800 text-sm">Student</span>
                   <span className="text-[11px] text-slate-400 mt-0.5">Report &amp; track issues</span>
                 </button>
-                
-                <button 
-                  onClick={() => { 
+
+                <button
+                  onClick={() => {
                     localStorage.setItem('resolveit_role', 'authority');
-                    setUserRole('authority'); 
-                    setHasSelectedRole(true); 
+                    setUserRole('authority');
+                    setHasSelectedRole(true);
                     setSelectedAuthorityDepartment('All Departments');
                     setSelectedAuthorityLevel('All');
                     setSelectedKpiFilter('all');
                     navigateTo('dashboard');
-                    
+
                     // Notify authority of new unsolved problems
                     const newIssues = issues.filter(i => i.status === 'Not Started');
                     if (newIssues.length > 0) {
@@ -905,8 +905,8 @@ export default function App() {
       </div>
 
       {/* Navbar */}
-      <nav className="bg-[#115e59] h-16 flex items-center justify-between px-4 sticky top-0 z-30 shadow-lg shadow-teal-900/20" style={{backgroundImage: 'linear-gradient(135deg, #115e59 0%, #0d4f4a 100%)'}}>
-        
+      <nav className="bg-[#115e59] h-16 flex items-center justify-between px-4 sticky top-0 z-30 shadow-lg shadow-teal-900/20" style={{ backgroundImage: 'linear-gradient(135deg, #115e59 0%, #0d4f4a 100%)' }}>
+
         {/* Dropdown Overlay */}
         {(notificationsOpen || userMenuOpen || searchOpen) && (
           <div className="fixed inset-0 z-20" onClick={() => { setNotificationsOpen(false); setUserMenuOpen(false); setSearchOpen(false); }}></div>
@@ -956,27 +956,27 @@ export default function App() {
             </span>
           </div>
         </div>
-        
+
         <div className="flex items-center gap-4 sm:gap-5 text-white relative z-30">
           <div className={`hidden sm:flex items-center rounded-full transition-all duration-300 border overflow-hidden ${searchOpen ? 'w-64 border-teal-500 bg-white shadow-sm' : 'w-10 border-transparent bg-transparent hover:bg-white/10'}`}>
-            <input 
-              type="text" 
-              placeholder="Search..." 
+            <input
+              type="text"
+              placeholder="Search..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className={`bg-white text-teal-800 placeholder-teal-600/50 text-sm outline-none transition-all duration-300 ${searchOpen ? 'w-full px-4 py-1.5 opacity-100' : 'w-0 opacity-0 pointer-events-none'}`} 
+              className={`bg-white text-teal-800 placeholder-teal-600/50 text-sm outline-none transition-all duration-300 ${searchOpen ? 'w-full px-4 py-1.5 opacity-100' : 'w-0 opacity-0 pointer-events-none'}`}
             />
-            <button className={`p-2 rounded-full transition-colors flex-shrink-0 ${searchOpen ? 'text-teal-600 hover:text-teal-800' : 'text-white hover:text-teal-200'}`} onClick={() => { if(!searchOpen) { pushModalState(); setSearchOpen(true); setNotificationsOpen(false); setUserMenuOpen(false); } else { setSearchOpen(false); } }}>
+            <button className={`p-2 rounded-full transition-colors flex-shrink-0 ${searchOpen ? 'text-teal-600 hover:text-teal-800' : 'text-white hover:text-teal-200'}`} onClick={() => { if (!searchOpen) { pushModalState(); setSearchOpen(true); setNotificationsOpen(false); setUserMenuOpen(false); } else { setSearchOpen(false); } }}>
               <Search size={20} />
             </button>
           </div>
-          
-          <button className="hover:text-teal-200 transition-colors relative" onClick={() => { if(!notificationsOpen) pushModalState(); setNotificationsOpen(true); setUserMenuOpen(false); setSearchOpen(false); }}>
+
+          <button className="hover:text-teal-200 transition-colors relative" onClick={() => { if (!notificationsOpen) pushModalState(); setNotificationsOpen(true); setUserMenuOpen(false); setSearchOpen(false); }}>
             <Bell size={22} />
             {notifications.length > 0 && <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-orange-500 rounded-full border-2 border-[#115e59] pulse-ring"></span>}
           </button>
 
-          <button onClick={() => { if(!userMenuOpen) pushModalState(); setUserMenuOpen(true); setNotificationsOpen(false); setSearchOpen(false); }} className="w-9 h-9 rounded-full bg-gradient-to-br from-teal-500 to-teal-700 flex items-center justify-center font-bold text-sm border-2 border-teal-500/50 hover:from-teal-400 hover:to-teal-600 transition-all shadow-md shadow-teal-900/30">
+          <button onClick={() => { if (!userMenuOpen) pushModalState(); setUserMenuOpen(true); setNotificationsOpen(false); setSearchOpen(false); }} className="w-9 h-9 rounded-full bg-gradient-to-br from-teal-500 to-teal-700 flex items-center justify-center font-bold text-sm border-2 border-teal-500/50 hover:from-teal-400 hover:to-teal-600 transition-all shadow-md shadow-teal-900/30">
             {userRole === 'authority' ? 'RS' : 'HV'}
           </button>
 
@@ -1012,10 +1012,10 @@ export default function App() {
                 <p className="text-xs text-slate-500">{userRole === 'authority' ? 'rohit@jklu.edu.in' : 'hritvikavashistha@jklu.edu.in'}</p>
               </div>
               <div className="p-2 text-slate-700">
-                <button 
-                  onClick={() => { 
+                <button
+                  onClick={() => {
                     const nextRole = userRole === 'authority' ? 'student' : 'authority';
-                    setUserRole(nextRole); 
+                    setUserRole(nextRole);
                     localStorage.setItem('resolveit_role', nextRole);
                     setUserMenuOpen(false);
                     if (nextRole === 'authority') {
@@ -1023,7 +1023,7 @@ export default function App() {
                     } else {
                       navigateTo('dashboard');
                     }
-                  }} 
+                  }}
                   className="w-full text-left px-3 py-2 flex items-center justify-between hover:bg-teal-50 hover:text-teal-700 transition-colors rounded-lg text-sm font-medium"
                 >
                   <span className="flex items-center gap-2.5">
@@ -1056,7 +1056,7 @@ export default function App() {
       {/* View Rendering */}
       {currentView === 'dashboard' ? (
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-20 view-slide-in">
-          
+
           {/* Welcome Greeting Card */}
           <div className="w-full bg-gradient-to-r from-teal-50/70 via-emerald-50/30 to-teal-50/40 border border-teal-200/90 rounded-3xl p-6 sm:p-7 shadow-xs mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="flex items-center gap-4 sm:gap-5">
@@ -1188,22 +1188,20 @@ export default function App() {
                     <button
                       key={dept}
                       onClick={() => setSelectedDepartmentFilter(dept)}
-                      className={`text-left px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2.5 shrink-0 ${
-                        selectedDepartmentFilter === dept
-                          ? 'bg-teal-600 text-white shadow-md shadow-teal-500/20'
-                          : 'text-slate-600 hover:bg-slate-50 hover:text-teal-700'
-                      }`}
+                      className={`text-left px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2.5 shrink-0 ${selectedDepartmentFilter === dept
+                        ? 'bg-teal-600 text-white shadow-md shadow-teal-500/20'
+                        : 'text-slate-600 hover:bg-slate-50 hover:text-teal-700'
+                        }`}
                     >
-                      <span className={`w-2 h-2 rounded-full shrink-0 ${
-                        selectedDepartmentFilter === dept ? 'bg-white' :
+                      <span className={`w-2 h-2 rounded-full shrink-0 ${selectedDepartmentFilter === dept ? 'bg-white' :
                         dept === 'All Departments' ? 'bg-slate-400' :
-                        dept.includes('Hostel') ? 'bg-teal-400' :
-                        dept.includes('Infrastructure') ? 'bg-blue-400' :
-                        dept.includes('Academics') ? 'bg-violet-400' :
-                        dept.includes('Sports') || dept.includes('Student Life') ? 'bg-amber-400' :
-                        dept.includes('Health') ? 'bg-rose-400' :
-                        'bg-emerald-400'
-                      }`}></span>
+                          dept.includes('Hostel') ? 'bg-teal-400' :
+                            dept.includes('Infrastructure') ? 'bg-blue-400' :
+                              dept.includes('Academics') ? 'bg-violet-400' :
+                                dept.includes('Sports') || dept.includes('Student Life') ? 'bg-amber-400' :
+                                  dept.includes('Health') ? 'bg-rose-400' :
+                                    'bg-emerald-400'
+                        }`}></span>
                       <span className="truncate">{dept}</span>
                     </button>
                   ))}
@@ -1228,8 +1226,8 @@ export default function App() {
               <div className="flex flex-col gap-4">
                 {[...issues]
                   .filter(issue => selectedDepartmentFilter === 'All Departments' || issue.department === selectedDepartmentFilter || (selectedDepartmentFilter.includes('Health') && issue.department?.includes('Health')))
-                  .filter(issue => 
-                    issue.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                  .filter(issue =>
+                    issue.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                     issue.description.toLowerCase().includes(searchQuery.toLowerCase())
                   )
                   .sort((a, b) => {
@@ -1247,15 +1245,15 @@ export default function App() {
                   })
                   .map(issue => (
                     <Card key={issue.id} onClick={() => openIssueDetails(issue, 'dashboard')}
-                      className={`card-hover cursor-pointer group bg-white rounded-2xl border border-slate-200 overflow-hidden transition-all duration-200 hover:border-teal-300 ${
-                        issue.statusColor === 'emerald' ? 'card-accent-emerald' :
-                        issue.statusColor === 'blue'    ? 'card-accent-blue' :
-                        issue.statusColor === 'amber'   ? 'card-accent-amber' :
-                        'card-accent-rose'
-                      }`}
+                      className={`card-hover cursor-pointer group bg-white rounded-2xl border border-slate-200 overflow-hidden transition-all duration-200 hover:border-teal-300 ${issue.statusColor === 'emerald' ? 'card-accent-emerald' :
+                        issue.statusColor === 'blue' ? 'card-accent-blue' :
+                          issue.statusColor === 'amber' ? 'card-accent-amber' :
+                            'card-accent-rose'
+                        }`}
                     >
                       <CardHeader className="pb-2">
                         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                          {issue.imageUrl && <img src={issue.imageUrl} alt="" className="w-14 h-14 rounded-xl object-cover border border-slate-100 hidden sm:block" />}
                           <div className="flex-1 min-w-0">
                             <CardTitle className="text-base font-bold text-slate-800 group-hover:text-teal-700 transition-colors leading-snug mb-2">
                               {issue.title}
@@ -1272,13 +1270,11 @@ export default function App() {
                             </div>
                           </div>
                           <div className="flex items-start gap-2 shrink-0">
-                            {issue.imageUrl && <img src={issue.imageUrl} alt="" className="w-14 h-14 rounded-xl object-cover border border-slate-100 hidden sm:block" />}
-                            <Badge variant="outline" className={`shrink-0 self-start gap-1 px-3 py-1 rounded-full text-xs font-bold border ${
-                              issue.statusColor === 'emerald' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 
-                              issue.statusColor === 'blue' ? 'bg-blue-50 text-blue-600 border-blue-200' : 
-                              issue.statusColor === 'amber' ? 'bg-amber-50 text-amber-600 border-amber-200' : 
-                              'bg-rose-50 text-rose-600 border-rose-200'
-                            }`}>
+                            <Badge variant="outline" className={`shrink-0 self-start gap-1 px-3 py-1 rounded-full text-xs font-bold border ${issue.statusColor === 'emerald' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
+                              issue.statusColor === 'blue' ? 'bg-blue-50 text-blue-600 border-blue-200' :
+                                issue.statusColor === 'amber' ? 'bg-amber-50 text-amber-600 border-amber-200' :
+                                  'bg-rose-50 text-rose-600 border-rose-200'
+                              }`}>
                               {issue.status === 'Solved' && <CheckCircle size={12} />}
                               {issue.status === 'Seen' && <CheckCircle size={12} className="opacity-70" />}
                               {issue.status === 'Not Started' && <AlertCircle size={12} />}
@@ -1318,13 +1314,12 @@ export default function App() {
                               }}
                               disabled={issue.status === 'Solved'}
                               title={issue.status === 'Solved' ? 'Issue solved · Upvotes closed' : issue.isLiked ? 'Remove upvote' : 'Upvote problem'}
-                              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold transition-all ${
-                                issue.status === 'Solved'
-                                  ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-default'
-                                  : issue.isLiked 
-                                    ? 'bg-teal-50 text-teal-700 border border-teal-200 shadow-2xs hover:bg-teal-100 cursor-pointer' 
-                                    : 'bg-slate-50 text-slate-600 border border-slate-200 hover:bg-teal-50 hover:text-teal-700 hover:border-teal-200 cursor-pointer'
-                              }`}
+                              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold transition-all ${issue.status === 'Solved'
+                                ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-default'
+                                : issue.isLiked
+                                  ? 'bg-teal-50 text-teal-700 border border-teal-200 shadow-2xs hover:bg-teal-100 cursor-pointer'
+                                  : 'bg-slate-50 text-slate-600 border border-slate-200 hover:bg-teal-50 hover:text-teal-700 hover:border-teal-200 cursor-pointer'
+                                }`}
                             >
                               <ArrowUp size={13} className={issue.isLiked ? 'text-teal-600 font-extrabold' : ''} /> {issue.upvotes}
                             </button>
@@ -1364,13 +1359,12 @@ export default function App() {
           {/* Interactive KPI Quick-Filter Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 mb-6">
             {/* 1. Overdue SLA */}
-            <div 
+            <div
               onClick={() => setSelectedKpiFilter(prev => prev === 'overdue' ? 'all' : 'overdue')}
-              className={`p-4 rounded-2xl border transition-all cursor-pointer relative ${
-                selectedKpiFilter === 'overdue'
-                  ? 'bg-rose-50/90 border-rose-400 ring-2 ring-rose-400/50 shadow-sm'
-                  : 'bg-white border-slate-200 hover:border-rose-300 hover:shadow-xs'
-              }`}
+              className={`p-4 rounded-2xl border transition-all cursor-pointer relative ${selectedKpiFilter === 'overdue'
+                ? 'bg-rose-50/90 border-rose-400 ring-2 ring-rose-400/50 shadow-sm'
+                : 'bg-white border-slate-200 hover:border-rose-300 hover:shadow-xs'
+                }`}
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -1392,13 +1386,12 @@ export default function App() {
             </div>
 
             {/* 2. Open / In Progress */}
-            <div 
+            <div
               onClick={() => setSelectedKpiFilter(prev => prev === 'open' ? 'all' : 'open')}
-              className={`p-4 rounded-2xl border transition-all cursor-pointer relative ${
-                selectedKpiFilter === 'open'
-                  ? 'bg-blue-50/90 border-blue-400 ring-2 ring-blue-400/50 shadow-sm'
-                  : 'bg-white border-slate-200 hover:border-blue-300 hover:shadow-xs'
-              }`}
+              className={`p-4 rounded-2xl border transition-all cursor-pointer relative ${selectedKpiFilter === 'open'
+                ? 'bg-blue-50/90 border-blue-400 ring-2 ring-blue-400/50 shadow-sm'
+                : 'bg-white border-slate-200 hover:border-blue-300 hover:shadow-xs'
+                }`}
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -1420,13 +1413,12 @@ export default function App() {
             </div>
 
             {/* 3. Escalated In */}
-            <div 
+            <div
               onClick={() => setSelectedKpiFilter(prev => prev === 'escalated' ? 'all' : 'escalated')}
-              className={`p-4 rounded-2xl border transition-all cursor-pointer relative ${
-                selectedKpiFilter === 'escalated'
-                  ? 'bg-amber-50/90 border-amber-400 ring-2 ring-amber-400/50 shadow-sm'
-                  : 'bg-white border-slate-200 hover:border-amber-300 hover:shadow-xs'
-              }`}
+              className={`p-4 rounded-2xl border transition-all cursor-pointer relative ${selectedKpiFilter === 'escalated'
+                ? 'bg-amber-50/90 border-amber-400 ring-2 ring-amber-400/50 shadow-sm'
+                : 'bg-white border-slate-200 hover:border-amber-300 hover:shadow-xs'
+                }`}
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -1448,13 +1440,12 @@ export default function App() {
             </div>
 
             {/* 4. Solved Tickets */}
-            <div 
+            <div
               onClick={() => setSelectedKpiFilter(prev => prev === 'solved' ? 'all' : 'solved')}
-              className={`p-4 rounded-2xl border transition-all cursor-pointer relative ${
-                selectedKpiFilter === 'solved'
-                  ? 'bg-emerald-50/90 border-emerald-400 ring-2 ring-emerald-400/50 shadow-sm'
-                  : 'bg-white border-slate-200 hover:border-emerald-300 hover:shadow-xs'
-              }`}
+              className={`p-4 rounded-2xl border transition-all cursor-pointer relative ${selectedKpiFilter === 'solved'
+                ? 'bg-emerald-50/90 border-emerald-400 ring-2 ring-emerald-400/50 shadow-sm'
+                : 'bg-white border-slate-200 hover:border-emerald-300 hover:shadow-xs'
+                }`}
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -1505,11 +1496,10 @@ export default function App() {
                     <button
                       key={lvl.key}
                       onClick={() => setSelectedAuthorityLevel(lvl.key as any)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                        isSelected
-                          ? 'bg-white text-teal-800 shadow-xs border border-slate-200'
-                          : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-                      }`}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${isSelected
+                        ? 'bg-white text-teal-800 shadow-xs border border-slate-200'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                        }`}
                     >
                       {lvl.label}
                       <span className="ml-1 text-[10px] opacity-75 font-semibold">({count})</span>
@@ -1565,34 +1555,32 @@ export default function App() {
               })
               .map(issue => {
                 const handlerTitle = issue.assignedAuthority || getAuthorityTitle(issue.department, issue.currentLevel || 1);
-                
+
                 return (
-                  <Card 
-                    key={issue.id} 
+                  <Card
+                    key={issue.id}
                     onClick={() => openIssueDetails(issue, 'authority-dashboard')}
-                    className={`card-hover cursor-pointer group bg-white rounded-2xl border border-slate-200 overflow-hidden transition-all duration-200 hover:border-teal-300 ${
-                      issue.statusColor === 'emerald' ? 'card-accent-emerald' :
-                      issue.statusColor === 'blue'    ? 'card-accent-blue' :
-                      issue.statusColor === 'amber'   ? 'card-accent-amber' :
-                      'card-accent-rose'
-                    }`}
+                    className={`card-hover cursor-pointer group bg-white rounded-2xl border border-slate-200 overflow-hidden transition-all duration-200 hover:border-teal-300 ${issue.statusColor === 'emerald' ? 'card-accent-emerald' :
+                      issue.statusColor === 'blue' ? 'card-accent-blue' :
+                        issue.statusColor === 'amber' ? 'card-accent-amber' :
+                          'card-accent-rose'
+                      }`}
                   >
                     <CardHeader className="pb-3 pt-5 px-6">
                       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
                         <div className="flex-1 min-w-0">
                           <div className="flex flex-wrap items-center gap-2 mb-2">
                             <span className="font-mono text-xs font-bold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-md">{issue.id}</span>
-                            
+
                             {/* Hierarchy Level Badge */}
-                            <span className={`inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-extrabold border ${
-                              (issue.currentLevel || 1) === 4 
-                                ? 'bg-purple-100 text-purple-800 border-purple-200'
-                                : (issue.currentLevel || 1) === 3
+                            <span className={`inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-extrabold border ${(issue.currentLevel || 1) === 4
+                              ? 'bg-purple-100 text-purple-800 border-purple-200'
+                              : (issue.currentLevel || 1) === 3
                                 ? 'bg-indigo-100 text-indigo-800 border-indigo-200'
                                 : (issue.currentLevel || 1) === 2
-                                ? 'bg-sky-100 text-sky-800 border-sky-200'
-                                : 'bg-teal-50 text-teal-800 border-teal-200'
-                            }`}>
+                                  ? 'bg-sky-100 text-sky-800 border-sky-200'
+                                  : 'bg-teal-50 text-teal-800 border-teal-200'
+                              }`}>
                               <span>L{issue.currentLevel || 1}: {handlerTitle}</span>
                             </span>
 
@@ -1625,12 +1613,11 @@ export default function App() {
 
                         {/* Status Badge */}
                         <div className="flex items-center gap-2 self-start lg:self-center">
-                          <Badge variant="outline" className={`gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${
-                            issue.statusColor === 'emerald' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 
-                            issue.statusColor === 'blue' ? 'bg-blue-50 text-blue-700 border-blue-200' : 
-                            issue.statusColor === 'amber' ? 'bg-amber-50 text-amber-700 border-amber-200' : 
-                            'bg-rose-50 text-rose-700 border-rose-200'
-                          }`}>
+                          <Badge variant="outline" className={`gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${issue.statusColor === 'emerald' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                            issue.statusColor === 'blue' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                              issue.statusColor === 'amber' ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                                'bg-rose-50 text-rose-700 border-rose-200'
+                            }`}>
                             {issue.status === 'Solved' && <CheckCircle size={14} />}
                             {issue.status === 'In Progress' && <Clock size={14} />}
                             {issue.status === 'Seen' && <CheckCircle size={14} className="opacity-70" />}
@@ -1696,23 +1683,23 @@ export default function App() {
                 return true;
               })
               .length === 0 && (
-              <div className="text-center p-14 bg-white rounded-2xl border border-slate-200 border-dashed">
-                <ShieldCheck size={36} className="mx-auto text-slate-300 mb-3" />
-                <p className="text-slate-700 font-bold text-base">No tickets match active filters</p>
-                <p className="text-slate-400 text-sm mt-1 mb-4">There are no tickets matching your active department, hierarchy level, and KPI filters.</p>
-                <Button 
-                  variant="outline"
-                  onClick={() => {
-                    setSelectedAuthorityDepartment('All Departments');
-                    setSelectedAuthorityLevel('All');
-                    setSelectedKpiFilter('all');
-                  }}
-                  className="rounded-xl font-bold text-xs text-teal-700 border-teal-200 hover:bg-teal-50"
-                >
-                  Reset All Filters
-                </Button>
-              </div>
-            )}
+                <div className="text-center p-14 bg-white rounded-2xl border border-slate-200 border-dashed">
+                  <ShieldCheck size={36} className="mx-auto text-slate-300 mb-3" />
+                  <p className="text-slate-700 font-bold text-base">No tickets match active filters</p>
+                  <p className="text-slate-400 text-sm mt-1 mb-4">There are no tickets matching your active department, hierarchy level, and KPI filters.</p>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setSelectedAuthorityDepartment('All Departments');
+                      setSelectedAuthorityLevel('All');
+                      setSelectedKpiFilter('all');
+                    }}
+                    className="rounded-xl font-bold text-xs text-teal-700 border-teal-200 hover:bg-teal-50"
+                  >
+                    Reset All Filters
+                  </Button>
+                </div>
+              )}
           </div>
         </main>
       ) : currentView === 'recent-reported' ? (
@@ -1731,11 +1718,10 @@ export default function App() {
           <div className="flex items-center gap-2 p-1.5 bg-slate-100 rounded-2xl border border-slate-200 mb-6 max-w-xl">
             <button
               onClick={() => setMyTicketsTab('reported')}
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all ${
-                myTicketsTab === 'reported' 
-                  ? 'bg-white text-teal-800 shadow-sm border border-slate-200' 
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all ${myTicketsTab === 'reported'
+                ? 'bg-white text-teal-800 shadow-sm border border-slate-200'
+                : 'text-slate-600 hover:text-slate-900'
+                }`}
             >
               <span>Reported by Me</span>
               <span className={`text-[11px] px-2 py-0.5 rounded-full font-extrabold ${myTicketsTab === 'reported' ? 'bg-teal-100 text-teal-800' : 'bg-slate-200 text-slate-600'}`}>
@@ -1744,11 +1730,10 @@ export default function App() {
             </button>
             <button
               onClick={() => setMyTicketsTab('upvoted')}
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all ${
-                myTicketsTab === 'upvoted' 
-                  ? 'bg-white text-teal-800 shadow-sm border border-slate-200' 
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all ${myTicketsTab === 'upvoted'
+                ? 'bg-white text-teal-800 shadow-sm border border-slate-200'
+                : 'text-slate-600 hover:text-slate-900'
+                }`}
             >
               <span>Upvoted by Me</span>
               <span className={`text-[11px] px-2 py-0.5 rounded-full font-extrabold ${myTicketsTab === 'upvoted' ? 'bg-teal-100 text-teal-800' : 'bg-slate-200 text-slate-600'}`}>
@@ -1757,11 +1742,10 @@ export default function App() {
             </button>
             <button
               onClick={() => setMyTicketsTab('resolved')}
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all ${
-                myTicketsTab === 'resolved' 
-                  ? 'bg-white text-emerald-800 shadow-sm border border-slate-200' 
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all ${myTicketsTab === 'resolved'
+                ? 'bg-white text-emerald-800 shadow-sm border border-slate-200'
+                : 'text-slate-600 hover:text-slate-900'
+                }`}
             >
               <span>Resolved</span>
               <span className={`text-[11px] px-2 py-0.5 rounded-full font-extrabold ${myTicketsTab === 'resolved' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'}`}>
@@ -1781,12 +1765,11 @@ export default function App() {
               })
               .map(issue => (
                 <Card key={issue.id} onClick={() => openIssueDetails(issue, 'recent-reported')}
-                  className={`card-hover cursor-pointer group bg-white rounded-2xl border border-slate-200 overflow-hidden transition-all duration-200 hover:border-teal-300 ${
-                    issue.statusColor === 'emerald' ? 'card-accent-emerald' :
-                    issue.statusColor === 'blue'    ? 'card-accent-blue' :
-                    issue.statusColor === 'amber'   ? 'card-accent-amber' :
-                    'card-accent-rose'
-                  }`}>
+                  className={`card-hover cursor-pointer group bg-white rounded-2xl border border-slate-200 overflow-hidden transition-all duration-200 hover:border-teal-300 ${issue.statusColor === 'emerald' ? 'card-accent-emerald' :
+                    issue.statusColor === 'blue' ? 'card-accent-blue' :
+                      issue.statusColor === 'amber' ? 'card-accent-amber' :
+                        'card-accent-rose'
+                    }`}>
                   <CardHeader className="pb-2">
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                       <div>
@@ -1806,12 +1789,11 @@ export default function App() {
                         </CardDescription>
                       </div>
 
-                      <Badge variant="outline" className={`shrink-0 gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${
-                        issue.statusColor === 'emerald' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 
-                        issue.statusColor === 'blue' ? 'bg-blue-50 text-blue-700 border-blue-200' : 
-                        issue.statusColor === 'amber' ? 'bg-amber-50 text-amber-700 border-amber-200' : 
-                        'bg-rose-50 text-rose-700 border-rose-200'
-                      }`}>
+                      <Badge variant="outline" className={`shrink-0 gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${issue.statusColor === 'emerald' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                        issue.statusColor === 'blue' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                          issue.statusColor === 'amber' ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                            'bg-rose-50 text-rose-700 border-rose-200'
+                        }`}>
                         {issue.status === 'Solved' && <CheckCircle size={13} />}
                         {issue.status === 'In Progress' && <Clock size={13} />}
                         {issue.status === 'Seen' && <CheckCircle size={13} className="opacity-70" />}
@@ -1845,13 +1827,12 @@ export default function App() {
                         }}
                         disabled={issue.status === 'Solved'}
                         title={issue.status === 'Solved' ? 'Issue solved · Upvotes closed' : issue.isLiked ? 'Remove upvote' : 'Upvote problem'}
-                        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
-                          issue.status === 'Solved'
-                            ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-default'
-                            : issue.isLiked 
-                              ? 'bg-teal-50 text-teal-700 border border-teal-200 hover:bg-teal-100 cursor-pointer' 
-                              : 'bg-slate-50 text-slate-600 border border-slate-200 hover:bg-teal-50 hover:text-teal-700 cursor-pointer'
-                        }`}
+                        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${issue.status === 'Solved'
+                          ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-default'
+                          : issue.isLiked
+                            ? 'bg-teal-50 text-teal-700 border border-teal-200 hover:bg-teal-100 cursor-pointer'
+                            : 'bg-slate-50 text-slate-600 border border-slate-200 hover:bg-teal-50 hover:text-teal-700 cursor-pointer'
+                          }`}
                       >
                         <ArrowUp size={13} className={issue.isLiked ? 'text-teal-600 font-extrabold' : ''} /> {issue.upvotes}
                       </button>
@@ -1866,369 +1847,361 @@ export default function App() {
               if (myTicketsTab === 'resolved') return (issue.isMine || issue.isLiked) && issue.status === 'Solved';
               return issue.isMine;
             }).length === 0 && (
-              <div className="text-center p-14 bg-white rounded-2xl border border-slate-200 border-dashed">
-                <CheckCircle size={36} className="mx-auto text-slate-300 mb-3" />
-                <p className="text-slate-700 font-bold text-base">No tickets in this tab</p>
-                <p className="text-slate-400 text-sm mt-1 mb-4">
-                  {myTicketsTab === 'reported' 
-                    ? "You haven't submitted any grievances yet." 
-                    : myTicketsTab === 'upvoted' 
-                    ? "You haven't upvoted any tickets yet." 
-                    : "No tickets in your list have been resolved yet."}
-                </p>
-                {myTicketsTab === 'reported' && (
-                  <Button onClick={() => navigateTo('report')} className="bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl">
-                    Report a Problem
-                  </Button>
-                )}
-              </div>
-            )}
+                <div className="text-center p-14 bg-white rounded-2xl border border-slate-200 border-dashed">
+                  <CheckCircle size={36} className="mx-auto text-slate-300 mb-3" />
+                  <p className="text-slate-700 font-bold text-base">No tickets in this tab</p>
+                  <p className="text-slate-400 text-sm mt-1 mb-4">
+                    {myTicketsTab === 'reported'
+                      ? "You haven't submitted any grievances yet."
+                      : myTicketsTab === 'upvoted'
+                        ? "You haven't upvoted any tickets yet."
+                        : "No tickets in your list have been resolved yet."}
+                  </p>
+                  {myTicketsTab === 'reported' && (
+                    <Button onClick={() => navigateTo('report')} className="bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl">
+                      Report a Problem
+                    </Button>
+                  )}
+                </div>
+              )}
           </div>
         </main>
       ) : currentView === 'issue-details' ? (
         selectedIssue ? (
-        <main className="max-w-5xl mx-auto px-4 pt-10 pb-20 view-slide-in">
-          <div className="bg-white border border-slate-200 shadow-md shadow-slate-100/60 rounded-2xl p-6 md:p-10 mb-8">
-            <button 
-              onClick={() => { 
-                if (issueSourceView === 'authority-dashboard') {
-                  navigateTo('authority-dashboard');
-                } else if (issueSourceView === 'recent-reported') {
-                  navigateTo('recent-reported');
-                } else {
-                  navigateTo('dashboard');
-                }
-              }} 
-              className="text-teal-600 font-bold mb-6 flex items-center gap-1 hover:text-teal-800 transition-colors cursor-pointer"
-            >
-              &larr; Back to {issueSourceView === 'authority-dashboard' ? 'Authority Workspace' : issueSourceView === 'recent-reported' ? 'My Tickets' : 'Home'}
-            </button>
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-6 border-b border-slate-100">
-              <div className="flex items-center gap-3">
-                <span className="font-mono text-sm font-bold text-slate-500">{selectedIssue.id}</span>
-                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold border ${
-                  selectedIssue.statusColor === 'emerald' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 
-                  selectedIssue.statusColor === 'blue' ? 'bg-blue-50 text-blue-600 border-blue-200' : 
-                  selectedIssue.statusColor === 'amber' ? 'bg-amber-50 text-amber-600 border-amber-200' : 
-                  'bg-rose-50 text-rose-600 border-rose-200'
-                }`}>
-                  {selectedIssue.status === 'Solved' && <CheckCircle size={14} />}
+          <main className="max-w-5xl mx-auto px-4 pt-10 pb-20 view-slide-in">
+            <div className="bg-white border border-slate-200 shadow-md shadow-slate-100/60 rounded-2xl p-6 md:p-10 mb-8">
+              <button
+                onClick={() => {
+                  if (issueSourceView === 'authority-dashboard') {
+                    navigateTo('authority-dashboard');
+                  } else if (issueSourceView === 'recent-reported') {
+                    navigateTo('recent-reported');
+                  } else {
+                    navigateTo('dashboard');
+                  }
+                }}
+                className="text-teal-600 font-bold mb-6 flex items-center gap-1 hover:text-teal-800 transition-colors cursor-pointer"
+              >
+                &larr; Back to {issueSourceView === 'authority-dashboard' ? 'Authority Workspace' : issueSourceView === 'recent-reported' ? 'My Tickets' : 'Home'}
+              </button>
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-6 border-b border-slate-100">
+                <div className="flex items-center gap-3">
+                  <span className="font-mono text-sm font-bold text-slate-500">{selectedIssue.id}</span>
+                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold border ${selectedIssue.statusColor === 'emerald' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
+                    selectedIssue.statusColor === 'blue' ? 'bg-blue-50 text-blue-600 border-blue-200' :
+                      selectedIssue.statusColor === 'amber' ? 'bg-amber-50 text-amber-600 border-amber-200' :
+                        'bg-rose-50 text-rose-600 border-rose-200'
+                    }`}>
+                    {selectedIssue.status === 'Solved' && <CheckCircle size={14} />}
 
-                  {selectedIssue.status === 'Seen' && <CheckCircle size={14} className="opacity-70" />}
-                  {selectedIssue.status === 'Not Started' && <AlertCircle size={14} />}
-                  {selectedIssue.status}
-                </span>
-              </div>
-              <span className="flex items-center gap-1 text-sm font-medium text-slate-500"><Clock size={16} /> Reported {selectedIssue.time}</span>
-            </div>
-            
-            <h1 className="text-3xl md:text-4xl font-bold text-slate-800 mb-6">{selectedIssue.title}</h1>
-
-            {/* 4-Level Authority Hierarchy Pipeline */}
-            <div className="mb-8 p-6 bg-slate-50/90 border border-slate-200 rounded-3xl shadow-sm">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-teal-700 uppercase tracking-wider">Hierarchy Escalation Pipeline</span>
-                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-200 text-slate-700 font-bold">{selectedIssue.department}</span>
-                  </div>
-                  <p className="text-sm font-semibold text-slate-800 mt-1">
-                    {selectedIssue.status === 'Solved' ? 'Resolved by Authority: ' : 'Current Assigned Authority: '}
-                    <strong className="text-teal-700 font-extrabold text-base">
-                      {selectedIssue.assignedAuthority || getAuthorityTitle(selectedIssue.department, selectedIssue.currentLevel || 1)}
-                    </strong>
-                    <span className="text-xs font-bold text-slate-500 ml-2">
-                      ({selectedIssue.status === 'Solved' ? `Resolved at Level ${selectedIssue.currentLevel || 1}` : `Level ${selectedIssue.currentLevel || 1}`})
-                    </span>
-                  </p>
+                    {selectedIssue.status === 'Seen' && <CheckCircle size={14} className="opacity-70" />}
+                    {selectedIssue.status === 'Not Started' && <AlertCircle size={14} />}
+                    {selectedIssue.status}
+                  </span>
                 </div>
-                {selectedIssue.isEscalated && (
-                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-amber-100/80 text-amber-900 border border-amber-300 text-xs font-bold shadow-sm self-start sm:self-auto">
-                    <Zap size={14} className="text-amber-600 fill-amber-500" />
-                    <span>Escalated from {selectedIssue.escalatedFrom} • {selectedIssue.escalationReason}</span>
-                  </div>
-                )}
+                <span className="flex items-center gap-1 text-sm font-medium text-slate-500"><Clock size={16} /> Reported {selectedIssue.time}</span>
               </div>
 
-              {/* Step Flow Nodes */}
-              <div className="grid grid-cols-4 gap-2 sm:gap-4 relative pt-2">
-                {[1, 2, 3, 4].map((lvl) => {
-                  const levelTitle = getAuthorityTitle(selectedIssue.department, lvl);
-                  const curLvl = selectedIssue.currentLevel || 1;
-                  const isPast = lvl < curLvl;
-                  const isCurrent = lvl === curLvl;
-                  const isSolved = selectedIssue.status === 'Solved';
+              <h1 className="text-3xl md:text-4xl font-bold text-slate-800 mb-6">{selectedIssue.title}</h1>
 
-                  return (
-                    <div key={lvl} className="flex flex-col items-center text-center relative group">
-                      <div className={`w-9 h-9 sm:w-11 sm:h-11 rounded-2xl flex items-center justify-center font-extrabold text-xs sm:text-sm mb-2 transition-all ${
-                        isCurrent
+              {/* 4-Level Authority Hierarchy Pipeline */}
+              <div className="mb-8 p-6 bg-slate-50/90 border border-slate-200 rounded-3xl shadow-sm">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-teal-700 uppercase tracking-wider">Hierarchy Escalation Pipeline</span>
+                      <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-200 text-slate-700 font-bold">{selectedIssue.department}</span>
+                    </div>
+                    <p className="text-sm font-semibold text-slate-800 mt-1">
+                      {selectedIssue.status === 'Solved' ? 'Resolved by Authority: ' : 'Current Assigned Authority: '}
+                      <strong className="text-teal-700 font-extrabold text-base">
+                        {selectedIssue.assignedAuthority || getAuthorityTitle(selectedIssue.department, selectedIssue.currentLevel || 1)}
+                      </strong>
+                      <span className="text-xs font-bold text-slate-500 ml-2">
+                        ({selectedIssue.status === 'Solved' ? `Resolved at Level ${selectedIssue.currentLevel || 1}` : `Level ${selectedIssue.currentLevel || 1}`})
+                      </span>
+                    </p>
+                  </div>
+                  {selectedIssue.isEscalated && (
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-amber-100/80 text-amber-900 border border-amber-300 text-xs font-bold shadow-sm self-start sm:self-auto">
+                      <Zap size={14} className="text-amber-600 fill-amber-500" />
+                      <span>Escalated from {selectedIssue.escalatedFrom} • {selectedIssue.escalationReason}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Step Flow Nodes */}
+                <div className="grid grid-cols-4 gap-2 sm:gap-4 relative pt-2">
+                  {[1, 2, 3, 4].map((lvl) => {
+                    const levelTitle = getAuthorityTitle(selectedIssue.department, lvl);
+                    const curLvl = selectedIssue.currentLevel || 1;
+                    const isPast = lvl < curLvl;
+                    const isCurrent = lvl === curLvl;
+                    const isSolved = selectedIssue.status === 'Solved';
+
+                    return (
+                      <div key={lvl} className="flex flex-col items-center text-center relative group">
+                        <div className={`w-9 h-9 sm:w-11 sm:h-11 rounded-2xl flex items-center justify-center font-extrabold text-xs sm:text-sm mb-2 transition-all ${isCurrent
                           ? isSolved
                             ? 'bg-emerald-600 text-white ring-4 ring-emerald-200 shadow-md scale-105'
                             : 'bg-teal-600 text-white ring-4 ring-teal-200 shadow-md scale-105'
                           : isPast
-                          ? 'bg-emerald-500 text-white shadow-sm'
-                          : 'bg-white text-slate-400 border border-slate-200'
-                      }`}>
-                        {isPast || (isCurrent && isSolved) ? <Check size={18} strokeWidth={2.5} /> : `L${lvl}`}
+                            ? 'bg-emerald-500 text-white shadow-sm'
+                            : 'bg-white text-slate-400 border border-slate-200'
+                          }`}>
+                          {isPast || (isCurrent && isSolved) ? <Check size={18} strokeWidth={2.5} /> : `L${lvl}`}
+                        </div>
+                        <span className={`text-[11px] sm:text-xs font-bold leading-tight max-w-[120px] ${isCurrent
+                          ? (isSolved ? 'text-emerald-900 font-extrabold' : 'text-teal-900 font-extrabold')
+                          : isPast
+                            ? 'text-slate-700'
+                            : 'text-slate-400'
+                          }`}>
+                          {levelTitle}
+                        </span>
+                        <span className={`text-[10px] mt-1 font-semibold ${isCurrent
+                          ? (isSolved ? 'text-emerald-600 font-bold uppercase tracking-wider' : 'text-teal-600 uppercase tracking-wider')
+                          : 'text-slate-400'
+                          }`}>
+                          {isCurrent
+                            ? (isSolved ? 'Resolved Here' : 'Active Now')
+                            : lvl === 4
+                              ? 'Supreme'
+                              : `Level ${lvl}`}
+                        </span>
                       </div>
-                      <span className={`text-[11px] sm:text-xs font-bold leading-tight max-w-[120px] ${
-                        isCurrent 
-                          ? (isSolved ? 'text-emerald-900 font-extrabold' : 'text-teal-900 font-extrabold') 
-                          : isPast 
-                          ? 'text-slate-700' 
-                          : 'text-slate-400'
-                      }`}>
-                        {levelTitle}
-                      </span>
-                      <span className={`text-[10px] mt-1 font-semibold ${
-                        isCurrent 
-                          ? (isSolved ? 'text-emerald-600 font-bold uppercase tracking-wider' : 'text-teal-600 uppercase tracking-wider') 
-                          : 'text-slate-400'
-                      }`}>
-                        {isCurrent 
-                          ? (isSolved ? 'Resolved Here' : 'Active Now') 
-                          : lvl === 4 
-                          ? 'Supreme' 
-                          : `Level ${lvl}`}
-                      </span>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-            
-            {/* When viewing in Authority Workspace mode, allow immediate action */}
-            {userRole === 'authority' && issueSourceView === 'authority-dashboard' && (
-              <div className="mb-8 p-6 bg-slate-50 border border-slate-200 rounded-2xl shadow-sm">
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-bold text-slate-800 text-lg flex items-center gap-2">
-                        <ShieldCheck className="text-teal-600" size={20} /> Authority Actions
-                      </h3>
-                      <span className="text-[10px] font-extrabold uppercase tracking-wider bg-teal-100 text-teal-800 px-2 py-0.5 rounded-full border border-teal-200">
-                        Workspace Action Mode
-                      </span>
+
+              {/* When viewing in Authority Workspace mode, allow immediate action */}
+              {userRole === 'authority' && issueSourceView === 'authority-dashboard' && (
+                <div className="mb-8 p-6 bg-slate-50 border border-slate-200 rounded-2xl shadow-sm">
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-bold text-slate-800 text-lg flex items-center gap-2">
+                          <ShieldCheck className="text-teal-600" size={20} /> Authority Actions
+                        </h3>
+                        <span className="text-[10px] font-extrabold uppercase tracking-wider bg-teal-100 text-teal-800 px-2 py-0.5 rounded-full border border-teal-200">
+                          Workspace Action Mode
+                        </span>
+                      </div>
+                      <p className="text-slate-500 text-sm mt-0.5">Take immediate official action on this ticket in your department queue.</p>
                     </div>
-                    <p className="text-slate-500 text-sm mt-0.5">Take immediate official action on this ticket in your department queue.</p>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={(e) => handleAcknowledge(selectedIssue.id, e)}
-                      disabled={selectedIssue.status === 'In Progress' || selectedIssue.status === 'Solved'}
-                      className={`rounded-xl text-xs font-bold gap-1.5 ${
-                        selectedIssue.status === 'In Progress' || selectedIssue.status === 'Solved'
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={(e) => handleAcknowledge(selectedIssue.id, e)}
+                        disabled={selectedIssue.status === 'In Progress' || selectedIssue.status === 'Solved'}
+                        className={`rounded-xl text-xs font-bold gap-1.5 ${selectedIssue.status === 'In Progress' || selectedIssue.status === 'Solved'
                           ? 'bg-slate-100 text-slate-400 border-slate-200'
                           : 'bg-white text-teal-700 border-teal-200 hover:bg-teal-50 shadow-sm'
-                      }`}
-                    >
-                      <CheckCircle size={14} />
-                      {selectedIssue.status === 'In Progress' ? 'Acknowledged' : 'Acknowledge'}
-                    </Button>
+                          }`}
+                      >
+                        <CheckCircle size={14} />
+                        {selectedIssue.status === 'In Progress' ? 'Acknowledged' : 'Acknowledge'}
+                      </Button>
 
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={(e) => handleOpenPostUpdate(selectedIssue, e)}
-                      className="bg-white hover:bg-blue-50 text-blue-700 border-blue-200 rounded-xl text-xs font-bold gap-1.5 shadow-sm"
-                    >
-                      <MessageSquare size={14} />
-                      Post Update
-                    </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={(e) => handleOpenPostUpdate(selectedIssue, e)}
+                        className="bg-white hover:bg-blue-50 text-blue-700 border-blue-200 rounded-xl text-xs font-bold gap-1.5 shadow-sm"
+                      >
+                        <MessageSquare size={14} />
+                        Post Update
+                      </Button>
 
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={(e) => handleOpenEscalate(selectedIssue, e)}
-                      disabled={(selectedIssue.currentLevel || 1) >= 4 || selectedIssue.status === 'Solved'}
-                      className={`rounded-xl text-xs font-bold gap-1.5 ${
-                        (selectedIssue.currentLevel || 1) >= 4 || selectedIssue.status === 'Solved'
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={(e) => handleOpenEscalate(selectedIssue, e)}
+                        disabled={(selectedIssue.currentLevel || 1) >= 4 || selectedIssue.status === 'Solved'}
+                        className={`rounded-xl text-xs font-bold gap-1.5 ${(selectedIssue.currentLevel || 1) >= 4 || selectedIssue.status === 'Solved'
                           ? 'bg-slate-100 text-slate-400 border-slate-200 opacity-60'
                           : 'bg-white hover:bg-amber-50 text-amber-800 border-amber-300 shadow-sm'
-                      }`}
-                    >
-                      <Zap size={14} className="text-amber-600" />
-                      Escalate Level
-                    </Button>
+                          }`}
+                      >
+                        <Zap size={14} className="text-amber-600" />
+                        Escalate Level
+                      </Button>
 
-                    <Button
-                      size="sm"
-                      onClick={(e) => handleOneClickSolve(selectedIssue.id, e)}
-                      disabled={selectedIssue.status === 'Solved'}
-                      className={`rounded-xl text-xs font-extrabold gap-1.5 shadow-sm ${
-                        selectedIssue.status === 'Solved'
+                      <Button
+                        size="sm"
+                        onClick={(e) => handleOneClickSolve(selectedIssue.id, e)}
+                        disabled={selectedIssue.status === 'Solved'}
+                        className={`rounded-xl text-xs font-extrabold gap-1.5 shadow-sm ${selectedIssue.status === 'Solved'
                           ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-100 cursor-default border border-emerald-200'
                           : 'bg-emerald-600 hover:bg-emerald-700 text-white'
-                      }`}
-                    >
-                      <CheckCheck size={15} />
-                      {selectedIssue.status === 'Solved' ? 'Resolved' : 'Mark Solved'}
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* When authority opened from Home Page (Recent Campus Issues), show read-only view like student with clear link to workspace */}
-            {userRole === 'authority' && issueSourceView !== 'authority-dashboard' && (
-              <div className="mb-8 p-5 bg-gradient-to-r from-teal-50/90 via-emerald-50/50 to-teal-50/90 border border-teal-200/90 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
-                <div className="flex items-start sm:items-center gap-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center shrink-0">
-                    <ShieldCheck size={22} />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm font-bold text-slate-800">Public Campus Issue View</p>
-                      <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-200/80 text-slate-700 px-2 py-0.5 rounded-full">
-                        Read-Only (Student View)
-                      </span>
+                          }`}
+                      >
+                        <CheckCheck size={15} />
+                        {selectedIssue.status === 'Solved' ? 'Resolved' : 'Mark Solved'}
+                      </Button>
                     </div>
-                    <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">
-                      You are viewing this grievance as students see it. To take official action (Acknowledge, Escalate, Post Update, or Mark Solved), please switch to your Authority Workspace.
-                    </p>
                   </div>
-                </div>
-                <Button
-                  onClick={() => {
-                    setIssueSourceView('authority-dashboard');
-                  }}
-                  className="bg-[#115e59] hover:bg-[#0f524e] text-white text-xs font-bold px-4 py-2.5 rounded-xl shrink-0 flex items-center gap-2 shadow-sm transition-transform active:scale-95 cursor-pointer"
-                >
-                  <ShieldCheck size={14} />
-                  Take Official Action on Ticket &rarr;
-                </Button>
-              </div>
-            )}
-            
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-              <div className="bg-gradient-to-br from-slate-50 to-white p-4 rounded-2xl border border-slate-100 shadow-sm">
-                <p className="text-[10px] text-slate-400 font-bold tracking-widest mb-1.5 uppercase">Department</p>
-                <p className="font-semibold text-slate-800 text-sm leading-tight">{selectedIssue.department}</p>
-              </div>
-              <div className="bg-gradient-to-br from-slate-50 to-white p-4 rounded-2xl border border-slate-100 shadow-sm">
-                <p className="text-[10px] text-slate-400 font-bold tracking-widest mb-1.5 uppercase">Category</p>
-                <p className="font-semibold text-slate-800 text-sm leading-tight">{selectedIssue.category}</p>
-              </div>
-              <div className="bg-gradient-to-br from-slate-50 to-white p-4 rounded-2xl border border-slate-100 shadow-sm">
-                <p className="text-[10px] text-slate-400 font-bold tracking-widest mb-1.5 uppercase">Specific Issue</p>
-                <p className="font-semibold text-slate-800 text-sm leading-tight">{selectedIssue.specificIssue}</p>
-              </div>
-              <div className="bg-gradient-to-br from-slate-50 to-white p-4 rounded-2xl border border-slate-100 shadow-sm">
-                <p className="text-[10px] text-slate-400 font-bold tracking-widest mb-1.5 uppercase">Location</p>
-                <p className="font-semibold text-slate-800 text-sm leading-tight">{selectedIssue.location}</p>
-              </div>
-            </div>
-            
-            <div className="mb-10">
-              <p className="text-sm text-slate-400 font-bold tracking-wider mb-3">DESCRIPTION</p>
-              <div className="text-slate-700 bg-slate-50 p-5 md:p-8 rounded-2xl border border-slate-100 text-lg leading-relaxed shadow-inner">
-                {selectedIssue.description}
-              </div>
-            </div>
-
-            {selectedIssue.imageUrl && (
-              <div className="mb-10 animate-in fade-in slide-in-from-bottom-2">
-                <p className="text-sm text-slate-400 font-bold tracking-wider mb-3">ATTACHED EVIDENCE</p>
-                <div className="rounded-2xl border border-slate-200 overflow-hidden shadow-sm inline-block w-full sm:w-auto sm:max-w-xl group bg-slate-50">
-                  <img 
-                    src={selectedIssue.imageUrl} 
-                    alt="Evidence" 
-                    className="w-full max-h-[400px] object-cover group-hover:scale-[1.02] transition-transform duration-500 ease-out" 
-                  />
-                </div>
-              </div>
-            )}
-            
-            <div className="flex flex-col sm:flex-row gap-4 border-t border-slate-100 pt-8">
-              {selectedIssue.status !== 'Solved' ? (
-                <button 
-                  onClick={() => {
-                    setIssues(prevIssues => prevIssues.map(issue => {
-                      if (issue.id === selectedIssue.id) {
-                        const newLiked = !issue.isLiked;
-                        const newIssue = {
-                          ...issue,
-                          isLiked: newLiked,
-                          upvotes: issue.upvotes + (newLiked ? 1 : -1)
-                        };
-                        setSelectedIssue(newIssue);
-                        return newIssue;
-                      }
-                      return issue;
-                    }));
-                  }}
-                  className={`flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl font-bold transition-all border cursor-pointer ${
-                    selectedIssue.isLiked 
-                      ? 'bg-teal-50 text-teal-700 border-teal-200 shadow-sm' 
-                      : 'bg-white text-slate-700 border-slate-200 hover:bg-teal-50 hover:text-teal-700 hover:border-teal-200'
-                  }`}
-                >
-                  <ThumbsUp size={20} className={selectedIssue.isLiked ? 'fill-teal-700 text-teal-700' : ''} /> 
-                  {selectedIssue.isLiked ? 'Upvoted' : 'Upvote'} ({selectedIssue.upvotes})
-                </button>
-              ) : (
-                <div className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-bold bg-slate-100 text-slate-500 border border-slate-200">
-                  <CheckCircle size={18} className="text-emerald-600" /> Solved • Upvotes Closed ({selectedIssue.upvotes})
                 </div>
               )}
-              <button 
-                onClick={() => setIsCommenting(true)}
-                className="flex items-center justify-center gap-2 bg-slate-100 text-slate-700 hover:bg-slate-200 border border-transparent px-8 py-3.5 rounded-xl font-bold transition-colors cursor-pointer"
-              >
-                <MessageSquare size={20} /> Add Comment
-              </button>
-            </div>
-            
-            {/* Communication Thread */}
-            <div className="mt-10 border-t border-slate-100 pt-8 smooth-enter-up">
-              <div className="flex items-center justify-between mb-6">
-                <p className="text-sm text-slate-400 font-bold tracking-wider uppercase">Comments & Official Updates</p>
-                <span className="text-xs font-bold text-teal-700 bg-teal-50 px-3 py-1 rounded-full flex items-center gap-1.5 border border-teal-200/80">
-                  <MessageSquare size={13} /> Public Campus Thread
-                </span>
-              </div>
-              
-              <div className="space-y-3 mb-6">
-                 {selectedIssue.comments && selectedIssue.comments.map((c: any, i: number) => (
-                    <div key={i} className="bg-gradient-to-br from-slate-50 to-white p-5 rounded-2xl border border-slate-100 shadow-sm smooth-enter-up">
-                       <div className="flex items-center gap-2 mb-2">
-                         <div className="w-7 h-7 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center font-bold text-xs shrink-0">{c.author[0]}</div>
-                         <p className="text-sm font-bold text-slate-800">{c.author}</p>
-                         <span className="text-slate-400 font-medium text-xs ml-auto">{c.time}</span>
-                       </div>
-                       <p className="text-slate-600 text-sm leading-relaxed pl-9">{c.text}</p>
+
+              {/* When authority opened from Home Page (Recent Campus Issues), show read-only view like student with clear link to workspace */}
+              {userRole === 'authority' && issueSourceView !== 'authority-dashboard' && (
+                <div className="mb-8 p-5 bg-gradient-to-r from-teal-50/90 via-emerald-50/50 to-teal-50/90 border border-teal-200/90 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
+                  <div className="flex items-start sm:items-center gap-3.5">
+                    <div className="w-10 h-10 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center shrink-0">
+                      <ShieldCheck size={22} />
                     </div>
-                 ))}
-                 {(!selectedIssue.comments || selectedIssue.comments.length === 0) && (
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-bold text-slate-800">Public Campus Issue View</p>
+                        <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-200/80 text-slate-700 px-2 py-0.5 rounded-full">
+                          Read-Only (Student View)
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">
+                        You are viewing this grievance as students see it. To take official action (Acknowledge, Escalate, Post Update, or Mark Solved), please switch to your Authority Workspace.
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    onClick={() => {
+                      setIssueSourceView('authority-dashboard');
+                    }}
+                    className="bg-[#115e59] hover:bg-[#0f524e] text-white text-xs font-bold px-4 py-2.5 rounded-xl shrink-0 flex items-center gap-2 shadow-sm transition-transform active:scale-95 cursor-pointer"
+                  >
+                    <ShieldCheck size={14} />
+                    Take Official Action on Ticket &rarr;
+                  </Button>
+                </div>
+              )}
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+                <div className="bg-gradient-to-br from-slate-50 to-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                  <p className="text-[10px] text-slate-400 font-bold tracking-widest mb-1.5 uppercase">Department</p>
+                  <p className="font-semibold text-slate-800 text-sm leading-tight">{selectedIssue.department}</p>
+                </div>
+                <div className="bg-gradient-to-br from-slate-50 to-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                  <p className="text-[10px] text-slate-400 font-bold tracking-widest mb-1.5 uppercase">Category</p>
+                  <p className="font-semibold text-slate-800 text-sm leading-tight">{selectedIssue.category}</p>
+                </div>
+                <div className="bg-gradient-to-br from-slate-50 to-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                  <p className="text-[10px] text-slate-400 font-bold tracking-widest mb-1.5 uppercase">Specific Issue</p>
+                  <p className="font-semibold text-slate-800 text-sm leading-tight">{selectedIssue.specificIssue}</p>
+                </div>
+                <div className="bg-gradient-to-br from-slate-50 to-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                  <p className="text-[10px] text-slate-400 font-bold tracking-widest mb-1.5 uppercase">Location</p>
+                  <p className="font-semibold text-slate-800 text-sm leading-tight">{selectedIssue.location}</p>
+                </div>
+              </div>
+
+              <div className="mb-10">
+                <p className="text-sm text-slate-400 font-bold tracking-wider mb-3">DESCRIPTION</p>
+                <div className="text-slate-700 bg-slate-50 p-5 md:p-8 rounded-2xl border border-slate-100 text-lg leading-relaxed shadow-inner">
+                  {selectedIssue.description}
+                </div>
+              </div>
+
+              {selectedIssue.imageUrl && (
+                <div className="mb-10 animate-in fade-in slide-in-from-bottom-2">
+                  <p className="text-sm text-slate-400 font-bold tracking-wider mb-3">ATTACHED EVIDENCE</p>
+                  <div className="rounded-2xl border border-slate-200 overflow-hidden shadow-sm inline-block w-full sm:w-auto sm:max-w-xl group bg-slate-50">
+                    <img
+                      src={selectedIssue.imageUrl}
+                      alt="Evidence"
+                      className="w-full max-h-[400px] object-cover group-hover:scale-[1.02] transition-transform duration-500 ease-out"
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="flex flex-col sm:flex-row gap-4 border-t border-slate-100 pt-8">
+                {selectedIssue.status !== 'Solved' ? (
+                  <button
+                    onClick={() => {
+                      setIssues(prevIssues => prevIssues.map(issue => {
+                        if (issue.id === selectedIssue.id) {
+                          const newLiked = !issue.isLiked;
+                          const newIssue = {
+                            ...issue,
+                            isLiked: newLiked,
+                            upvotes: issue.upvotes + (newLiked ? 1 : -1)
+                          };
+                          setSelectedIssue(newIssue);
+                          return newIssue;
+                        }
+                        return issue;
+                      }));
+                    }}
+                    className={`flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl font-bold transition-all border cursor-pointer ${selectedIssue.isLiked
+                      ? 'bg-teal-50 text-teal-700 border-teal-200 shadow-sm'
+                      : 'bg-white text-slate-700 border-slate-200 hover:bg-teal-50 hover:text-teal-700 hover:border-teal-200'
+                      }`}
+                  >
+                    <ThumbsUp size={20} className={selectedIssue.isLiked ? 'fill-teal-700 text-teal-700' : ''} />
+                    {selectedIssue.isLiked ? 'Upvoted' : 'Upvote'} ({selectedIssue.upvotes})
+                  </button>
+                ) : (
+                  <div className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-bold bg-slate-100 text-slate-500 border border-slate-200">
+                    <CheckCircle size={18} className="text-emerald-600" /> Solved • Upvotes Closed ({selectedIssue.upvotes})
+                  </div>
+                )}
+                <button
+                  onClick={() => setIsCommenting(true)}
+                  className="flex items-center justify-center gap-2 bg-slate-100 text-slate-700 hover:bg-slate-200 border border-transparent px-8 py-3.5 rounded-xl font-bold transition-colors cursor-pointer"
+                >
+                  <MessageSquare size={20} /> Add Comment
+                </button>
+              </div>
+
+              {/* Communication Thread */}
+              <div className="mt-10 border-t border-slate-100 pt-8 smooth-enter-up">
+                <div className="flex items-center justify-between mb-6">
+                  <p className="text-sm text-slate-400 font-bold tracking-wider uppercase">Comments & Official Updates</p>
+                  <span className="text-xs font-bold text-teal-700 bg-teal-50 px-3 py-1 rounded-full flex items-center gap-1.5 border border-teal-200/80">
+                    <MessageSquare size={13} /> Public Campus Thread
+                  </span>
+                </div>
+
+                <div className="space-y-3 mb-6">
+                  {selectedIssue.comments && selectedIssue.comments.map((c: any, i: number) => (
+                    <div key={i} className="bg-gradient-to-br from-slate-50 to-white p-5 rounded-2xl border border-slate-100 shadow-sm smooth-enter-up">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-7 h-7 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center font-bold text-xs shrink-0">{c.author[0]}</div>
+                        <p className="text-sm font-bold text-slate-800">{c.author}</p>
+                        <span className="text-slate-400 font-medium text-xs ml-auto">{c.time}</span>
+                      </div>
+                      <p className="text-slate-600 text-sm leading-relaxed pl-9">{c.text}</p>
+                    </div>
+                  ))}
+                  {(!selectedIssue.comments || selectedIssue.comments.length === 0) && (
                     <div className="text-center p-10 bg-slate-50 rounded-2xl border border-slate-100 border-dashed">
                       <MessageSquare size={28} className="mx-auto text-slate-300 mb-3" />
                       <p className="text-slate-500 font-semibold">No messages yet.</p>
                       <p className="text-slate-400 text-sm mt-1">This thread is open to all students and authorities to post updates and comments.</p>
                     </div>
-                 )}
-              </div>
+                  )}
+                </div>
 
-              {isCommenting && (
-                 <div className="smooth-enter-up p-5 bg-white border border-slate-200 rounded-xl shadow-sm">
-                    <Textarea 
+                {isCommenting && (
+                  <div className="smooth-enter-up p-5 bg-white border border-slate-200 rounded-xl shadow-sm">
+                    <Textarea
                       value={newComment}
                       onChange={(e) => setNewComment(e.target.value)}
                       placeholder="Type your comment or update here..."
                       className="w-full mb-4 resize-none h-24"
                     />
                     <div className="flex gap-3 justify-end">
-                       <button onClick={() => setIsCommenting(false)} className="px-5 py-2 font-bold text-slate-500 hover:bg-slate-100 rounded-lg transition-colors">Cancel</button>
-                       <Button onClick={submitComment} className="bg-teal-600 hover:bg-teal-700 text-white font-bold px-6 py-2 rounded-lg">Post Comment</Button>
+                      <button onClick={() => setIsCommenting(false)} className="px-5 py-2 font-bold text-slate-500 hover:bg-slate-100 rounded-lg transition-colors">Cancel</button>
+                      <Button onClick={submitComment} className="bg-teal-600 hover:bg-teal-700 text-white font-bold px-6 py-2 rounded-lg">Post Comment</Button>
                     </div>
-                 </div>
-              )}
+                  </div>
+                )}
+              </div>
+
             </div>
-            
-          </div>
-        </main>
+          </main>
         ) : (
           <main className="max-w-5xl mx-auto px-4 pt-10 pb-20 text-center">
             <h2 className="text-2xl font-bold text-slate-800 mb-2">Issue Not Found</h2>
@@ -2238,9 +2211,9 @@ export default function App() {
       ) : (
         /* Report a Problem View */
         <main className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-20 view-slide-in">
-          
+
           <div className="bg-white border border-slate-200 shadow-xl shadow-slate-100/60 rounded-3xl overflow-hidden">
-            
+
             {/* Header */}
             <div className="bg-gradient-to-r from-slate-50 to-orange-50/30 border-b border-slate-100 p-7 flex items-center gap-4">
               <div className="p-3.5 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl text-white shadow-lg shadow-orange-500/25">
@@ -2251,12 +2224,12 @@ export default function App() {
                 <p className="text-slate-500 text-sm font-medium mt-0.5">Submit an official ticket for fast resolution.</p>
               </div>
             </div>
-            
+
             <div className="p-8 space-y-10">
-              
+
               {/* Form Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                
+
                 {/* Department */}
                 <div>
                   <label className="block text-xs font-bold text-slate-500 mb-2.5 uppercase tracking-wider">Department</label>
@@ -2300,12 +2273,12 @@ export default function App() {
                     />
                   </div>
                 )}
-                
+
                 {/* Issue Title */}
                 <div>
                   <label className="block text-xs font-bold text-slate-500 mb-2.5 uppercase tracking-wider">Issue Title</label>
-                  <Input 
-                    type="text" 
+                  <Input
+                    type="text"
                     value={issueTitle}
                     onChange={(e) => setIssueTitle(e.target.value)}
                     placeholder="Short description"
@@ -2317,7 +2290,7 @@ export default function App() {
               {/* Details & Location Container */}
               <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  
+
                   {/* Building/Facility */}
                   <div>
                     <label className="block text-xs font-bold text-slate-500 mb-2.5 uppercase tracking-wider">Building / Facility</label>
@@ -2330,45 +2303,45 @@ export default function App() {
                       grouped={false}
                     />
                   </div>
-                  
+
                   {/* Exact Location */}
                   <div>
                     <label className="block text-xs font-bold text-slate-500 mb-2.5 uppercase tracking-wider">Exact Location</label>
-                    <Input 
-                      type="text" 
+                    <Input
+                      type="text"
                       value={exactLocation}
                       onChange={(e) => setExactLocation(e.target.value)}
                       placeholder="Floor, room, zone, equipment or bus number"
                       className="w-full h-14 px-4 bg-white border-slate-200 rounded-xl focus-visible:ring-2 focus-visible:ring-teal-500 text-slate-700 font-medium"
                     />
                   </div>
-                  
+
                   {/* Date */}
                   <div className="md:col-span-2">
                     <label className="block text-xs font-bold text-slate-500 mb-2.5 uppercase tracking-wider">Date (If specific incident)</label>
-                    <input 
-                      type="date" 
+                    <input
+                      type="date"
                       value={incidentDate}
                       onChange={(e) => setIncidentDate(e.target.value)}
                       className="w-full p-4 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 accent-teal-500 outline-none text-slate-700 font-medium transition-all"
                     />
                   </div>
-                  
+
                   {/* Detailed Description */}
                   <div className="md:col-span-2">
                     <label className="block text-xs font-bold text-slate-500 mb-2.5 uppercase tracking-wider">Detailed Description</label>
-                    <Textarea 
+                    <Textarea
                       value={detailedDescription}
                       onChange={(e) => setDetailedDescription(e.target.value)}
-                      placeholder="Context and specifics of the problem..." 
+                      placeholder="Context and specifics of the problem..."
                       className="w-full p-4 bg-white border-slate-200 rounded-xl focus-visible:ring-2 focus-visible:ring-teal-500 text-slate-700 font-medium resize-none min-h-[120px]"
                     />
                   </div>
-                  
+
                   {/* Confidentiality Toggle */}
                   <div className="md:col-span-2 flex items-center gap-3 bg-white p-4 rounded-xl border border-slate-200">
-                    <input 
-                      type="checkbox" 
+                    <input
+                      type="checkbox"
                       id="confidential"
                       checked={isConfidential}
                       onChange={(e) => setIsConfidential(e.target.checked)}
@@ -2389,7 +2362,7 @@ export default function App() {
                   <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2"><Camera className="text-teal-600" size={20} /> Live Evidence</h3>
                   <span className="text-[10px] font-bold uppercase tracking-widest bg-orange-100 text-orange-600 px-2.5 py-1 rounded-full">Required</span>
                 </div>
-                
+
                 <div className="bg-slate-50 rounded-2xl border border-dashed border-slate-300 p-8 flex flex-col items-center justify-center min-h-[300px]">
                   {!cameraActive && !photoTaken ? (
                     <div className="animate-in fade-in flex flex-col items-center text-center">
@@ -2407,7 +2380,7 @@ export default function App() {
                     <div className="w-full max-w-lg bg-black rounded-xl overflow-hidden relative aspect-video flex items-center justify-center animate-in zoom-in-95">
                       <video ref={videoRef} className="w-full h-full object-cover" autoPlay playsInline muted></video>
                       <div className="absolute top-4 right-4 w-3 h-3 bg-red-500 rounded-full animate-pulse shadow-[0_0_12px_red]"></div>
-                      <button 
+                      <button
                         onClick={takePhoto}
                         className="absolute bottom-6 w-16 h-16 bg-white/20 border-4 border-white rounded-full z-10 hover:bg-white/40 transition-colors backdrop-blur-sm shadow-lg"
                       ></button>
@@ -2422,7 +2395,7 @@ export default function App() {
                           <span className="text-zinc-500 font-bold italic tracking-wide">Photo Captured</span>
                         )}
                       </div>
-                      <button 
+                      <button
                         onClick={() => { setPhotoTaken(false); setCameraActive(true); setCapturedImage(null); }}
                         className="absolute -top-3 -right-3 bg-white text-slate-800 p-2.5 rounded-full hover:bg-slate-100 transition-colors shadow-lg border border-slate-200"
                       >
@@ -2438,7 +2411,7 @@ export default function App() {
 
             {/* Submit Button Area */}
             <div className="bg-slate-50 border-t border-slate-100 p-6 flex justify-end">
-              <Button 
+              <Button
                 onClick={handleCheckDuplicateAndSubmit}
                 className="bg-teal-600 hover:bg-teal-700 text-white font-bold text-lg py-6 px-10 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center gap-2"
               >
