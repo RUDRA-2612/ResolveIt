@@ -37,3 +37,6 @@ logo_3_b_w_light-removebg.png
 resolveIt_home_page.jpeg
 *.jpeg
 *.jpg
+
+# obvious stuff
+.env
