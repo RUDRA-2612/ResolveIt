@@ -1,17 +1,16 @@
-import { useState, useEffect } from 'react';
-import { PlusCircle, Heart, ShieldCheck, CheckCircle, ArrowUp } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { PlusCircle, Heart, ShieldCheck, RefreshCw } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 
 import type {
   Issue,
   UserRole,
   IssueSourceView,
+  IssueSortMode,
+  IssueNotification,
 } from './types/issue';
 
-import { INITIAL_ISSUES } from './data/mockIssues';
-import { useIssues } from './hooks/useIssues';
-import { useNotifications } from './hooks/useNotifications';
-import { filterIssues, sortIssues, findDuplicateIssue, getIssueAgeMinutes } from './lib/issues';
+import { filterIssues, findDuplicateIssue, getIssueAgeMinutes } from './lib/issues';
 import { DEPARTMENT_LEVELS } from './taxonomy';
 
 import { Navbar } from './components/layout/Navbar';
@@ -32,36 +31,47 @@ import {
   DuplicateModal,
 } from './components/modals/Modals';
 
+import {
+  fetchAllTickets,
+  submitNewTicket,
+  uploadEvidenceImage,
+  toggleUpvoteRecord,
+  acknowledgeTicketInDb,
+  escalateTicketInDb,
+  solveTicketInDb,
+  postCommentToDb,
+} from './lib/supabaseService';
+
 export default function App() {
-  const { issues, setIssues, issuesRef, findIssue, addIssue, updateIssue } = useIssues(INITIAL_ISSUES);
-  const { notifications, setNotifications, addNotification, clearNotifications } = useNotifications([]);
+  // Core Issues State (Fetched from Supabase)
+  const [issues, setIssues] = useState<Issue[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [currentView, setCurrentView] = useState('dashboard');
-  const [issueSourceView, setIssueSourceView] = useState<IssueSourceView>('dashboard');
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
-  const [feedbackOpen, setFeedbackOpen] = useState(false);
-  const [reportBugOpen, setReportBugOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterTab, setFilterTab] = useState<'Top' | 'New'>('Top');
-  const [selectedDepartmentFilter, setSelectedDepartmentFilter] = useState('All Departments');
-
+  // Authentication & Role
   const [userRole, setUserRole] = useState<UserRole | null>(
     (localStorage.getItem('resolveit_role') as UserRole) || null
   );
   const [hasSelectedRole, setHasSelectedRole] = useState(!!localStorage.getItem('resolveit_role'));
 
-  const [selectedAuthorityDepartment, setSelectedAuthorityDepartment] = useState('All Departments');
-  const [selectedAuthorityLevel, setSelectedAuthorityLevel] = useState<'All' | '1' | '2' | '3' | '4'>('All');
-  const [selectedKpiFilter, setSelectedKpiFilter] = useState<'all' | 'overdue' | 'open' | 'escalated' | 'solved'>('all');
-  const [myTicketsTab, setMyTicketsTab] = useState<'reported' | 'upvoted' | 'resolved'>('reported');
-
+  // Navigation & View Routing
+  const [currentView, setCurrentView] = useState('dashboard');
+  const [issueSourceView, setIssueSourceView] = useState<IssueSourceView>('dashboard');
   const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
 
-  // Authority & Action States
+  // UI Drawer & Header Controls
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [notifications, setNotifications] = useState<IssueNotification[]>([]);
+
+  // Modals
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [reportBugOpen, setReportBugOpen] = useState(false);
+
+  // Authority Action Modals
   const [postUpdateModalOpen, setPostUpdateModalOpen] = useState(false);
   const [actionTicket, setActionTicket] = useState<Issue | null>(null);
   const [postUpdateText, setPostUpdateText] = useState('');
@@ -70,10 +80,48 @@ export default function App() {
   const [escalateReason, setEscalateReason] = useState('SLA Breached / Unresolved');
   const [escalateNote, setEscalateNote] = useState('');
 
+  // Duplicate Check Modal
   const [duplicateModalOpen, setDuplicateModalOpen] = useState(false);
   const [matchedDuplicate, setMatchedDuplicate] = useState<Issue | null>(null);
   const [pendingFormSubmit, setPendingFormSubmit] = useState<any>(null);
 
+  // Filters & Tabs
+  const [filterTab, setFilterTab] = useState<IssueSortMode>('Top');
+  const [selectedDepartmentFilter, setSelectedDepartmentFilter] = useState('All Departments');
+  const [selectedAuthorityDepartment, setSelectedAuthorityDepartment] = useState('All Departments');
+  const [selectedAuthorityLevel, setSelectedAuthorityLevel] = useState<'All' | '1' | '2' | '3' | '4'>('All');
+  const [selectedKpiFilter, setSelectedKpiFilter] = useState<'all' | 'overdue' | 'open' | 'escalated' | 'solved'>('all');
+  const [myTicketsTab, setMyTicketsTab] = useState<'reported' | 'upvoted' | 'resolved'>('reported');
+
+  // Supabase Data Refresh
+  const refreshTickets = useCallback(async () => {
+    setLoading(true);
+    const liveIssues = await fetchAllTickets();
+    setIssues(liveIssues);
+
+    // If viewing issue details, refresh selected issue
+    if (selectedIssue) {
+      const updated = liveIssues.find((i) => i.id === selectedIssue.id);
+      if (updated) setSelectedIssue(updated);
+    }
+    setLoading(false);
+  }, [selectedIssue]);
+
+  useEffect(() => {
+    void refreshTickets();
+  }, []);
+
+  const getAuthorityTitle = (dept: string, level: number = 1): string => {
+    if (DEPARTMENT_LEVELS && DEPARTMENT_LEVELS[dept] && DEPARTMENT_LEVELS[dept][level]) {
+      return DEPARTMENT_LEVELS[dept][level];
+    }
+    if (level === 4) return "VC (Vice-Chancellor)";
+    if (level === 3) return "Department Head / Dean";
+    if (level === 2) return "Assistant In-Charge";
+    return "Department Representative";
+  };
+
+  // Browser Navigation & History Handling
   const pushModalState = () => {
     window.history.pushState({ view: currentView, modal: true }, '', '');
   };
@@ -112,57 +160,6 @@ export default function App() {
   };
 
   useEffect(() => {
-    const resolveView = (stateView?: string, stateIssueId?: string, stateFrom?: string) => {
-      const params = new URLSearchParams(window.location.search);
-      const idFromUrl = params.get('id');
-      const fromParam = params.get('from');
-      const path = window.location.pathname.replace(/^\//, '');
-
-      let targetView = stateView;
-      if (!targetView) {
-        if (path === 'report') targetView = 'report';
-        else if (path === 'authority-dashboard') {
-          targetView = 'authority-dashboard';
-          setUserRole('authority');
-          localStorage.setItem('resolveit_role', 'authority');
-        }
-        else if (path === 'recent-reported') targetView = 'recent-reported';
-        else if (path.startsWith('issue') || idFromUrl) targetView = 'issue-details';
-        else targetView = 'dashboard';
-      }
-
-      if (targetView === 'authority-dashboard') {
-        setUserRole('authority');
-        localStorage.setItem('resolveit_role', 'authority');
-      }
-
-      if (targetView === 'issue-details') {
-        const issueId = stateIssueId || idFromUrl;
-        const currentList = issuesRef.current;
-        const found = currentList.find(i => i.id === issueId) || currentList[0];
-        setSelectedIssue(found);
-        const origin = (stateFrom || (fromParam === 'workspace' ? 'authority-dashboard' : 'dashboard')) as IssueSourceView;
-        setIssueSourceView(origin);
-      } else {
-        setSelectedIssue(null);
-      }
-      setCurrentView(targetView);
-    };
-
-    if (!localStorage.getItem('resolveit_role')) {
-      window.history.replaceState({ view: 'dashboard' }, '', '/dashboard');
-      resolveView('dashboard');
-    } else if (!window.history.state) {
-      const params = new URLSearchParams(window.location.search);
-      const idFromUrl = params.get('id');
-      const fromParam = params.get('from');
-      const path = window.location.pathname.replace(/^\//, '') || 'dashboard';
-      window.history.replaceState({ view: path, issueId: idFromUrl || undefined, from: fromParam === 'workspace' ? 'authority-dashboard' : 'dashboard' }, '', window.location.pathname + window.location.search);
-      resolveView(path, idFromUrl || undefined, fromParam === 'workspace' ? 'authority-dashboard' : 'dashboard');
-    } else {
-      resolveView(window.history.state.view, window.history.state.issueId, window.history.state.from);
-    }
-
     const handlePopState = (e: PopStateEvent) => {
       setProfileOpen(false);
       setNotificationsOpen(false);
@@ -175,176 +172,16 @@ export default function App() {
       setEscalateModalOpen(false);
       setDuplicateModalOpen(false);
 
-      const stateView = e.state?.view;
-      const stateIssueId = e.state?.issueId || new URLSearchParams(window.location.search).get('id');
-      const stateFrom = e.state?.from;
-      resolveView(stateView, stateIssueId, stateFrom);
+      const stateView = e.state?.view || 'dashboard';
+      setCurrentView(stateView);
     };
 
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  const getAuthorityTitle = (dept: string, level: number = 1): string => {
-    if (DEPARTMENT_LEVELS && DEPARTMENT_LEVELS[dept] && DEPARTMENT_LEVELS[dept][level]) {
-      return DEPARTMENT_LEVELS[dept][level];
-    }
-    if (level === 4) return "VC (Vice-Chancellor)";
-    if (level === 3) return "Department Head / Dean";
-    if (level === 2) return "Assistant In-Charge";
-    return "Department Representative";
-  };
-
-  const handleUpvote = (issueId: string, e?: React.MouseEvent) => {
-    if (e) e.stopPropagation();
-    updateIssue(issueId, (issue) => {
-      if (issue.status === 'Solved') return issue;
-      const nextLiked = !issue.isLiked;
-      const updated = {
-        ...issue,
-        isLiked: nextLiked,
-        upvotes: issue.upvotes + (nextLiked ? 1 : -1),
-      };
-      if (selectedIssue && selectedIssue.id === issueId) {
-        setSelectedIssue(updated);
-      }
-      return updated;
-    });
-  };
-
-  const handleAddComment = (commentText: string) => {
-    if (!selectedIssue) return;
-    const commentObj = {
-      author: userRole === 'authority' ? 'Authority Representative' : 'Hritvika (You)',
-      time: 'Just now',
-      text: commentText,
-    };
-
-    updateIssue(selectedIssue.id, (issue) => {
-      const updated = {
-        ...issue,
-        comments: [...issue.comments, commentObj],
-      };
-      setSelectedIssue(updated);
-      return updated;
-    });
-
-    if (userRole === 'authority') {
-      addNotification({
-        id: Date.now(),
-        title: `New Comment: ${selectedIssue.title}`,
-        message: `The authority left a message on your ticket.`,
-        time: 'Just now',
-        unread: true,
-      });
-    }
-  };
-
-  const handleAcknowledge = (ticketId: string) => {
-    updateIssue(ticketId, (issue) => {
-      const handlerTitle = getAuthorityTitle(issue.department, issue.currentLevel || 1);
-      const updateNote = {
-        author: handlerTitle,
-        time: 'Just now',
-        text: `Ticket acknowledged by ${handlerTitle}. Investigation and remediation have commenced.`,
-      };
-      const updated = {
-        ...issue,
-        status: 'In Progress' as const,
-        statusColor: 'blue' as const,
-        comments: [...issue.comments, updateNote],
-      };
-      if (selectedIssue && selectedIssue.id === ticketId) setSelectedIssue(updated);
-      return updated;
-    });
-
-    addNotification({
-      id: Date.now(),
-      title: 'Ticket Acknowledged',
-      message: `Ticket #${ticketId} was acknowledged and moved to In Progress.`,
-      time: 'Just now',
-      unread: true,
-    });
-  };
-
-  const handlePostUpdateSubmit = () => {
-    if (!actionTicket || !postUpdateText.trim()) return;
-    const handlerTitle = getAuthorityTitle(actionTicket.department, actionTicket.currentLevel || 1);
-    const updateNote = {
-      author: `${handlerTitle} (Official Update)`,
-      time: 'Just now',
-      text: postUpdateText.trim(),
-    };
-
-    updateIssue(actionTicket.id, (issue) => {
-      const updated = {
-        ...issue,
-        comments: [...issue.comments, updateNote],
-      };
-      if (selectedIssue && selectedIssue.id === actionTicket.id) setSelectedIssue(updated);
-      return updated;
-    });
-
-    setPostUpdateModalOpen(false);
-    setActionTicket(null);
-    setPostUpdateText('');
-  };
-
-  const handleEscalateSubmit = () => {
-    if (!actionTicket) return;
-    const prevLvl = actionTicket.currentLevel || 1;
-    const nextLvl = Math.min(4, prevLvl + 1);
-    const prevTitle = getAuthorityTitle(actionTicket.department, prevLvl);
-    const newTitle = getAuthorityTitle(actionTicket.department, nextLvl);
-    const finalReason = escalateReason.trim() || 'SLA Breached / Administrative Escalation';
-
-    const escalateLog = {
-      author: 'Hierarchy Escalation Engine',
-      time: 'Just now',
-      text: `Level ${prevLvl} (${prevTitle}) escalated ticket to Level ${nextLvl} (${newTitle}). Reason: ${finalReason}${escalateNote ? ` - Note: "${escalateNote}"` : ''}.`,
-    };
-
-    updateIssue(actionTicket.id, (issue) => {
-      const updated = {
-        ...issue,
-        currentLevel: nextLvl,
-        assignedAuthority: newTitle,
-        isEscalated: true,
-        escalatedFrom: `L${prevLvl}: ${prevTitle}`,
-        escalationReason: finalReason,
-        comments: [...issue.comments, escalateLog],
-      };
-      if (selectedIssue && selectedIssue.id === actionTicket.id) setSelectedIssue(updated);
-      return updated;
-    });
-
-    setEscalateModalOpen(false);
-    setActionTicket(null);
-  };
-
-  const handleSolve = (ticketId: string) => {
-    updateIssue(ticketId, (issue) => {
-      const handlerTitle = getAuthorityTitle(issue.department, issue.currentLevel || 1);
-      const resolvedLog = {
-        author: `${handlerTitle} (Resolution)`,
-        time: 'Just now',
-        text: `Ticket marked as Solved and verified by ${handlerTitle}.`,
-      };
-      const updated = {
-        ...issue,
-        status: 'Solved' as const,
-        statusColor: 'emerald' as const,
-        isOverdue: false,
-        slaTimer: 'Solved',
-        resolvedAt: 'Just now',
-        comments: [...issue.comments, resolvedLog],
-      };
-      if (selectedIssue && selectedIssue.id === ticketId) setSelectedIssue(updated);
-      return updated;
-    });
-  };
-
-  const handleCheckDuplicateAndSubmit = (formData: any) => {
+  // Supabase Database Action Handlers
+  const handleCheckDuplicateAndSubmit = async (formData: any) => {
     const duplicate = findDuplicateIssue(issues, {
       department: formData.department || 'Campus Infrastructure & IT',
       category: formData.category,
@@ -359,45 +196,98 @@ export default function App() {
       setDuplicateModalOpen(true);
       pushModalState();
     } else {
-      executeSubmitTicket(formData);
+      await executeSubmitTicket(formData);
     }
   };
 
-  const executeSubmitTicket = (formData: any) => {
+  const executeSubmitTicket = async (formData: any) => {
+    let uploadedUrl: string | null = null;
+    if (formData.capturedImage) {
+      uploadedUrl = await uploadEvidenceImage(formData.capturedImage);
+    }
+
     const effectiveDept = formData.department || 'Campus Infrastructure & IT';
     const effectiveTitle = formData.issueTitle.trim() || formData.specificIssue || 'Campus grievance report';
-    const effectiveLocation = formData.building ? (formData.exactLocation ? `${formData.building} - ${formData.exactLocation}` : formData.building) : (formData.exactLocation || 'Campus premises');
-    const newId = `TKT-${143 + issues.length}`;
 
-    const newTicket: Issue = {
-      id: newId,
+    await submitNewTicket({
+      departmentName: effectiveDept,
+      categoryName: formData.category,
+      specificIssue: formData.specificIssue,
       title: effectiveTitle,
-      location: effectiveLocation,
+      building: formData.building,
+      exactLocation: formData.exactLocation || 'Campus premises',
       description: formData.detailedDescription.trim() || `Reported issue regarding ${formData.specificIssue || formData.category || 'campus facilities'}.`,
-      upvotes: 1,
-      status: 'Not Started',
-      statusColor: 'rose',
-      time: 'Just now',
-      department: effectiveDept,
-      category: formData.category || 'General / Other Issues',
-      specificIssue: formData.specificIssue || 'General Issue',
-      imageUrl: formData.capturedImage || undefined,
-      isLiked: true,
-      isMine: true,
-      currentLevel: 1,
+      isConfidential: formData.isConfidential,
+      imageUrl: uploadedUrl,
       assignedAuthority: getAuthorityTitle(effectiveDept, 1),
-      isEscalated: false,
-      slaTimer: '24h remaining',
-      isOverdue: false,
-      comments: [],
-    };
+    });
 
-    addIssue(newTicket);
     setDuplicateModalOpen(false);
     setPendingFormSubmit(null);
+    await refreshTickets();
     navigateTo('dashboard');
   };
 
+  const handleUpvote = async (issueId: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    const target = issues.find((i) => i.id === issueId);
+    if (!target || target.status === 'Solved') return;
+
+    await toggleUpvoteRecord(issueId, target.isLiked);
+    await refreshTickets();
+  };
+
+  const handleAddComment = async (commentText: string) => {
+    if (!selectedIssue) return;
+    const authorName = userRole === 'authority' ? 'Authority Representative' : 'Hritvika (You)';
+    await postCommentToDb(selectedIssue.id, authorName, commentText);
+    await refreshTickets();
+  };
+
+  const handleAcknowledge = async (ticketId: string) => {
+    const target = issues.find((i) => i.id === ticketId);
+    if (!target) return;
+    const handlerTitle = getAuthorityTitle(target.department, target.currentLevel || 1);
+
+    await acknowledgeTicketInDb(ticketId, handlerTitle);
+    await refreshTickets();
+  };
+
+  const handlePostUpdateSubmit = async () => {
+    if (!actionTicket || !postUpdateText.trim()) return;
+    const handlerTitle = getAuthorityTitle(actionTicket.department, actionTicket.currentLevel || 1);
+
+    await postCommentToDb(actionTicket.id, `${handlerTitle} (Official Update)`, postUpdateText.trim());
+    setPostUpdateModalOpen(false);
+    setActionTicket(null);
+    setPostUpdateText('');
+    await refreshTickets();
+  };
+
+  const handleEscalateSubmit = async () => {
+    if (!actionTicket) return;
+    const prevLvl = actionTicket.currentLevel || 1;
+    const nextLvl = Math.min(4, prevLvl + 1);
+    const prevTitle = getAuthorityTitle(actionTicket.department, prevLvl);
+    const nextTitle = getAuthorityTitle(actionTicket.department, nextLvl);
+    const finalReason = escalateReason.trim() || 'SLA Breached / Administrative Escalation';
+
+    await escalateTicketInDb(actionTicket.id, nextLvl, nextTitle, prevTitle, finalReason, escalateNote);
+    setEscalateModalOpen(false);
+    setActionTicket(null);
+    await refreshTickets();
+  };
+
+  const handleSolve = async (ticketId: string) => {
+    const target = issues.find((i) => i.id === ticketId);
+    if (!target) return;
+    const handlerTitle = getAuthorityTitle(target.department, target.currentLevel || 1);
+
+    await solveTicketInDb(ticketId, handlerTitle);
+    await refreshTickets();
+  };
+
+  // Filtered & Sorted Issues List
   const displayedDashboardIssues = filterIssues(issues, {
     department: selectedDepartmentFilter,
     searchQuery,
@@ -430,7 +320,7 @@ export default function App() {
         notifications={notifications}
         notificationsOpen={notificationsOpen}
         setNotificationsOpen={setNotificationsOpen}
-        onClearNotifications={clearNotifications}
+        onClearNotifications={() => setNotifications([])}
         userMenuOpen={userMenuOpen}
         setUserMenuOpen={setUserMenuOpen}
         onOpenSidebar={() => { pushModalState(); setSidebarOpen(true); }}
@@ -486,7 +376,7 @@ export default function App() {
         onSubmitAnyway={() => pendingFormSubmit && executeSubmitTicket(pendingFormSubmit)}
         onUpvoteDuplicate={() => {
           if (matchedDuplicate) {
-            handleUpvote(matchedDuplicate.id);
+            void handleUpvote(matchedDuplicate.id);
             setDuplicateModalOpen(false);
             openIssueDetails(matchedDuplicate, 'dashboard');
           }
@@ -510,6 +400,9 @@ export default function App() {
                 </p>
               </div>
             </div>
+            <button onClick={refreshTickets} className="flex items-center gap-2 text-xs font-bold text-teal-700 bg-white border border-teal-200 px-3.5 py-2 rounded-xl shadow-2xs hover:bg-teal-50 transition-colors self-start md:self-auto">
+              <RefreshCw size={14} className={loading ? 'animate-spin' : ''} /> Sync Database
+            </button>
           </div>
 
           {userRole === 'authority' && (
@@ -589,9 +482,14 @@ export default function App() {
                     key={issue.id}
                     issue={issue}
                     onClick={() => openIssueDetails(issue, 'dashboard')}
-                    onUpvote={(e) => handleUpvote(issue.id, e)}
+                    onUpvote={(e) => void handleUpvote(issue.id, e)}
                   />
                 ))}
+                {displayedDashboardIssues.length === 0 && (
+                  <div className="text-center p-12 bg-white rounded-2xl border border-slate-200 border-dashed">
+                    <p className="text-slate-500 font-bold">No issues found matching selected filter.</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -654,7 +552,7 @@ export default function App() {
                   key={issue.id}
                   issue={issue}
                   onClick={() => openIssueDetails(issue, 'recent-reported')}
-                  onUpvote={(e) => handleUpvote(issue.id, e)}
+                  onUpvote={(e) => void handleUpvote(issue.id, e)}
                 />
               ))}
           </div>
@@ -670,12 +568,12 @@ export default function App() {
               else if (issueSourceView === 'recent-reported') navigateTo('recent-reported');
               else navigateTo('dashboard');
             }}
-            onToggleUpvote={handleUpvote}
-            onAddComment={handleAddComment}
-            onAcknowledge={handleAcknowledge}
+            onToggleUpvote={(id) => void handleUpvote(id)}
+            onAddComment={(txt) => void handleAddComment(txt)}
+            onAcknowledge={(id) => void handleAcknowledge(id)}
             onOpenPostUpdate={(issue) => { setActionTicket(issue); setPostUpdateText(''); setPostUpdateModalOpen(true); pushModalState(); }}
             onOpenEscalate={(issue) => { setActionTicket(issue); setEscalateReason(''); setEscalateNote(''); setEscalateModalOpen(true); pushModalState(); }}
-            onSolve={handleSolve}
+            onSolve={(id) => void handleSolve(id)}
             onSwitchToWorkspaceView={() => setIssueSourceView('authority-dashboard')}
           />
         ) : (
@@ -694,8 +592,18 @@ export default function App() {
       {currentView === 'dashboard' && (
         <footer className="mt-auto bg-gradient-to-b from-[#f8fafc] to-teal-50/30 flex flex-col items-center pb-10 pt-10">
           <p className="text-slate-500 text-sm mb-4 flex items-center justify-center gap-1.5 font-medium">
-            Crafted with <Heart size={14} className="text-rose-500 fill-rose-500 inline mx-0.5 animate-pulse" /> by HRTT
+            Crafted with <Heart size={14} className="text-rose-500 fill-rose-500 inline mx-0.5 animate-pulse" /> by
+            <span className="text-rose-500">H</span>
+            <span className="text-teal-600">R</span>
+            <span className="text-amber-500">T</span>
+            <span className="text-violet-500">T</span>
           </p>
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 mb-6 text-xs sm:text-sm font-bold">
+            <span className="px-4 py-1.5 rounded-full bg-rose-50 text-rose-500 border border-rose-200/70 hover:scale-105 hover:shadow-sm transition-all">Hritvika</span>
+            <span className="px-4 py-1.5 rounded-full bg-teal-50 text-teal-600 border border-teal-200/70 hover:scale-105 hover:shadow-sm transition-all">Rudra</span>
+            <span className="px-4 py-1.5 rounded-full bg-amber-50 text-amber-500 border border-amber-200/70 hover:scale-105 hover:shadow-sm transition-all">Tanishq</span>
+            <span className="px-4 py-1.5 rounded-full bg-violet-50 text-violet-500 border border-violet-200/70 hover:scale-105 hover:shadow-sm transition-all">Tvesha</span>
+          </div>
           <p className="text-xs text-slate-400 font-medium">© 2026 Resolvelt · All rights reserved</p>
         </footer>
       )}
