@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { PlusCircle, Heart, ShieldCheck, RefreshCw } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import type { User } from '@supabase/supabase-js';
 
 import type {
   Issue,
@@ -42,23 +43,33 @@ import {
   postCommentToDb,
 } from './lib/supabaseService';
 
-export default function App() {
-  // Core Issues State (Fetched from Supabase)
-  const [issues, setIssues] = useState<Issue[]>([]);
-  const [loading, setLoading] = useState(true);
+import { supabase } from './lib/supabase';
+import { onAuthStateChange, signOutUser } from './lib/authService';
+import { AuthContainer } from './components/auth/AuthContainer';
 
-  // Authentication & Role
-  const [userRole, setUserRole] = useState<UserRole | null>(
-    (localStorage.getItem('resolveit_role') as UserRole) || null
+export default function App() {
+  // Authentication State
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
+
+  // Core Issues & Data State
+  const [issues, setIssues] = useState<Issue[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // User Role & Role Selection Overlay State
+  const [userRole, setUserRole] = useState<UserRole>(
+    (localStorage.getItem('resolveit_role') as UserRole) || 'student'
   );
-  const [hasSelectedRole, setHasSelectedRole] = useState(!!localStorage.getItem('resolveit_role'));
+  const [hasSelectedRole, setHasSelectedRole] = useState(
+    !!localStorage.getItem('resolveit_role')
+  );
 
   // Navigation & View Routing
   const [currentView, setCurrentView] = useState('dashboard');
   const [issueSourceView, setIssueSourceView] = useState<IssueSourceView>('dashboard');
   const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
 
-  // UI Drawer & Header Controls
+  // UI Controls
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -93,23 +104,51 @@ export default function App() {
   const [selectedKpiFilter, setSelectedKpiFilter] = useState<'all' | 'overdue' | 'open' | 'escalated' | 'solved'>('all');
   const [myTicketsTab, setMyTicketsTab] = useState<'reported' | 'upvoted' | 'resolved'>('reported');
 
-  // Supabase Data Refresh
+  // Supabase Auth Listener on Mount
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setCurrentUser(session?.user ?? null);
+      setAuthLoading(false);
+    });
+
+    const { data: { subscription } } = onAuthStateChange((session) => {
+      setCurrentUser(session?.user ?? null);
+      setAuthLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Unified Supabase Data Refresh
   const refreshTickets = useCallback(async () => {
+    if (!currentUser) return;
     setLoading(true);
     const liveIssues = await fetchAllTickets();
     setIssues(liveIssues);
 
-    // If viewing issue details, refresh selected issue
     if (selectedIssue) {
       const updated = liveIssues.find((i) => i.id === selectedIssue.id);
       if (updated) setSelectedIssue(updated);
     }
     setLoading(false);
-  }, [selectedIssue]);
+  }, [currentUser, selectedIssue]);
 
   useEffect(() => {
-    void refreshTickets();
-  }, []);
+    if (currentUser) {
+      void refreshTickets();
+    }
+  }, [currentUser, refreshTickets]);
+
+  // Handle Logout
+  const handleLogout = async () => {
+    await signOutUser();
+    setCurrentUser(null);
+    localStorage.removeItem('resolveit_role');
+    setHasSelectedRole(false);
+    setUserMenuOpen(false);
+    setSelectedIssue(null);
+    setCurrentView('dashboard');
+  };
 
   const getAuthorityTitle = (dept: string, level: number = 1): string => {
     if (DEPARTMENT_LEVELS && DEPARTMENT_LEVELS[dept] && DEPARTMENT_LEVELS[dept][level]) {
@@ -180,7 +219,7 @@ export default function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  // Supabase Database Action Handlers
+  // Database Action Handlers
   const handleCheckDuplicateAndSubmit = async (formData: any) => {
     const duplicate = findDuplicateIssue(issues, {
       department: formData.department || 'Campus Infrastructure & IT',
@@ -239,7 +278,7 @@ export default function App() {
 
   const handleAddComment = async (commentText: string) => {
     if (!selectedIssue) return;
-    const authorName = userRole === 'authority' ? 'Authority Representative' : 'Hritvika (You)';
+    const authorName = userRole === 'authority' ? 'Authority Representative' : 'Student';
     await postCommentToDb(selectedIssue.id, authorName, commentText);
     await refreshTickets();
   };
@@ -287,6 +326,25 @@ export default function App() {
     await refreshTickets();
   };
 
+  // 1. Loading Screen
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  // 2. Auth Guard: Show Login/Register if not authenticated
+  if (!currentUser) {
+    return <AuthContainer onAuthSuccess={() => void refreshTickets()} />;
+  }
+
+  // Active User Info
+  const userEmail = currentUser.email || '';
+  const userName = currentUser.user_metadata?.full_name || userEmail.split('@')[0] || 'User';
+  const userInitials = userName.substring(0, 2).toUpperCase();
+
   // Filtered & Sorted Issues List
   const displayedDashboardIssues = filterIssues(issues, {
     department: selectedDepartmentFilter,
@@ -323,18 +381,14 @@ export default function App() {
         onClearNotifications={() => setNotifications([])}
         userMenuOpen={userMenuOpen}
         setUserMenuOpen={setUserMenuOpen}
+        userName={userName}
+        userEmail={userEmail}
+        userInitials={userInitials}
         onOpenSidebar={() => { pushModalState(); setSidebarOpen(true); }}
         onOpenProfile={() => { pushModalState(); setProfileOpen(true); }}
         onOpenFeedback={() => { pushModalState(); setFeedbackOpen(true); }}
         onOpenReportBug={() => { pushModalState(); setReportBugOpen(true); }}
-        onLogout={() => {
-          localStorage.removeItem('resolveit_role');
-          setUserRole(null);
-          setHasSelectedRole(false);
-          setUserMenuOpen(false);
-          setSelectedIssue(null);
-          navigateTo('dashboard');
-        }}
+        onLogout={handleLogout}
       />
 
       <Sidebar
@@ -389,18 +443,18 @@ export default function App() {
           <div className="w-full bg-gradient-to-r from-teal-50/70 via-emerald-50/30 to-teal-50/40 border border-teal-200/90 rounded-3xl p-6 sm:p-7 shadow-xs mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="flex items-center gap-4 sm:gap-5">
               <div className="w-14 h-14 rounded-2xl bg-teal-600 text-white flex items-center justify-center font-extrabold text-xl shadow-sm shrink-0">
-                {userRole === 'authority' ? 'RS' : 'HV'}
+                {userInitials}
               </div>
               <div>
                 <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-800">
-                  {userRole === 'authority' ? 'Good to see you, Rohit Sir.' : 'Welcome back, Hritvika'}
+                  {userRole === 'authority' ? `Good to see you, ${userName}.` : `Welcome back, ${userName}`}
                 </h2>
                 <p className="text-slate-500 text-sm mt-0.5 font-medium">
                   {userRole === 'authority' ? 'Review queues, manage escalations, and meet SLAs.' : 'Track your reported complaints or submit a new grievance below.'}
                 </p>
               </div>
             </div>
-            <button onClick={refreshTickets} className="flex items-center gap-2 text-xs font-bold text-teal-700 bg-white border border-teal-200 px-3.5 py-2 rounded-xl shadow-2xs hover:bg-teal-50 transition-colors self-start md:self-auto">
+            <button onClick={refreshTickets} className="flex items-center gap-2 text-xs font-bold text-teal-700 bg-white border border-teal-200 px-3.5 py-2 rounded-xl shadow-2xs hover:bg-teal-50 transition-colors self-start md:self-auto cursor-pointer">
               <RefreshCw size={14} className={loading ? 'animate-spin' : ''} /> Sync Database
             </button>
           </div>
@@ -471,8 +525,8 @@ export default function App() {
                   {selectedDepartmentFilter === 'All Departments' ? 'Recent Campus Issues' : selectedDepartmentFilter}
                 </h3>
                 <div className="bg-slate-200 p-1 rounded-lg flex text-sm font-bold w-fit">
-                  <button onClick={() => setFilterTab('Top')} className={`px-5 py-1.5 rounded-md transition-all ${filterTab === 'Top' ? 'bg-white text-teal-700 shadow-sm' : 'text-slate-500'}`}>Trending</button>
-                  <button onClick={() => setFilterTab('New')} className={`px-5 py-1.5 rounded-md transition-all ${filterTab === 'New' ? 'bg-white text-teal-700 shadow-sm' : 'text-slate-500'}`}>Newest</button>
+                  <button onClick={() => setFilterTab('Top')} className={`px-5 py-1.5 rounded-md transition-all cursor-pointer ${filterTab === 'Top' ? 'bg-white text-teal-700 shadow-sm' : 'text-slate-500'}`}>Trending</button>
+                  <button onClick={() => setFilterTab('New')} className={`px-5 py-1.5 rounded-md transition-all cursor-pointer ${filterTab === 'New' ? 'bg-white text-teal-700 shadow-sm' : 'text-slate-500'}`}>Newest</button>
                 </div>
               </div>
 
@@ -509,7 +563,7 @@ export default function App() {
       ) : currentView === 'recent-reported' ? (
         <main className="max-w-4xl mx-auto px-4 pt-8 pb-20 view-slide-in">
           <div className="flex items-center gap-3 mb-6">
-            <button onClick={() => navigateTo('dashboard')} className="text-teal-700 hover:text-teal-900 p-2 rounded-full hover:bg-teal-50 transition-colors border border-slate-200 bg-white shadow-sm">
+            <button onClick={() => navigateTo('dashboard')} className="text-teal-700 hover:text-teal-900 p-2 rounded-full hover:bg-teal-50 transition-colors border border-slate-200 bg-white shadow-sm cursor-pointer">
               &larr; Back
             </button>
             <div>
@@ -521,19 +575,19 @@ export default function App() {
           <div className="flex items-center gap-2 p-1.5 bg-slate-100 rounded-2xl border border-slate-200 mb-6 max-w-xl">
             <button
               onClick={() => setMyTicketsTab('reported')}
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all ${myTicketsTab === 'reported' ? 'bg-white text-teal-800 shadow-sm' : 'text-slate-600'}`}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${myTicketsTab === 'reported' ? 'bg-white text-teal-800 shadow-sm' : 'text-slate-600'}`}
             >
               <span>Reported by Me</span>
             </button>
             <button
               onClick={() => setMyTicketsTab('upvoted')}
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all ${myTicketsTab === 'upvoted' ? 'bg-white text-teal-800 shadow-sm' : 'text-slate-600'}`}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${myTicketsTab === 'upvoted' ? 'bg-white text-teal-800 shadow-sm' : 'text-slate-600'}`}
             >
               <span>Upvoted by Me</span>
             </button>
             <button
               onClick={() => setMyTicketsTab('resolved')}
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all ${myTicketsTab === 'resolved' ? 'bg-white text-emerald-800 shadow-sm' : 'text-slate-600'}`}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${myTicketsTab === 'resolved' ? 'bg-white text-emerald-800 shadow-sm' : 'text-slate-600'}`}
             >
               <span>Resolved</span>
             </button>
@@ -579,7 +633,7 @@ export default function App() {
         ) : (
           <main className="max-w-5xl mx-auto px-4 pt-10 pb-20 text-center">
             <h2 className="text-2xl font-bold text-slate-800 mb-2">Issue Not Found</h2>
-            <button onClick={() => navigateTo('dashboard')} className="text-teal-600 font-bold hover:underline">Return to Home</button>
+            <button onClick={() => navigateTo('dashboard')} className="text-teal-600 font-bold hover:underline cursor-pointer">Return to Home</button>
           </main>
         )
       ) : (
