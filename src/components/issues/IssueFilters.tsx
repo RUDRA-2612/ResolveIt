@@ -1,19 +1,14 @@
 import { Filter } from 'lucide-react';
 import { ISSUE_DATA } from '../../taxonomy';
-import type { IssueSortMode } from '../../types/issue';
 
 interface IssueFiltersProps {
     selectedDepartment: string;
     onSelectDepartment: (dept: string) => void;
-    filterTab: IssueSortMode;
-    onSelectTab: (tab: IssueSortMode) => void;
 }
 
 export function IssueFilters({
     selectedDepartment,
     onSelectDepartment,
-    filterTab,
-    onSelectTab,
 }: IssueFiltersProps) {
     const departments = ['All Departments', ...Object.keys(ISSUE_DATA)];
 

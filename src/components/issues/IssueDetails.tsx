@@ -66,9 +66,9 @@ export function IssueDetails({
                     <div className="flex items-center gap-3">
                         <span className="font-mono text-sm font-bold text-slate-500">{issue.id}</span>
                         <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold border ${issue.statusColor === 'emerald' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
-                                issue.statusColor === 'blue' ? 'bg-blue-50 text-blue-600 border-blue-200' :
-                                    issue.statusColor === 'amber' ? 'bg-amber-50 text-amber-600 border-amber-200' :
-                                        'bg-rose-50 text-rose-600 border-rose-200'
+                            issue.statusColor === 'blue' ? 'bg-blue-50 text-blue-600 border-blue-200' :
+                                issue.statusColor === 'amber' ? 'bg-amber-50 text-amber-600 border-amber-200' :
+                                    'bg-rose-50 text-rose-600 border-rose-200'
                             }`}>
                             {issue.status === 'Solved' && <CheckCircle size={14} />}
                             {issue.status === 'Seen' && <CheckCircle size={14} className="opacity-70" />}
@@ -118,26 +118,26 @@ export function IssueDetails({
                             return (
                                 <div key={lvl} className="flex flex-col items-center text-center relative group">
                                     <div className={`w-9 h-9 sm:w-11 sm:h-11 rounded-2xl flex items-center justify-center font-extrabold text-xs sm:text-sm mb-2 transition-all ${isCurrent
-                                            ? isSolved
-                                                ? 'bg-emerald-600 text-white ring-4 ring-emerald-200 shadow-md scale-105'
-                                                : 'bg-teal-600 text-white ring-4 ring-teal-200 shadow-md scale-105'
-                                            : isPast
-                                                ? 'bg-emerald-500 text-white shadow-sm'
-                                                : 'bg-white text-slate-400 border border-slate-200'
+                                        ? isSolved
+                                            ? 'bg-emerald-600 text-white ring-4 ring-emerald-200 shadow-md scale-105'
+                                            : 'bg-teal-600 text-white ring-4 ring-teal-200 shadow-md scale-105'
+                                        : isPast
+                                            ? 'bg-emerald-500 text-white shadow-sm'
+                                            : 'bg-white text-slate-400 border border-slate-200'
                                         }`}>
                                         {isPast || (isCurrent && isSolved) ? <Check size={18} strokeWidth={2.5} /> : `L${lvl}`}
                                     </div>
                                     <span className={`text-[11px] sm:text-xs font-bold leading-tight max-w-[120px] ${isCurrent
-                                            ? (isSolved ? 'text-emerald-900 font-extrabold' : 'text-teal-900 font-extrabold')
-                                            : isPast
-                                                ? 'text-slate-700'
-                                                : 'text-slate-400'
+                                        ? (isSolved ? 'text-emerald-900 font-extrabold' : 'text-teal-900 font-extrabold')
+                                        : isPast
+                                            ? 'text-slate-700'
+                                            : 'text-slate-400'
                                         }`}>
                                         {levelTitle}
                                     </span>
                                     <span className={`text-[10px] mt-1 font-semibold ${isCurrent
-                                            ? (isSolved ? 'text-emerald-600 font-bold uppercase tracking-wider' : 'text-teal-600 uppercase tracking-wider')
-                                            : 'text-slate-400'
+                                        ? (isSolved ? 'text-emerald-600 font-bold uppercase tracking-wider' : 'text-teal-600 uppercase tracking-wider')
+                                        : 'text-slate-400'
                                         }`}>
                                         {isCurrent ? (isSolved ? 'Resolved Here' : 'Active Now') : lvl === 4 ? 'Supreme' : `Level ${lvl}`}
                                     </span>
@@ -169,8 +169,8 @@ export function IssueDetails({
                                     onClick={() => onAcknowledge(issue.id)}
                                     disabled={issue.status === 'In Progress' || issue.status === 'Solved'}
                                     className={`rounded-xl text-xs font-bold gap-1.5 ${issue.status === 'In Progress' || issue.status === 'Solved'
-                                            ? 'bg-slate-100 text-slate-400 border-slate-200'
-                                            : 'bg-white text-teal-700 border-teal-200 hover:bg-teal-50 shadow-sm'
+                                        ? 'bg-slate-100 text-slate-400 border-slate-200'
+                                        : 'bg-white text-teal-700 border-teal-200 hover:bg-teal-50 shadow-sm'
                                         }`}
                                 >
                                     <CheckCircle size={14} />
@@ -192,8 +192,8 @@ export function IssueDetails({
                                     onClick={() => onOpenEscalate(issue)}
                                     disabled={(issue.currentLevel || 1) >= 4 || issue.status === 'Solved'}
                                     className={`rounded-xl text-xs font-bold gap-1.5 ${(issue.currentLevel || 1) >= 4 || issue.status === 'Solved'
-                                            ? 'bg-slate-100 text-slate-400 border-slate-200 opacity-60'
-                                            : 'bg-white hover:bg-amber-50 text-amber-800 border-amber-300 shadow-sm'
+                                        ? 'bg-slate-100 text-slate-400 border-slate-200 opacity-60'
+                                        : 'bg-white hover:bg-amber-50 text-amber-800 border-amber-300 shadow-sm'
                                         }`}
                                 >
                                     <Zap size={14} className="text-amber-600" /> Escalate Level
@@ -204,8 +204,8 @@ export function IssueDetails({
                                     onClick={() => onSolve(issue.id)}
                                     disabled={issue.status === 'Solved'}
                                     className={`rounded-xl text-xs font-extrabold gap-1.5 shadow-sm ${issue.status === 'Solved'
-                                            ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-100 cursor-default border border-emerald-200'
-                                            : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                                        ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-100 cursor-default border border-emerald-200'
+                                        : 'bg-emerald-600 hover:bg-emerald-700 text-white'
                                         }`}
                                 >
                                     <CheckCheck size={15} />
@@ -283,8 +283,8 @@ export function IssueDetails({
                         <button
                             onClick={() => onToggleUpvote(issue.id)}
                             className={`flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl font-bold transition-all border cursor-pointer ${issue.isLiked
-                                    ? 'bg-teal-50 text-teal-700 border-teal-200 shadow-sm'
-                                    : 'bg-white text-slate-700 border-slate-200 hover:bg-teal-50 hover:text-teal-700 hover:border-teal-200'
+                                ? 'bg-teal-50 text-teal-700 border-teal-200 shadow-sm'
+                                : 'bg-white text-slate-700 border-slate-200 hover:bg-teal-50 hover:text-teal-700 hover:border-teal-200'
                                 }`}
                         >
                             <ThumbsUp size={20} className={issue.isLiked ? 'fill-teal-700 text-teal-700' : ''} />

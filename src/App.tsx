@@ -331,8 +331,15 @@ export default function App() {
         userRole={userRole}
       />
 
-      {/* Global Modals */}
-      <ProfileModal open={profileOpen} onClose={() => setProfileOpen(false)} userRole={userRole} />
+      <ProfileModal
+        open={profileOpen}
+        onClose={() => setProfileOpen(false)}
+        userRole={userRole}
+        userName={userName}
+        userEmail={userEmail}
+        userInitials={userInitials}
+      />
+      {/* <ProfileModal open={profileOpen} onClose={() => setProfileOpen(false)} userRole={userRole} /> */}
       <FeedbackModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
       <ReportBugModal open={reportBugOpen} onClose={() => setReportBugOpen(false)} />
 
@@ -453,8 +460,6 @@ export default function App() {
                   <IssueFilters
                     selectedDepartment={selectedDepartmentFilter}
                     onSelectDepartment={setSelectedDepartmentFilter}
-                    filterTab={filterTab}
-                    onSelectTab={setFilterTab}
                   />
                 </div>
 
@@ -619,6 +624,18 @@ export default function App() {
   );
 }
 
+interface IssueDetailsRouteProps {
+  issues: Issue[];
+  userRole: UserRole | null;
+  onToggleUpvote: (issueId: string) => void;
+  onAddComment: (issueId: string, commentText: string) => void;
+  onAcknowledge: (issueId: string) => void;
+  onOpenPostUpdate: (issue: Issue) => void;
+  onOpenEscalate: (issue: Issue) => void;
+  onSolve: (issueId: string) => void;
+  onDeleteTicket?: (issueId: string) => void;
+}
+
 // Wrapper component to cleanly extract issue ID from URL parameters
 function IssueDetailsRoute({
   issues,
@@ -629,7 +646,7 @@ function IssueDetailsRoute({
   onOpenPostUpdate,
   onOpenEscalate,
   onSolve,
-}: any) {
+}: IssueDetailsRouteProps) {
   const { id } = useParams();
   const navigate = useNavigate();
   const issue = issues.find((i: Issue) => String(i.id) === String(id));

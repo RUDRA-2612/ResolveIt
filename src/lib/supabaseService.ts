@@ -24,12 +24,12 @@ export function mapRowToIssue(row: any, currentUserId: string = DEFAULT_USER_ID)
     }));
 
     return {
-        id: row.ticket_code || `TKT-${row.id}`,
+        id: String(row.ticket_code || row.id || 'TKT-unknown'),
         title: row.title,
-        location: row.building ? `${row.building} - ${row.exact_location}` : row.exact_location,
+        location: row.building ? `${row.building} - ${row.exact_location || 'Campus location'}` : (row.exact_location || 'Campus location'),
         description: row.description,
         upvotes: upvotesCount,
-        status: row.status,
+        status: row.status || 'Not Started',
         statusColor: row.status_color || 'rose',
         time: new Date(row.created_at).toLocaleDateString(),
         department: row.department?.name || 'Campus Infrastructure & IT',
@@ -69,41 +69,40 @@ export const fetchAllTickets = async (): Promise<Issue[]> => {
     if (error || !rawTickets) return [];
 
     return rawTickets.map((t) => {
-        const upvotesList = t.upvote || [];
+        const upvotesList = Array.isArray(t.upvote) ? t.upvote : [];
+        const comments = (t.ticket_update || []).map((u: any) => ({
+            author: u.author_name || 'System Update',
+            time: new Date(u.created_at).toLocaleString([], { hour: '2-digit', minute: '2-digit' }),
+            text: u.content,
+        }));
+
         return {
             id: String(t.id),
             title: t.title,
+            location: t.building ? `${t.building} - ${t.exact_location || 'Campus location'}` : (t.exact_location || 'Campus location'),
             description: t.description,
-            department: t.department?.name || 'General',
-            category: t.category?.name || 'General',
-            specificIssue: t.specific_issue,
-            building: t.building,
-            exactLocation: t.exact_location,
-            imageUrl: t.image_url,
-            time: new Date(t.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            upvotes: upvotesList.length,
             status: t.status || 'Not Started',
             statusColor: t.status_color || 'rose',
+            time: new Date(t.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            department: t.department?.name || 'General',
+            category: t.category?.name || 'General',
+            specificIssue: t.specific_issue || 'General Issue',
+            imageUrl: t.image_url || undefined,
+            isLiked: activeUserId ? upvotesList.some((u: any) => u.user_id === activeUserId) : false,
+            isMine: activeUserId ? t.user_id === activeUserId : false,
             currentLevel: t.current_level || 1,
             assignedAuthority: t.assigned_authority || 'Department Head',
             isEscalated: t.is_escalated || false,
-            escalatedFrom: t.escalated_from,
-            escalationReason: t.escalation_reason,
-            slaDueAt: t.sla_due_at,
-            upvotes: upvotesList.length,
-            // Dynamic computation based on active logged-in user
-            isMine: activeUserId ? t.user_id === activeUserId : false,
-            isLiked: activeUserId ? upvotesList.some((u: any) => u.user_id === activeUserId) : false,
-            updates: (t.ticket_update || []).map((u: any) => ({
-                id: String(u.id),
-                author: u.author_name,
-                text: u.content,
-                timestamp: new Date(u.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                type: u.update_type,
-            })),
+            escalatedFrom: t.escalated_from || undefined,
+            escalationReason: t.escalation_reason || undefined,
+            slaTimer: t.sla_due_at ? 'Active SLA' : undefined,
+            isOverdue: t.sla_due_at ? new Date(t.sla_due_at) < new Date() : false,
+            resolvedAt: t.resolved_at || undefined,
+            comments,
         };
     });
 };
-
 /** 2. Upload Captured Camera Image to Supabase Storage */
 export async function uploadEvidenceImage(base64Image: string): Promise<string | null> {
     try {
@@ -264,4 +263,42 @@ export const postCommentToDb = async (ticketId: string, authorName: string, cont
         content,
         update_type: 'official_update',
     });
+};
+
+export const deleteTicketInDb = async (ticketId: string) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('Unauthenticated');
+
+    const numericTicketId = parseInt(ticketId, 10);
+
+    // 1. Check for attached image file
+    const { data: ticket } = await supabase
+        .from('ticket')
+        .select('image_url, user_id')
+        .eq('id', numericTicketId)
+        .single();
+
+    if (!ticket) return;
+
+    // 2. Remove file from Supabase Storage bucket if it exists (i wouldn't usually do this but the supabase limits make me)
+    if (ticket.image_url) {
+        try {
+            const urlParts = ticket.image_url.split('/evidence/');
+            if (urlParts.length > 1) {
+                const filePath = `evidence/${urlParts[1]}`;
+                await supabase.storage.from('evidence').remove([filePath]);
+            }
+        } catch (err) {
+            console.warn('Could not remove storage attachment:', err);
+        }
+    }
+
+    // 3. Delete ticket row (owner matching enforcement)
+    const { error } = await supabase
+        .from('ticket')
+        .delete()
+        .eq('id', numericTicketId)
+        .eq('user_id', user.id);
+
+    if (error) throw error;
 };

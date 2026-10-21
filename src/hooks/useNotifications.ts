@@ -7,20 +7,20 @@ export function useNotifications(initialNotifications: IssueNotification[] = [])
     useState<IssueNotification[]>(initialNotifications);
 
   const addNotification = useCallback((notification: IssueNotification) => {
-    setNotifications((current) => [notification, ...current]);
+    setNotifications((current) => [{ ...notification, isRead: notification.isRead ?? !notification.unread }, ...current]);
   }, []);
 
   const markAsRead = useCallback((id: IssueNotification['id']) => {
     setNotifications((current) =>
       current.map((notification) =>
-        notification.id === id ? { ...notification, unread: false } : notification,
+        notification.id === id ? { ...notification, isRead: true, unread: false } : notification,
       ),
     );
   }, []);
 
   const markAllAsRead = useCallback(() => {
     setNotifications((current) =>
-      current.map((notification) => ({ ...notification, unread: false })),
+      current.map((notification) => ({ ...notification, isRead: true, unread: false })),
     );
   }, []);
 
@@ -35,7 +35,7 @@ export function useNotifications(initialNotifications: IssueNotification[] = [])
   }, []);
 
   const unreadCount = notifications.reduce(
-    (count, notification) => count + Number(notification.unread),
+    (count, notification) => count + Number(!(notification.isRead ?? !notification.unread)),
     0,
   );
 

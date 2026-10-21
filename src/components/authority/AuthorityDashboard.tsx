@@ -1,7 +1,6 @@
-import { ShieldCheck, AlertTriangle, Clock, Zap, CheckCircle, X } from 'lucide-react';
+import { ShieldCheck, AlertTriangle, Clock, Zap, CheckCircle } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import type { Issue } from '../../types/issue';
 import { DEPARTMENT_LEVELS } from '../../taxonomy';
 
@@ -66,6 +65,34 @@ export function AuthorityDashboard({
                         <ShieldCheck size={14} /> Official Officer View
                     </span>
                 </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3 mb-6">
+                <label className="flex flex-col text-xs font-bold uppercase tracking-[0.12em] text-slate-500">
+                    Department
+                    <select
+                        value={selectedDepartment}
+                        onChange={(event) => setSelectedDepartment(event.target.value)}
+                        className="mt-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 focus:border-teal-500 focus:outline-none"
+                    >
+                        {['All Departments', ...Object.keys(DEPARTMENT_LEVELS)].map((department) => (
+                            <option key={department} value={department}>{department}</option>
+                        ))}
+                    </select>
+                </label>
+
+                <label className="flex flex-col text-xs font-bold uppercase tracking-[0.12em] text-slate-500">
+                    Escalation Level
+                    <select
+                        value={selectedLevel}
+                        onChange={(event) => setSelectedLevel(event.target.value as 'All' | '1' | '2' | '3' | '4')}
+                        className="mt-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 focus:border-teal-500 focus:outline-none"
+                    >
+                        {['All', '1', '2', '3', '4'].map((level) => (
+                            <option key={level} value={level}>{level === 'All' ? 'All levels' : `Level ${level}`}</option>
+                        ))}
+                    </select>
+                </label>
             </div>
 
             {/* KPI Cards */}
