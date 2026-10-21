@@ -48,6 +48,8 @@ import { supabase } from './lib/supabase';
 import { onAuthStateChange, signOutUser } from './lib/authService';
 import { AuthContainer } from './components/auth/AuthContainer';
 
+import resolveItLogo from '../public/logo.png';
+
 function getUserDisplayName(user: User | null): string {
   const metadata = user?.user_metadata;
   const metadataName = [metadata?.full_name, metadata?.name, metadata?.preferred_username]
@@ -691,6 +693,9 @@ export default function App() {
 
       {location.pathname === '/dashboard' && (
         <footer className="mt-auto bg-gradient-to-b from-[#f8fafc] to-teal-50/30 flex flex-col items-center pb-10 pt-10">
+          <div>
+            <img src={resolveItLogo} alt="ResolveIt Logo" className="w-32 h-auto mb-2" />
+          </div>
           <p className="text-slate-500 text-sm mb-4 flex items-center justify-center gap-1.5 font-medium">
             Crafted with <Heart size={14} className="text-rose-500 fill-rose-500 inline mx-0.5 animate-pulse" /> by
             <span className="text-rose-500">H</span>

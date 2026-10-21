@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
     Search,
@@ -60,8 +61,36 @@ export function Navbar({
 }: NavbarProps) {
     const navigate = useNavigate();
     const location = useLocation();
+    const profileMenuRef = useRef<HTMLDivElement>(null);
+    const notificationsMenuRef = useRef<HTMLDivElement>(null);
 
     const unreadCount = notifications.filter((n) => !(n.isRead ?? !n.unread)).length;
+
+    useEffect(() => {
+        if (!userMenuOpen) return;
+
+        const handleOutsideClick = (event: MouseEvent) => {
+            if (event.target instanceof Node && !profileMenuRef.current?.contains(event.target)) {
+                setUserMenuOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleOutsideClick);
+        return () => document.removeEventListener('mousedown', handleOutsideClick);
+    }, [userMenuOpen, setUserMenuOpen]);
+
+    useEffect(() => {
+        if (!notificationsOpen) return;
+
+        const handleOutsideClick = (event: MouseEvent) => {
+            if (event.target instanceof Node && !notificationsMenuRef.current?.contains(event.target)) {
+                setNotificationsOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleOutsideClick);
+        return () => document.removeEventListener('mousedown', handleOutsideClick);
+    }, [notificationsOpen, setNotificationsOpen]);
 
     return (
         <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200/80">
@@ -82,7 +111,7 @@ export function Navbar({
                         className="flex items-center gap-2.5 cursor-pointer select-none"
                     >
                         <div className="w-9 h-9 rounded-xl bg-teal-600 text-white flex items-center justify-center font-black text-lg shadow-md shadow-teal-600/20">
-                            R
+                            <img src="/logo.png" alt="Logo" className="h-8 w-8 object-contain" />
                         </div>
                         <span className="font-extrabold text-xl text-slate-900 tracking-tight">
                             Resolve<span className="text-teal-600">It</span>
@@ -128,7 +157,7 @@ export function Navbar({
                     )}
 
                     {/* Notifications Dropdown Toggle */}
-                    <div className="relative">
+                    <div className="relative" ref={notificationsMenuRef}>
                         <button
                             onClick={() => {
                                 setNotificationsOpen(!notificationsOpen);
@@ -188,7 +217,7 @@ export function Navbar({
                     </div>
 
                     {/* User Profile Menu Dropdown */}
-                    <div className="relative">
+                    <div className="relative" ref={profileMenuRef}>
                         <button
                             onClick={() => {
                                 setUserMenuOpen(!userMenuOpen);

@@ -93,7 +93,7 @@ export function ProfileModal({
                         <p className="text-xs text-slate-400 font-bold tracking-wider mb-1">FULL NAME</p>
                         <p className="font-semibold text-slate-700">{userName}</p>
                     </div>
-                    <div>
+                    <div style={{ display: 'none' }}>
                         <p className="text-xs text-slate-400 font-bold tracking-wider mb-1">{userRole === 'authority' ? 'DEPARTMENT' : 'ROLL NUMBER'}</p>
                         <p className="font-semibold text-slate-700">{userRole === 'authority' ? 'Campus Administration' : '2025BTECH259'}</p>
                     </div>
