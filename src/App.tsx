@@ -92,6 +92,8 @@ export default function App() {
   const [duplicateModalOpen, setDuplicateModalOpen] = useState(false);
   const [matchedDuplicate, setMatchedDuplicate] = useState<Issue | null>(null);
   const [pendingFormSubmit, setPendingFormSubmit] = useState<any>(null);
+  const [duplicateSubmitError, setDuplicateSubmitError] = useState<string | null>(null);
+  const [duplicateSubmitting, setDuplicateSubmitting] = useState(false);
 
   // Filters & Tabs
   const [filterTab, setFilterTab] = useState<IssueSortMode>('Top');
@@ -174,6 +176,7 @@ export default function App() {
     if (duplicate) {
       setMatchedDuplicate(duplicate);
       setPendingFormSubmit(formData);
+      setDuplicateSubmitError(null);
       setDuplicateModalOpen(true);
     } else {
       await executeSubmitTicket(formData);
@@ -365,9 +368,25 @@ export default function App() {
 
       <DuplicateModal
         open={duplicateModalOpen}
-        onClose={() => setDuplicateModalOpen(false)}
+        onClose={() => {
+          setDuplicateModalOpen(false);
+          setDuplicateSubmitError(null);
+        }}
         matchedDuplicate={matchedDuplicate}
-        onSubmitAnyway={() => pendingFormSubmit && executeSubmitTicket(pendingFormSubmit)}
+        onSubmitAnyway={async () => {
+          if (!pendingFormSubmit) return;
+          setDuplicateSubmitting(true);
+          setDuplicateSubmitError(null);
+          try {
+            await executeSubmitTicket(pendingFormSubmit);
+          } catch (error) {
+            setDuplicateSubmitError(error instanceof Error ? error.message : 'Could not submit the ticket.');
+          } finally {
+            setDuplicateSubmitting(false);
+          }
+        }}
+        submitError={duplicateSubmitError}
+        isSubmitting={duplicateSubmitting}
         onUpvoteDuplicate={() => {
           if (matchedDuplicate) {
             void handleUpvote(matchedDuplicate.id);

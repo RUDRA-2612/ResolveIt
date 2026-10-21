@@ -67,11 +67,13 @@ interface ReportIssueFormProps {
         incidentDate: string;
         isConfidential: boolean;
         capturedImage: string | null;
-    }) => void;
+    }) => void | Promise<void>;
     onPushModalState: () => void;
 }
 
 export function ReportIssueForm({ onSubmitTicket, onPushModalState }: ReportIssueFormProps) {
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState<string | null>(null);
     const [department, setDepartment] = useState('');
     const [category, setCategory] = useState('');
     const [specificIssue, setSpecificIssue] = useState('');
@@ -88,24 +90,38 @@ export function ReportIssueForm({ onSubmitTicket, onPushModalState }: ReportIssu
         cameraActive,
         photoTaken,
         capturedImage,
+        cameraError,
         startCamera,
         takePhoto,
         resetPhoto,
     } = useCamera();
 
-    const handleSubmit = () => {
-        onSubmitTicket({
-            department,
-            category,
-            specificIssue,
-            building,
-            issueTitle,
-            exactLocation,
-            detailedDescription,
-            incidentDate,
-            isConfidential,
-            capturedImage,
-        });
+    const handleSubmit = async () => {
+        if (!capturedImage) {
+            setSubmitError('Take a live evidence photo before submitting this ticket.');
+            return;
+        }
+
+        setIsSubmitting(true);
+        setSubmitError(null);
+        try {
+            await onSubmitTicket({
+                department,
+                category,
+                specificIssue,
+                building,
+                issueTitle,
+                exactLocation,
+                detailedDescription,
+                incidentDate,
+                isConfidential,
+                capturedImage,
+            });
+        } catch (error) {
+            setSubmitError(error instanceof Error ? error.message : 'Could not submit the ticket.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -277,18 +293,23 @@ export function ReportIssueForm({ onSubmitTicket, onPushModalState }: ReportIssu
                                 </div>
                             )}
                             <canvas ref={canvasRef} className="hidden"></canvas>
+                            {cameraError && <p role="alert" className="mt-4 text-sm font-semibold text-rose-700">{cameraError}</p>}
                         </div>
                     </div>
                 </div>
 
                 <div className="bg-slate-50 border-t border-slate-100 p-6 flex justify-end">
-                    <Button
-                        onClick={handleSubmit}
-                        className="bg-teal-600 hover:bg-teal-700 text-white font-bold text-lg py-6 px-10 rounded-xl shadow-md transition-all flex items-center gap-2"
-                    >
-                        <CheckCircle size={20} />
-                        Submit Ticket
-                    </Button>
+                    <div className="flex w-full flex-col items-end gap-3">
+                        {submitError && <p role="alert" className="w-full text-sm font-semibold text-rose-700">{submitError}</p>}
+                        <Button
+                            onClick={() => void handleSubmit()}
+                            disabled={isSubmitting}
+                            className="bg-teal-600 hover:bg-teal-700 text-white font-bold text-lg py-6 px-10 rounded-xl shadow-md transition-all flex items-center gap-2"
+                        >
+                            <CheckCircle size={20} />
+                            {isSubmitting ? 'Submitting…' : 'Submit Ticket'}
+                        </Button>
+                    </div>
                 </div>
             </div>
         </main>

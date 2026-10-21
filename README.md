@@ -1,5 +1,13 @@
 # React + TypeScript + Vite
 
+## Supabase evidence image storage
+
+In an existing Supabase project, run [`supabase_storage.sql`](./supabase_storage.sql) in the Supabase SQL Editor. It creates the public `evidence` bucket and authenticated upload/delete policies scoped to each user's folder. The bucket must be public for issue evidence URLs to display.
+
+Do not rerun [`supabase_schema.sql`](./supabase_schema.sql) on a project containing data; it drops and recreates the application tables.
+
+Upload failures are shown on the report form. If an upload is rejected, check that the storage SQL has been applied and that the user is signed in.
+
 This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
 
 Currently, two official plugins are available:
