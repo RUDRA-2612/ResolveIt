@@ -51,30 +51,39 @@ export function mapRowToIssue(row: any, currentUserId: string = DEFAULT_USER_ID)
 }
 
 /** 1. Fetch All Tickets with joins */
-export const fetchAllTickets = async (): Promise<Issue[]> => {
-    const { data: { user } } = await supabase.auth.getUser();
-    const activeUserId = user?.id;
-
+export const fetchAllTickets = async (activeUserId: string): Promise<Issue[]> => {
     const { data: rawTickets, error } = await supabase
         .from('ticket')
         .select(`
-      *,
+      id, user_id, title, building, exact_location, description, status, status_color,
+      created_at, current_level, assigned_authority, is_escalated, escalated_from,
+      escalation_reason, sla_due_at, image_url, specific_issue,
       department ( name ),
       category ( name ),
       upvote ( user_id ),
-      ticket_update ( id, author_name, content, update_type, created_at )
+      ticket_update ( id, author_name, content, update_type, created_at, app_user ( name, email ) )
     `)
         .order('created_at', { ascending: false });
 
-    if (error || !rawTickets) return [];
+    if (error) throw new Error(`Could not fetch reports: ${error.message}`);
+    if (!rawTickets) return [];
 
     return rawTickets.map((t) => {
         const upvotesList = Array.isArray(t.upvote) ? t.upvote : [];
-        const comments = (t.ticket_update || []).map((u: any) => ({
-            author: u.author_name || 'System Update',
-            time: new Date(u.created_at).toLocaleString([], { hour: '2-digit', minute: '2-digit' }),
-            text: u.content,
-        }));
+        const comments = (t.ticket_update || []).map((u: any) => {
+            const profile = u.app_user?.[0];
+            const profileName = profile?.name || profile?.email?.split('@')[0];
+            const savedAuthor = u.author_name?.trim();
+            const author = !savedAuthor || savedAuthor === 'Student' || savedAuthor === 'Authority Representative'
+                ? profileName || savedAuthor || 'System Update'
+                : savedAuthor;
+
+            return {
+                author,
+                time: new Date(u.created_at).toLocaleString([], { hour: '2-digit', minute: '2-digit' }),
+                text: u.content,
+            };
+        });
 
         return {
             id: String(t.id),
@@ -85,8 +94,8 @@ export const fetchAllTickets = async (): Promise<Issue[]> => {
             status: t.status || 'Not Started',
             statusColor: t.status_color || 'rose',
             time: new Date(t.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            department: t.department?.name || 'General',
-            category: t.category?.name || 'General',
+            department: t.department?.[0]?.name || 'General',
+            category: t.category?.[0]?.name || 'General',
             specificIssue: t.specific_issue || 'General Issue',
             imageUrl: t.image_url || undefined,
             isLiked: activeUserId ? upvotesList.some((u: any) => u.user_id === activeUserId) : false,
@@ -98,7 +107,6 @@ export const fetchAllTickets = async (): Promise<Issue[]> => {
             escalationReason: t.escalation_reason || undefined,
             slaTimer: t.sla_due_at ? 'Active SLA' : undefined,
             isOverdue: t.sla_due_at ? new Date(t.sla_due_at) < new Date() : false,
-            resolvedAt: t.resolved_at || undefined,
             comments,
         };
     });
@@ -136,16 +144,62 @@ export async function uploadEvidenceImage(dataUrl: string): Promise<string> {
 export const submitNewTicket = async (payload: any) => {
     const userId = await getCurrentUserId();
 
-    // Resolve Department & Category IDs
-    const { data: dept } = await supabase.from('department').select('id').eq('name', payload.departmentName).single();
-    const { data: cat } = await supabase.from('category').select('id').eq('name', payload.categoryName).single();
+    const departmentAliases: Record<string, string> = {
+        'Hostel, Mess & Laundry': payload.categoryName?.startsWith('Mess ')
+            ? 'Mess & Dining Services'
+            : 'Hostel & Residential Services',
+        'Academics & Library': payload.categoryName === 'Library Services'
+            ? 'Library & Resource Center'
+            : 'Academic & Exam Cell',
+        'Student Life & Sports': 'Sports & Student Activities',
+        'Health, Well-being & Safety': 'Health & Wellness',
+    };
+    const departmentName = departmentAliases[payload.departmentName] || payload.departmentName;
+
+    let { data: dept, error: departmentError } = await supabase
+        .from('department')
+        .select('id')
+        .eq('name', departmentName)
+        .maybeSingle();
+
+    if (departmentError) throw departmentError;
+    if (!dept) {
+        const { data, error } = await supabase
+            .from('department')
+            .insert({ name: departmentName })
+            .select('id')
+            .single();
+
+        if (error) throw new Error(`Could not resolve department "${payload.departmentName}": ${error.message}`);
+        dept = data;
+    }
+
+    let { data: cat, error: categoryError } = await supabase
+        .from('category')
+        .select('id')
+        .eq('department_id', dept.id)
+        .eq('name', payload.categoryName)
+        .limit(1)
+        .maybeSingle();
+
+    if (categoryError) throw categoryError;
+    if (!cat) {
+        const { data, error } = await supabase
+            .from('category')
+            .insert({ department_id: dept.id, name: payload.categoryName })
+            .select('id')
+            .single();
+
+        if (error) throw new Error(`Could not resolve category "${payload.categoryName}": ${error.message}`);
+        cat = data;
+    }
 
     const { data, error } = await supabase
         .from('ticket')
         .insert({
             user_id: userId,
-            department_id: dept?.id || 1,
-            category_id: cat?.id || 1,
+            department_id: dept.id,
+            category_id: cat.id,
             specific_issue: payload.specificIssue,
             title: payload.title,
             description: payload.description,
@@ -241,7 +295,6 @@ export async function solveTicketInDb(ticketCode: string, handlerTitle: string, 
         .update({
             status: 'Solved',
             status_color: 'emerald',
-            resolved_at: new Date().toISOString(),
         })
         .eq('id', numericId);
 
@@ -275,17 +328,23 @@ export const deleteTicketInDb = async (ticketId: string) => {
     if (!user) throw new Error('Unauthenticated');
 
     const numericTicketId = parseInt(ticketId, 10);
+    if (!Number.isSafeInteger(numericTicketId) || numericTicketId <= 0) {
+        throw new Error('Invalid ticket ID.');
+    }
 
-    // 1. Check for attached image file
-    const { data: ticket } = await supabase
+    // Verify ownership before touching either the ticket or its evidence.
+    const { data: ticket, error: fetchError } = await supabase
         .from('ticket')
         .select('image_url, user_id')
         .eq('id', numericTicketId)
         .single();
 
-    if (!ticket) return;
+    if (fetchError) throw fetchError;
+    if (!ticket || ticket.user_id !== user.id) {
+        throw new Error('Only the person who posted this issue can delete it.');
+    }
 
-    // 2. Remove file from Supabase Storage bucket if it exists (i wouldn't usually do this but the supabase limits make me)
+    // Remove the owner's evidence file if it exists.
     if (ticket.image_url) {
         try {
             const urlParts = ticket.image_url.split('/evidence/');
@@ -298,7 +357,6 @@ export const deleteTicketInDb = async (ticketId: string) => {
         }
     }
 
-    // 3. Delete ticket row (owner matching enforcement)
     const { error } = await supabase
         .from('ticket')
         .delete()

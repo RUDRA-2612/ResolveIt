@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, Clock, CheckCircle, AlertCircle, Check, ThumbsUp, MessageSquare, ShieldCheck, Zap, CheckCheck } from 'lucide-react';
+import { ArrowLeft, Clock, CheckCircle, AlertCircle, Check, ThumbsUp, MessageSquare, ShieldCheck, Zap, CheckCheck, Trash2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import type { Issue, UserRole, IssueSourceView } from '../../types/issue';
@@ -17,6 +17,7 @@ interface IssueDetailsProps {
     onOpenEscalate: (issue: Issue) => void;
     onSolve: (issueId: string) => void;
     onSwitchToWorkspaceView: () => void;
+    onDelete: (issueId: string) => void;
 }
 
 export function IssueDetails({
@@ -31,6 +32,7 @@ export function IssueDetails({
     onOpenEscalate,
     onSolve,
     onSwitchToWorkspaceView,
+    onDelete,
 }: IssueDetailsProps) {
     const [isCommenting, setIsCommenting] = useState(false);
     const [newComment, setNewComment] = useState('');
@@ -79,7 +81,18 @@ export function IssueDetails({
                     <span className="flex items-center gap-1 text-sm font-medium text-slate-500"><Clock size={16} /> Reported {issue.time}</span>
                 </div>
 
-                <h1 className="text-3xl md:text-4xl font-bold text-slate-800 mb-6">{issue.title}</h1>
+                <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <h1 className="text-3xl md:text-4xl font-bold text-slate-800">{issue.title}</h1>
+                    {issue.isMine && (
+                        <Button
+                            variant="outline"
+                            onClick={() => onDelete(issue.id)}
+                            className="shrink-0 border-rose-200 text-rose-700 hover:bg-rose-50 hover:text-rose-800"
+                        >
+                            <Trash2 size={16} /> Delete Issue
+                        </Button>
+                    )}
+                </div>
 
                 {/* 4-Level Pipeline Visualizer */}
                 <div className="mb-8 p-6 bg-slate-50/90 border border-slate-200 rounded-3xl shadow-sm">
@@ -316,8 +329,8 @@ export function IssueDetails({
                         {issue.comments && issue.comments.map((c, i) => (
                             <div key={i} className="bg-gradient-to-br from-slate-50 to-white p-5 rounded-2xl border border-slate-100 shadow-sm">
                                 <div className="flex items-center gap-2 mb-2">
-                                    <div className="w-7 h-7 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center font-bold text-xs shrink-0">{c.author[0]}</div>
-                                    <p className="text-sm font-bold text-slate-800">{c.author}</p>
+                                    <div className="w-7 h-7 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center font-bold text-xs shrink-0">{c.author.charAt(0).toUpperCase()}</div>
+                                    <p className="text-sm font-bold text-slate-800">Posted by {c.author}</p>
                                     <span className="text-slate-400 font-medium text-xs ml-auto">{c.time}</span>
                                 </div>
                                 <p className="text-slate-600 text-sm leading-relaxed pl-9">{c.text}</p>

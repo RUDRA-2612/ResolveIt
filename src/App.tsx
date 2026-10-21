@@ -41,11 +41,21 @@ import {
   escalateTicketInDb,
   solveTicketInDb,
   postCommentToDb,
+  deleteTicketInDb,
 } from './lib/supabaseService';
 
 import { supabase } from './lib/supabase';
 import { onAuthStateChange, signOutUser } from './lib/authService';
 import { AuthContainer } from './components/auth/AuthContainer';
+
+function getUserDisplayName(user: User | null): string {
+  const metadata = user?.user_metadata;
+  const metadataName = [metadata?.full_name, metadata?.name, metadata?.preferred_username]
+    .find((value): value is string => typeof value === 'string' && value.trim().length > 0)
+    ?.trim();
+
+  return metadataName || user?.email?.split('@')[0] || 'Signed-in user';
+}
 
 export default function App() {
   const navigate = useNavigate();
@@ -57,7 +67,8 @@ export default function App() {
 
   // Core Data
   const [issues, setIssues] = useState<Issue[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [ticketsError, setTicketsError] = useState<string | null>(null);
 
   // User Role & Overlay
   const [userRole, setUserRole] = useState<UserRole>(
@@ -120,11 +131,21 @@ export default function App() {
 
   // Clean Data Fetching (No loop vulnerabilities)
   const refreshTickets = useCallback(async () => {
-    if (!currentUser) return;
+    if (!currentUser) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
-    const liveIssues = await fetchAllTickets();
-    setIssues(liveIssues);
-    setLoading(false);
+    setTicketsError(null);
+    try {
+      const liveIssues = await fetchAllTickets(currentUser.id);
+      setIssues(liveIssues);
+    } catch (error) {
+      console.error('Failed to fetch reports:', error);
+      setTicketsError(error instanceof Error ? error.message : 'Could not fetch reports.');
+    } finally {
+      setLoading(false);
+    }
   }, [currentUser]);
 
   useEffect(() => {
@@ -221,7 +242,7 @@ export default function App() {
   };
 
   const handleAddComment = async (ticketId: string, commentText: string) => {
-    const authorName = userRole === 'authority' ? 'Authority Representative' : 'Student';
+    const authorName = getUserDisplayName(currentUser);
     await postCommentToDb(ticketId, authorName, commentText);
     await refreshTickets();
   };
@@ -239,7 +260,11 @@ export default function App() {
     if (!actionTicket || !postUpdateText.trim()) return;
     const handlerTitle = getAuthorityTitle(actionTicket.department, actionTicket.currentLevel || 1);
 
-    await postCommentToDb(actionTicket.id, `${handlerTitle} (Official Update)`, postUpdateText.trim());
+    await postCommentToDb(
+      actionTicket.id,
+      `${handlerTitle} · ${getUserDisplayName(currentUser)}`,
+      postUpdateText.trim(),
+    );
     setPostUpdateModalOpen(false);
     setActionTicket(null);
     setPostUpdateText('');
@@ -269,6 +294,19 @@ export default function App() {
     await refreshTickets();
   };
 
+  const handleDeleteTicket = async (ticketId: string) => {
+    if (!window.confirm('Are you sure you want to delete this issue? This cannot be undone.')) return;
+
+    try {
+      await deleteTicketInDb(ticketId);
+      await refreshTickets();
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Failed to delete issue:', error);
+      window.alert(error instanceof Error ? error.message : 'Could not delete the issue.');
+    }
+  };
+
   if (authLoading) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
@@ -282,7 +320,7 @@ export default function App() {
   }
 
   const userEmail = currentUser.email || '';
-  const userName = currentUser.user_metadata?.full_name || userEmail.split('@')[0] || 'User';
+  const userName = getUserDisplayName(currentUser);
   const userInitials = userName.substring(0, 2).toUpperCase();
 
   const displayedDashboardIssues = filterIssues(issues, {
@@ -419,8 +457,8 @@ export default function App() {
                     </p>
                   </div>
                 </div>
-                <button onClick={refreshTickets} className="flex items-center gap-2 text-xs font-bold text-teal-700 bg-white border border-teal-200 px-3.5 py-2 rounded-xl shadow-2xs hover:bg-teal-50 transition-colors self-start md:self-auto cursor-pointer">
-                  <RefreshCw size={14} className={loading ? 'animate-spin' : ''} /> Sync Database
+                <button onClick={() => void refreshTickets()} disabled={loading} className="flex items-center gap-2 text-xs font-bold text-teal-700 bg-white border border-teal-200 px-3.5 py-2 rounded-xl shadow-2xs hover:bg-teal-50 transition-colors self-start md:self-auto cursor-pointer disabled:cursor-wait disabled:opacity-70">
+                  <RefreshCw size={14} className={loading ? 'animate-spin' : ''} /> {loading ? 'Fetching reports…' : 'Sync Database'}
                 </button>
               </div>
 
@@ -494,6 +532,18 @@ export default function App() {
                   </div>
 
                   <div className="flex flex-col gap-4">
+                    {loading && (
+                      <div role="status" className="flex items-center justify-center gap-3 rounded-2xl border border-teal-100 bg-white p-10 text-sm font-semibold text-teal-700">
+                        <RefreshCw size={18} className="animate-spin" />
+                        Fetching reports…
+                      </div>
+                    )}
+                    {!loading && ticketsError && (
+                      <div role="alert" className="rounded-2xl border border-rose-200 bg-white p-8 text-center">
+                        <p className="mb-3 font-semibold text-rose-700">{ticketsError}</p>
+                        <button onClick={() => void refreshTickets()} className="font-bold text-teal-700 hover:underline">Try again</button>
+                      </div>
+                    )}
                     {displayedDashboardIssues.map((issue) => (
                       <IssueCard
                         key={issue.id}
@@ -502,7 +552,7 @@ export default function App() {
                         onUpvote={(e) => void handleUpvote(issue.id, e)}
                       />
                     ))}
-                    {displayedDashboardIssues.length === 0 && (
+                    {!loading && !ticketsError && displayedDashboardIssues.length === 0 && (
                       <div className="text-center p-12 bg-white rounded-2xl border border-slate-200 border-dashed">
                         <p className="text-slate-500 font-bold">No issues found matching selected filter.</p>
                       </div>
@@ -520,6 +570,8 @@ export default function App() {
           element={
             <AuthorityDashboard
               issues={issues}
+              loading={loading}
+              error={ticketsError}
               selectedDepartment={selectedAuthorityDepartment}
               setSelectedDepartment={setSelectedAuthorityDepartment}
               selectedLevel={selectedAuthorityLevel}
@@ -569,7 +621,20 @@ export default function App() {
               </div>
 
               <div className="space-y-4">
+                {loading && (
+                  <div role="status" className="flex items-center justify-center gap-3 rounded-2xl border border-teal-100 bg-white p-10 text-sm font-semibold text-teal-700">
+                    <RefreshCw size={18} className="animate-spin" />
+                    Fetching your reports…
+                  </div>
+                )}
+                {!loading && ticketsError && (
+                  <div role="alert" className="rounded-2xl border border-rose-200 bg-white p-8 text-center">
+                    <p className="mb-3 font-semibold text-rose-700">{ticketsError}</p>
+                    <button onClick={() => void refreshTickets()} className="font-bold text-teal-700 hover:underline">Try again</button>
+                  </div>
+                )}
                 {issues
+                  .filter(() => !loading && !ticketsError)
                   .filter(issue => {
                     if (myTicketsTab === 'reported') return issue.isMine;
                     if (myTicketsTab === 'upvoted') return issue.isLiked;
@@ -606,6 +671,8 @@ export default function App() {
           element={
             <IssueDetailsRoute
               issues={issues}
+              loading={loading}
+              error={ticketsError}
               userRole={userRole}
               onToggleUpvote={(id) => void handleUpvote(id)}
               onAddComment={(id, text) => void handleAddComment(id, text)}
@@ -613,6 +680,7 @@ export default function App() {
               onOpenPostUpdate={(issue) => { setActionTicket(issue); setPostUpdateText(''); setPostUpdateModalOpen(true); }}
               onOpenEscalate={(issue) => { setActionTicket(issue); setEscalateReason(''); setEscalateNote(''); setEscalateModalOpen(true); }}
               onSolve={(id) => void handleSolve(id)}
+              onDelete={(id) => void handleDeleteTicket(id)}
             />
           }
         />
@@ -645,6 +713,8 @@ export default function App() {
 
 interface IssueDetailsRouteProps {
   issues: Issue[];
+  loading: boolean;
+  error: string | null;
   userRole: UserRole | null;
   onToggleUpvote: (issueId: string) => void;
   onAddComment: (issueId: string, commentText: string) => void;
@@ -652,12 +722,14 @@ interface IssueDetailsRouteProps {
   onOpenPostUpdate: (issue: Issue) => void;
   onOpenEscalate: (issue: Issue) => void;
   onSolve: (issueId: string) => void;
-  onDeleteTicket?: (issueId: string) => void;
+  onDelete: (issueId: string) => void;
 }
 
 // Wrapper component to cleanly extract issue ID from URL parameters
 function IssueDetailsRoute({
   issues,
+  loading,
+  error,
   userRole,
   onToggleUpvote,
   onAddComment,
@@ -665,10 +737,28 @@ function IssueDetailsRoute({
   onOpenPostUpdate,
   onOpenEscalate,
   onSolve,
+  onDelete,
 }: IssueDetailsRouteProps) {
   const { id } = useParams();
   const navigate = useNavigate();
   const issue = issues.find((i: Issue) => String(i.id) === String(id));
+
+  if (loading && !issue) {
+    return (
+      <main role="status" className="max-w-5xl mx-auto px-4 pt-10 pb-20 text-center text-teal-700">
+        <RefreshCw size={24} className="mx-auto mb-3 animate-spin" />
+        Fetching report…
+      </main>
+    );
+  }
+
+  if (error && !issue) {
+    return (
+      <main role="alert" className="max-w-5xl mx-auto px-4 pt-10 pb-20 text-center text-rose-700">
+        {error}
+      </main>
+    );
+  }
 
   if (!issue) {
     return (
@@ -694,6 +784,7 @@ function IssueDetailsRoute({
       onOpenEscalate={onOpenEscalate}
       onSolve={onSolve}
       onSwitchToWorkspaceView={() => navigate('/authority-dashboard')}
+      onDelete={onDelete}
     />
   );
 }
