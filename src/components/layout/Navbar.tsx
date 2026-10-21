@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
     Search,
@@ -62,7 +61,7 @@ export function Navbar({
     const navigate = useNavigate();
     const location = useLocation();
 
-    const unreadCount = notifications.filter((n) => !n.isRead).length;
+    const unreadCount = notifications.filter((n) => !(n.isRead ?? !n.unread)).length;
 
     return (
         <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200/80">
@@ -170,12 +169,12 @@ export function Navbar({
                                         notifications.map((n) => (
                                             <div
                                                 key={n.id}
-                                                className={`p-3 rounded-xl border transition-all text-xs ${n.isRead ? 'bg-slate-50/60 border-slate-100' : 'bg-teal-50/40 border-teal-100'
+                                                className={`p-3 rounded-xl border transition-all text-xs ${n.isRead ?? !n.unread ? 'bg-slate-50/60 border-slate-100' : 'bg-teal-50/40 border-teal-100'
                                                     }`}
                                             >
                                                 <p className="font-bold text-slate-800 mb-0.5">{n.title}</p>
                                                 <p className="text-slate-500 font-medium leading-relaxed">{n.message}</p>
-                                                <span className="text-[10px] text-slate-400 font-bold block mt-1.5">{n.timestamp}</span>
+                                                <span className="text-[10px] text-slate-400 font-bold block mt-1.5">{n.timestamp ?? n.time}</span>
                                             </div>
                                         ))
                                     ) : (
