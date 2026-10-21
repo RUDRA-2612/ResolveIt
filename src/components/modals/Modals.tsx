@@ -190,12 +190,16 @@ export function DuplicateModal({
     matchedDuplicate,
     onSubmitAnyway,
     onUpvoteDuplicate,
+    submitError,
+    isSubmitting = false,
 }: {
     open: boolean;
     onClose: () => void;
     matchedDuplicate: Issue | null;
-    onSubmitAnyway: () => void;
+    onSubmitAnyway: () => void | Promise<void>;
     onUpvoteDuplicate: () => void;
+    submitError?: string | null;
+    isSubmitting?: boolean;
 }) {
     if (!open || !matchedDuplicate) return null;
 
@@ -223,11 +227,13 @@ export function DuplicateModal({
                     <p className="text-xs text-slate-500 mb-2 font-medium">{matchedDuplicate.location} • {matchedDuplicate.category}</p>
                 </div>
 
+                {submitError && <p role="alert" className="mb-4 text-sm font-semibold text-rose-700">{submitError}</p>}
+
                 <div className="flex flex-col sm:flex-row items-center gap-3 justify-end">
-                    <Button variant="outline" onClick={onSubmitAnyway} className="w-full sm:w-auto rounded-xl font-bold text-slate-600">
-                        Submit New Ticket Anyway
+                    <Button variant="outline" onClick={() => void onSubmitAnyway()} disabled={isSubmitting} className="w-full sm:w-auto rounded-xl font-bold text-slate-600">
+                        {isSubmitting ? 'Submitting…' : 'Submit New Ticket Anyway'}
                     </Button>
-                    <Button onClick={onUpvoteDuplicate} className="w-full sm:w-auto bg-[#ea580c] hover:bg-[#c2410c] text-white font-extrabold rounded-xl gap-2">
+                    <Button onClick={onUpvoteDuplicate} disabled={isSubmitting} className="w-full sm:w-auto bg-[#ea580c] hover:bg-[#c2410c] text-white font-extrabold rounded-xl gap-2">
                         <ThumbsUp size={16} /> Upvote Existing Ticket ({matchedDuplicate.upvotes + 1})
                     </Button>
                 </div>

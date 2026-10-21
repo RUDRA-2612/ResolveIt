@@ -273,7 +273,7 @@ export function IssueDetails({
                     <div className="mb-10">
                         <p className="text-sm text-slate-400 font-bold tracking-wider mb-3">ATTACHED EVIDENCE</p>
                         <div className="rounded-2xl border border-slate-200 overflow-hidden shadow-sm inline-block w-full sm:w-auto sm:max-w-xl group bg-slate-50">
-                            <img src={issue.imageUrl} alt="Evidence" className="w-full max-h-[400px] object-cover group-hover:scale-[1.02] transition-transform duration-500 ease-out" />
+                            <img src={issue.imageUrl} alt={`Evidence for ${issue.title}`} loading="lazy" className="w-full max-h-[400px] object-contain" />
                         </div>
                     </div>
                 )}

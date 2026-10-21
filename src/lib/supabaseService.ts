@@ -104,27 +104,32 @@ export const fetchAllTickets = async (): Promise<Issue[]> => {
     });
 };
 /** 2. Upload Captured Camera Image to Supabase Storage */
-export async function uploadEvidenceImage(base64Image: string): Promise<string | null> {
-    try {
-        const response = await fetch(base64Image);
-        const blob = await response.blob();
-        const filePath = `ticket_evidence_${Date.now()}.jpg`;
-
-        const { data, error } = await supabase.storage
-            .from('evidence')
-            .upload(filePath, blob, { contentType: 'image/jpeg', upsert: true });
-
-        if (error) {
-            console.error('Storage upload error:', error);
-            return null;
-        }
-
-        const { data: publicUrlData } = supabase.storage.from('evidence').getPublicUrl(data.path);
-        return publicUrlData.publicUrl;
-    } catch (err) {
-        console.error('Failed to process image upload:', err);
-        return null;
+export async function uploadEvidenceImage(dataUrl: string): Promise<string> {
+    const userId = await getCurrentUserId();
+    const response = await fetch(dataUrl);
+    if (!response.ok) {
+        throw new Error(`Could not read captured image (HTTP ${response.status}).`);
     }
+
+    const blob = await response.blob();
+    if (blob.size === 0 || !blob.type.startsWith('image/')) {
+        throw new Error('The captured evidence is empty or is not a valid image.');
+    }
+
+    const filePath = `${userId}/${crypto.randomUUID()}.jpg`;
+    const { data, error } = await supabase.storage
+        .from('evidence')
+        .upload(filePath, blob, { contentType: blob.type, upsert: false });
+
+    if (error) {
+        throw new Error(`Evidence upload failed: ${error.message}`);
+    }
+
+    const { data: publicUrlData } = supabase.storage.from('evidence').getPublicUrl(data.path);
+    if (!publicUrlData.publicUrl) {
+        throw new Error('Evidence uploaded, but Supabase did not return a public URL.');
+    }
+    return publicUrlData.publicUrl;
 }
 
 /** 3. Submit New Ticket */
@@ -285,7 +290,7 @@ export const deleteTicketInDb = async (ticketId: string) => {
         try {
             const urlParts = ticket.image_url.split('/evidence/');
             if (urlParts.length > 1) {
-                const filePath = `evidence/${urlParts[1]}`;
+                const filePath = decodeURIComponent(urlParts[1]);
                 await supabase.storage.from('evidence').remove([filePath]);
             }
         } catch (err) {
