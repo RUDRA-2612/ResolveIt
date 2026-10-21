@@ -1,4 +1,4 @@
-import { ShieldCheck, AlertTriangle, Clock, Zap, CheckCircle } from 'lucide-react';
+import { ShieldCheck, AlertTriangle, Clock, Zap, CheckCircle, RefreshCw } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { Issue } from '../../types/issue';
@@ -6,6 +6,8 @@ import { DEPARTMENT_LEVELS } from '../../taxonomy';
 
 interface AuthorityDashboardProps {
     issues: Issue[];
+    loading: boolean;
+    error: string | null;
     selectedDepartment: string;
     setSelectedDepartment: (dept: string) => void;
     selectedLevel: 'All' | '1' | '2' | '3' | '4';
@@ -18,6 +20,8 @@ interface AuthorityDashboardProps {
 
 export function AuthorityDashboard({
     issues,
+    loading,
+    error,
     selectedDepartment,
     setSelectedDepartment,
     selectedLevel,
@@ -184,6 +188,17 @@ export function AuthorityDashboard({
 
             {/* Ticket List Queue */}
             <div className="space-y-4">
+                {loading && (
+                    <div role="status" className="flex items-center justify-center gap-3 rounded-2xl border border-teal-100 bg-white p-10 text-sm font-semibold text-teal-700">
+                        <RefreshCw size={18} className="animate-spin" />
+                        Fetching reports…
+                    </div>
+                )}
+                {!loading && error && (
+                    <div role="alert" className="rounded-2xl border border-rose-200 bg-white p-8 text-center">
+                        <p className="font-semibold text-rose-700">{error}</p>
+                    </div>
+                )}
                 {filteredIssues.map((issue) => {
                     const handlerTitle = issue.assignedAuthority || getAuthorityTitle(issue.department, issue.currentLevel || 1);
                     return (
@@ -234,7 +249,7 @@ export function AuthorityDashboard({
                         </Card>
                     );
                 })}
-                {filteredIssues.length === 0 && (
+                {!loading && !error && filteredIssues.length === 0 && (
                     <div className="text-center p-14 bg-white rounded-2xl border border-slate-200 border-dashed">
                         <ShieldCheck size={36} className="mx-auto text-slate-300 mb-3" />
                         <p className="text-slate-700 font-bold text-base">No tickets match active filters</p>

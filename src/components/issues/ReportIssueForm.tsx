@@ -97,11 +97,6 @@ export function ReportIssueForm({ onSubmitTicket, onPushModalState }: ReportIssu
     } = useCamera();
 
     const handleSubmit = async () => {
-        if (!capturedImage) {
-            setSubmitError('Take a live evidence photo before submitting this ticket.');
-            return;
-        }
-
         setIsSubmitting(true);
         setSubmitError(null);
         try {
@@ -255,7 +250,7 @@ export function ReportIssueForm({ onSubmitTicket, onPushModalState }: ReportIssu
                     <div className="border-t border-slate-100 pt-8">
                         <div className="flex items-center justify-between mb-5">
                             <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2"><Camera className="text-teal-600" size={20} /> Live Evidence</h3>
-                            <span className="text-[10px] font-bold uppercase tracking-widest bg-orange-100 text-orange-600 px-2.5 py-1 rounded-full">Required</span>
+                            <span className="text-[10px] font-bold uppercase tracking-widest bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full">Optional</span>
                         </div>
 
                         <div className="bg-slate-50 rounded-2xl border border-dashed border-slate-300 p-8 flex flex-col items-center justify-center min-h-[300px]">
@@ -265,7 +260,7 @@ export function ReportIssueForm({ onSubmitTicket, onPushModalState }: ReportIssu
                                         <Camera size={32} className="text-slate-400" />
                                     </div>
                                     <p className="text-slate-500 text-sm mb-6 max-w-sm">
-                                        You must take a live photo of the issue.
+                                        Add a live photo if it helps explain the issue. You can submit without one.
                                     </p>
                                     <button onClick={() => { onPushModalState(); startCamera(); }} className="bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 px-8 rounded-xl flex items-center gap-2 transition-all shadow-md">
                                         <Camera size={18} /> Open Camera
