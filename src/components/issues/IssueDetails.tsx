@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, Clock, CheckCircle, AlertCircle, Check, ThumbsUp, MessageSquare, ShieldCheck, Zap, CheckCheck } from 'lucide-react';
+import { ArrowLeft, Clock, CheckCircle, AlertCircle, Check, ThumbsUp, MessageSquare, ShieldCheck, Zap, CheckCheck, Trash2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import type { Issue, UserRole, IssueSourceView } from '../../types/issue';
@@ -17,6 +17,7 @@ interface IssueDetailsProps {
     onOpenEscalate: (issue: Issue) => void;
     onSolve: (issueId: string) => void;
     onSwitchToWorkspaceView: () => void;
+    onDelete: (issueId: string) => void;
 }
 
 export function IssueDetails({
@@ -31,6 +32,7 @@ export function IssueDetails({
     onOpenEscalate,
     onSolve,
     onSwitchToWorkspaceView,
+    onDelete,
 }: IssueDetailsProps) {
     const [isCommenting, setIsCommenting] = useState(false);
     const [newComment, setNewComment] = useState('');
@@ -66,9 +68,9 @@ export function IssueDetails({
                     <div className="flex items-center gap-3">
                         <span className="font-mono text-sm font-bold text-slate-500">{issue.id}</span>
                         <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold border ${issue.statusColor === 'emerald' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
-                                issue.statusColor === 'blue' ? 'bg-blue-50 text-blue-600 border-blue-200' :
-                                    issue.statusColor === 'amber' ? 'bg-amber-50 text-amber-600 border-amber-200' :
-                                        'bg-rose-50 text-rose-600 border-rose-200'
+                            issue.statusColor === 'blue' ? 'bg-blue-50 text-blue-600 border-blue-200' :
+                                issue.statusColor === 'amber' ? 'bg-amber-50 text-amber-600 border-amber-200' :
+                                    'bg-rose-50 text-rose-600 border-rose-200'
                             }`}>
                             {issue.status === 'Solved' && <CheckCircle size={14} />}
                             {issue.status === 'Seen' && <CheckCircle size={14} className="opacity-70" />}
@@ -79,7 +81,18 @@ export function IssueDetails({
                     <span className="flex items-center gap-1 text-sm font-medium text-slate-500"><Clock size={16} /> Reported {issue.time}</span>
                 </div>
 
-                <h1 className="text-3xl md:text-4xl font-bold text-slate-800 mb-6">{issue.title}</h1>
+                <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <h1 className="text-3xl md:text-4xl font-bold text-slate-800">{issue.title}</h1>
+                    {issue.isMine && (
+                        <Button
+                            variant="outline"
+                            onClick={() => onDelete(issue.id)}
+                            className="shrink-0 border-rose-200 text-rose-700 hover:bg-rose-50 hover:text-rose-800"
+                        >
+                            <Trash2 size={16} /> Delete Issue
+                        </Button>
+                    )}
+                </div>
 
                 {/* 4-Level Pipeline Visualizer */}
                 <div className="mb-8 p-6 bg-slate-50/90 border border-slate-200 rounded-3xl shadow-sm">
@@ -118,26 +131,26 @@ export function IssueDetails({
                             return (
                                 <div key={lvl} className="flex flex-col items-center text-center relative group">
                                     <div className={`w-9 h-9 sm:w-11 sm:h-11 rounded-2xl flex items-center justify-center font-extrabold text-xs sm:text-sm mb-2 transition-all ${isCurrent
-                                            ? isSolved
-                                                ? 'bg-emerald-600 text-white ring-4 ring-emerald-200 shadow-md scale-105'
-                                                : 'bg-teal-600 text-white ring-4 ring-teal-200 shadow-md scale-105'
-                                            : isPast
-                                                ? 'bg-emerald-500 text-white shadow-sm'
-                                                : 'bg-white text-slate-400 border border-slate-200'
+                                        ? isSolved
+                                            ? 'bg-emerald-600 text-white ring-4 ring-emerald-200 shadow-md scale-105'
+                                            : 'bg-teal-600 text-white ring-4 ring-teal-200 shadow-md scale-105'
+                                        : isPast
+                                            ? 'bg-emerald-500 text-white shadow-sm'
+                                            : 'bg-white text-slate-400 border border-slate-200'
                                         }`}>
                                         {isPast || (isCurrent && isSolved) ? <Check size={18} strokeWidth={2.5} /> : `L${lvl}`}
                                     </div>
                                     <span className={`text-[11px] sm:text-xs font-bold leading-tight max-w-[120px] ${isCurrent
-                                            ? (isSolved ? 'text-emerald-900 font-extrabold' : 'text-teal-900 font-extrabold')
-                                            : isPast
-                                                ? 'text-slate-700'
-                                                : 'text-slate-400'
+                                        ? (isSolved ? 'text-emerald-900 font-extrabold' : 'text-teal-900 font-extrabold')
+                                        : isPast
+                                            ? 'text-slate-700'
+                                            : 'text-slate-400'
                                         }`}>
                                         {levelTitle}
                                     </span>
                                     <span className={`text-[10px] mt-1 font-semibold ${isCurrent
-                                            ? (isSolved ? 'text-emerald-600 font-bold uppercase tracking-wider' : 'text-teal-600 uppercase tracking-wider')
-                                            : 'text-slate-400'
+                                        ? (isSolved ? 'text-emerald-600 font-bold uppercase tracking-wider' : 'text-teal-600 uppercase tracking-wider')
+                                        : 'text-slate-400'
                                         }`}>
                                         {isCurrent ? (isSolved ? 'Resolved Here' : 'Active Now') : lvl === 4 ? 'Supreme' : `Level ${lvl}`}
                                     </span>
@@ -169,8 +182,8 @@ export function IssueDetails({
                                     onClick={() => onAcknowledge(issue.id)}
                                     disabled={issue.status === 'In Progress' || issue.status === 'Solved'}
                                     className={`rounded-xl text-xs font-bold gap-1.5 ${issue.status === 'In Progress' || issue.status === 'Solved'
-                                            ? 'bg-slate-100 text-slate-400 border-slate-200'
-                                            : 'bg-white text-teal-700 border-teal-200 hover:bg-teal-50 shadow-sm'
+                                        ? 'bg-slate-100 text-slate-400 border-slate-200'
+                                        : 'bg-white text-teal-700 border-teal-200 hover:bg-teal-50 shadow-sm'
                                         }`}
                                 >
                                     <CheckCircle size={14} />
@@ -192,8 +205,8 @@ export function IssueDetails({
                                     onClick={() => onOpenEscalate(issue)}
                                     disabled={(issue.currentLevel || 1) >= 4 || issue.status === 'Solved'}
                                     className={`rounded-xl text-xs font-bold gap-1.5 ${(issue.currentLevel || 1) >= 4 || issue.status === 'Solved'
-                                            ? 'bg-slate-100 text-slate-400 border-slate-200 opacity-60'
-                                            : 'bg-white hover:bg-amber-50 text-amber-800 border-amber-300 shadow-sm'
+                                        ? 'bg-slate-100 text-slate-400 border-slate-200 opacity-60'
+                                        : 'bg-white hover:bg-amber-50 text-amber-800 border-amber-300 shadow-sm'
                                         }`}
                                 >
                                     <Zap size={14} className="text-amber-600" /> Escalate Level
@@ -204,8 +217,8 @@ export function IssueDetails({
                                     onClick={() => onSolve(issue.id)}
                                     disabled={issue.status === 'Solved'}
                                     className={`rounded-xl text-xs font-extrabold gap-1.5 shadow-sm ${issue.status === 'Solved'
-                                            ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-100 cursor-default border border-emerald-200'
-                                            : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                                        ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-100 cursor-default border border-emerald-200'
+                                        : 'bg-emerald-600 hover:bg-emerald-700 text-white'
                                         }`}
                                 >
                                     <CheckCheck size={15} />
@@ -273,7 +286,7 @@ export function IssueDetails({
                     <div className="mb-10">
                         <p className="text-sm text-slate-400 font-bold tracking-wider mb-3">ATTACHED EVIDENCE</p>
                         <div className="rounded-2xl border border-slate-200 overflow-hidden shadow-sm inline-block w-full sm:w-auto sm:max-w-xl group bg-slate-50">
-                            <img src={issue.imageUrl} alt="Evidence" className="w-full max-h-[400px] object-cover group-hover:scale-[1.02] transition-transform duration-500 ease-out" />
+                            <img src={issue.imageUrl} alt={`Evidence for ${issue.title}`} loading="lazy" className="w-full max-h-[400px] object-contain" />
                         </div>
                     </div>
                 )}
@@ -283,8 +296,8 @@ export function IssueDetails({
                         <button
                             onClick={() => onToggleUpvote(issue.id)}
                             className={`flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl font-bold transition-all border cursor-pointer ${issue.isLiked
-                                    ? 'bg-teal-50 text-teal-700 border-teal-200 shadow-sm'
-                                    : 'bg-white text-slate-700 border-slate-200 hover:bg-teal-50 hover:text-teal-700 hover:border-teal-200'
+                                ? 'bg-teal-50 text-teal-700 border-teal-200 shadow-sm'
+                                : 'bg-white text-slate-700 border-slate-200 hover:bg-teal-50 hover:text-teal-700 hover:border-teal-200'
                                 }`}
                         >
                             <ThumbsUp size={20} className={issue.isLiked ? 'fill-teal-700 text-teal-700' : ''} />
@@ -316,8 +329,8 @@ export function IssueDetails({
                         {issue.comments && issue.comments.map((c, i) => (
                             <div key={i} className="bg-gradient-to-br from-slate-50 to-white p-5 rounded-2xl border border-slate-100 shadow-sm">
                                 <div className="flex items-center gap-2 mb-2">
-                                    <div className="w-7 h-7 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center font-bold text-xs shrink-0">{c.author[0]}</div>
-                                    <p className="text-sm font-bold text-slate-800">{c.author}</p>
+                                    <div className="w-7 h-7 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center font-bold text-xs shrink-0">{c.author.charAt(0).toUpperCase()}</div>
+                                    <p className="text-sm font-bold text-slate-800">Posted by {c.author}</p>
                                     <span className="text-slate-400 font-medium text-xs ml-auto">{c.time}</span>
                                 </div>
                                 <p className="text-slate-600 text-sm leading-relaxed pl-9">{c.text}</p>

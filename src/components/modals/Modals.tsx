@@ -1,4 +1,4 @@
-import { X, ShieldCheck, User, MessageSquare, AlertCircle, Send, AlertTriangle, ThumbsUp } from 'lucide-react';
+import { X, ShieldCheck, User, MessageSquare, Send, AlertTriangle, ThumbsUp } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
@@ -51,20 +51,28 @@ export function RoleSelectionOverlay({
     );
 }
 
+export interface ProfileModalProps {
+    open: boolean;
+    onClose: () => void;
+    userRole: UserRole | null;
+    userName?: string;
+    userEmail?: string;
+    userInitials?: string;
+}
+
 export function ProfileModal({
     open,
     onClose,
     userRole,
-}: {
-    open: boolean;
-    onClose: () => void;
-    userRole: UserRole | null;
-}) {
+    userName = 'User',
+    userEmail = '',
+    userInitials = 'U',
+}: ProfileModalProps) {
     if (!open) return null;
 
     return (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 smooth-overlay" onClick={onClose}>
-            <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-xl relative smooth-enter" onClick={e => e.stopPropagation()}>
+            <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-xl relative smooth-enter" onClick={(e) => e.stopPropagation()}>
                 <button onClick={onClose} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
                     <X size={20} />
                 </button>
@@ -72,9 +80,18 @@ export function ProfileModal({
                     {userRole === 'authority' ? 'Authority Profile' : 'Student Profile'}
                 </h3>
                 <div className="space-y-4">
+                    <div className="flex items-center gap-3 rounded-2xl border border-slate-100 bg-slate-50 p-3">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-teal-600 font-black text-white">
+                            {userInitials}
+                        </div>
+                        <div className="overflow-hidden">
+                            <p className="text-sm font-bold text-slate-800 truncate">{userName}</p>
+                            <p className="text-xs text-slate-500 truncate">{userEmail}</p>
+                        </div>
+                    </div>
                     <div>
                         <p className="text-xs text-slate-400 font-bold tracking-wider mb-1">FULL NAME</p>
-                        <p className="font-semibold text-slate-700">{userRole === 'authority' ? 'Authority Representative' : 'Hritvika Vashistha'}</p>
+                        <p className="font-semibold text-slate-700">{userName}</p>
                     </div>
                     <div>
                         <p className="text-xs text-slate-400 font-bold tracking-wider mb-1">{userRole === 'authority' ? 'DEPARTMENT' : 'ROLL NUMBER'}</p>
@@ -82,7 +99,7 @@ export function ProfileModal({
                     </div>
                     <div>
                         <p className="text-xs text-slate-400 font-bold tracking-wider mb-1">EMAIL ID</p>
-                        <p className="font-semibold text-slate-700">{userRole === 'authority' ? 'authority@jklu.edu.in' : 'hritvikavashistha@jklu.edu.in'}</p>
+                        <p className="font-semibold text-slate-700">{userEmail || (userRole === 'authority' ? 'authority@jklu.edu.in' : 'hritvikavashistha@jklu.edu.in')}</p>
                     </div>
                 </div>
             </div>
@@ -173,12 +190,16 @@ export function DuplicateModal({
     matchedDuplicate,
     onSubmitAnyway,
     onUpvoteDuplicate,
+    submitError,
+    isSubmitting = false,
 }: {
     open: boolean;
     onClose: () => void;
     matchedDuplicate: Issue | null;
-    onSubmitAnyway: () => void;
+    onSubmitAnyway: () => void | Promise<void>;
     onUpvoteDuplicate: () => void;
+    submitError?: string | null;
+    isSubmitting?: boolean;
 }) {
     if (!open || !matchedDuplicate) return null;
 
@@ -206,11 +227,13 @@ export function DuplicateModal({
                     <p className="text-xs text-slate-500 mb-2 font-medium">{matchedDuplicate.location} • {matchedDuplicate.category}</p>
                 </div>
 
+                {submitError && <p role="alert" className="mb-4 text-sm font-semibold text-rose-700">{submitError}</p>}
+
                 <div className="flex flex-col sm:flex-row items-center gap-3 justify-end">
-                    <Button variant="outline" onClick={onSubmitAnyway} className="w-full sm:w-auto rounded-xl font-bold text-slate-600">
-                        Submit New Ticket Anyway
+                    <Button variant="outline" onClick={() => void onSubmitAnyway()} disabled={isSubmitting} className="w-full sm:w-auto rounded-xl font-bold text-slate-600">
+                        {isSubmitting ? 'Submitting…' : 'Submit New Ticket Anyway'}
                     </Button>
-                    <Button onClick={onUpvoteDuplicate} className="w-full sm:w-auto bg-[#ea580c] hover:bg-[#c2410c] text-white font-extrabold rounded-xl gap-2">
+                    <Button onClick={onUpvoteDuplicate} disabled={isSubmitting} className="w-full sm:w-auto bg-[#ea580c] hover:bg-[#c2410c] text-white font-extrabold rounded-xl gap-2">
                         <ThumbsUp size={16} /> Upvote Existing Ticket ({matchedDuplicate.upvotes + 1})
                     </Button>
                 </div>

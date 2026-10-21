@@ -13,7 +13,9 @@ export interface IssueNotification {
     title: string;
     message: string;
     time: string;
-    unread: boolean;
+    timestamp?: string;
+    isRead?: boolean;
+    unread?: boolean;
 }
 
 export interface Issue {

@@ -67,11 +67,13 @@ interface ReportIssueFormProps {
         incidentDate: string;
         isConfidential: boolean;
         capturedImage: string | null;
-    }) => void;
+    }) => void | Promise<void>;
     onPushModalState: () => void;
 }
 
 export function ReportIssueForm({ onSubmitTicket, onPushModalState }: ReportIssueFormProps) {
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState<string | null>(null);
     const [department, setDepartment] = useState('');
     const [category, setCategory] = useState('');
     const [specificIssue, setSpecificIssue] = useState('');
@@ -88,24 +90,33 @@ export function ReportIssueForm({ onSubmitTicket, onPushModalState }: ReportIssu
         cameraActive,
         photoTaken,
         capturedImage,
+        cameraError,
         startCamera,
         takePhoto,
         resetPhoto,
     } = useCamera();
 
-    const handleSubmit = () => {
-        onSubmitTicket({
-            department,
-            category,
-            specificIssue,
-            building,
-            issueTitle,
-            exactLocation,
-            detailedDescription,
-            incidentDate,
-            isConfidential,
-            capturedImage,
-        });
+    const handleSubmit = async () => {
+        setIsSubmitting(true);
+        setSubmitError(null);
+        try {
+            await onSubmitTicket({
+                department,
+                category,
+                specificIssue,
+                building,
+                issueTitle,
+                exactLocation,
+                detailedDescription,
+                incidentDate,
+                isConfidential,
+                capturedImage,
+            });
+        } catch (error) {
+            setSubmitError(error instanceof Error ? error.message : 'Could not submit the ticket.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -239,7 +250,7 @@ export function ReportIssueForm({ onSubmitTicket, onPushModalState }: ReportIssu
                     <div className="border-t border-slate-100 pt-8">
                         <div className="flex items-center justify-between mb-5">
                             <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2"><Camera className="text-teal-600" size={20} /> Live Evidence</h3>
-                            <span className="text-[10px] font-bold uppercase tracking-widest bg-orange-100 text-orange-600 px-2.5 py-1 rounded-full">Required</span>
+                            <span className="text-[10px] font-bold uppercase tracking-widest bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full">Optional</span>
                         </div>
 
                         <div className="bg-slate-50 rounded-2xl border border-dashed border-slate-300 p-8 flex flex-col items-center justify-center min-h-[300px]">
@@ -249,7 +260,7 @@ export function ReportIssueForm({ onSubmitTicket, onPushModalState }: ReportIssu
                                         <Camera size={32} className="text-slate-400" />
                                     </div>
                                     <p className="text-slate-500 text-sm mb-6 max-w-sm">
-                                        You must take a live photo of the issue.
+                                        Add a live photo if it helps explain the issue. You can submit without one.
                                     </p>
                                     <button onClick={() => { onPushModalState(); startCamera(); }} className="bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 px-8 rounded-xl flex items-center gap-2 transition-all shadow-md">
                                         <Camera size={18} /> Open Camera
@@ -277,18 +288,23 @@ export function ReportIssueForm({ onSubmitTicket, onPushModalState }: ReportIssu
                                 </div>
                             )}
                             <canvas ref={canvasRef} className="hidden"></canvas>
+                            {cameraError && <p role="alert" className="mt-4 text-sm font-semibold text-rose-700">{cameraError}</p>}
                         </div>
                     </div>
                 </div>
 
                 <div className="bg-slate-50 border-t border-slate-100 p-6 flex justify-end">
-                    <Button
-                        onClick={handleSubmit}
-                        className="bg-teal-600 hover:bg-teal-700 text-white font-bold text-lg py-6 px-10 rounded-xl shadow-md transition-all flex items-center gap-2"
-                    >
-                        <CheckCircle size={20} />
-                        Submit Ticket
-                    </Button>
+                    <div className="flex w-full flex-col items-end gap-3">
+                        {submitError && <p role="alert" className="w-full text-sm font-semibold text-rose-700">{submitError}</p>}
+                        <Button
+                            onClick={() => void handleSubmit()}
+                            disabled={isSubmitting}
+                            className="bg-teal-600 hover:bg-teal-700 text-white font-bold text-lg py-6 px-10 rounded-xl shadow-md transition-all flex items-center gap-2"
+                        >
+                            <CheckCircle size={20} />
+                            {isSubmitting ? 'Submitting…' : 'Submit Ticket'}
+                        </Button>
+                    </div>
                 </div>
             </div>
         </main>
