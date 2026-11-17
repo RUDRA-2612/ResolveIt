@@ -12,6 +12,7 @@ import {
     Trash2,
 } from 'lucide-react';
 import type { UserRole, IssueNotification } from '../../types/issue';
+import { isUserAdmin } from '../../lib/adminAuth';
 
 interface NavbarProps {
     userRole: UserRole;
@@ -221,6 +222,21 @@ export function Navbar({
                                 >
                                     <User size={15} className="text-slate-400" /> View Profile
                                 </button>
+
+                                {isUserAdmin(userEmail) && (
+                                    <button
+                                        onClick={() => { setUserMenuOpen(false); navigate('/admin'); }}
+                                        className="w-full text-left px-3 py-2.5 rounded-xl text-xs font-black text-teal-900 bg-teal-50 hover:bg-teal-100/90 flex items-center justify-between transition-all cursor-pointer mb-1 border border-teal-200"
+                                    >
+                                        <div className="flex items-center gap-2.5">
+                                            <ShieldCheck size={16} className="text-teal-600" />
+                                            <span>Admin Panel</span>
+                                        </div>
+                                        <span className="text-[9px] uppercase tracking-wider bg-teal-700 text-white px-1.5 py-0.5 rounded font-black">
+                                            Admin
+                                        </span>
+                                    </button>
+                                )}
 
                                 <button
                                     onClick={() => { setUserMenuOpen(false); onToggleRole(); }}

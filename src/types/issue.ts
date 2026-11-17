@@ -42,6 +42,11 @@ export interface Issue {
     isOverdue?: boolean;
     resolvedAt?: string;
     comments: IssueComment[];
+    reporterName?: string;
+    reporterEmail?: string;
+    userId?: string;
+    createdAt?: string;
+    rawId?: number;
 }
 
 export interface DuplicateCheckInput {
