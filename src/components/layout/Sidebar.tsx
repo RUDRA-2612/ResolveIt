@@ -1,14 +1,16 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import { LayoutDashboard, Ticket, PlusCircle, ShieldCheck, X } from 'lucide-react'
 import type { UserRole } from '../../types/issue'
+import { isUserAdmin } from '../../lib/adminAuth'
 
 interface SidebarProps {
     sidebarOpen: boolean
     setSidebarOpen: (open: boolean) => void
     userRole: UserRole
+    userEmail?: string
 }
 
-export function Sidebar({ sidebarOpen, setSidebarOpen, userRole }: SidebarProps) {
+export function Sidebar({ sidebarOpen, setSidebarOpen, userRole, userEmail }: SidebarProps) {
     const location = useLocation()
     const navigate = useNavigate()
 
@@ -20,6 +22,10 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, userRole }: SidebarProps)
 
     if (userRole === 'authority') {
         navItems.push({ id: 'authority-dashboard', path: '/authority-dashboard', label: 'Authority Workspace', icon: ShieldCheck })
+    }
+
+    if (isUserAdmin(userEmail)) {
+        navItems.push({ id: 'admin', path: '/admin', label: 'Admin Panel', icon: ShieldCheck })
     }
 
     const handleNavigate = (path: string) => {

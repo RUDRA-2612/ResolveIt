@@ -10,6 +10,72 @@ const getCurrentUserId = async (): Promise<string> => {
     return user.id;
 }
 
+/** Maps raw or alias database department names to the canonical UI taxonomy */
+export function canonicalizeDepartmentName(rawName?: string | null): string {
+    if (!rawName) return 'Campus Infrastructure & IT';
+    const trimmed = rawName.trim();
+
+    if (
+        trimmed === 'Hostel, Mess & Laundry' ||
+        trimmed.includes('Hostel') ||
+        trimmed.includes('Mess') ||
+        trimmed.includes('Dining') ||
+        trimmed.includes('Laundry') ||
+        trimmed.includes('Residential')
+    ) {
+        return 'Hostel, Mess & Laundry';
+    }
+
+    if (
+        trimmed === 'Academics & Library' ||
+        trimmed.includes('Academic') ||
+        trimmed.includes('Library') ||
+        trimmed.includes('Exam') ||
+        trimmed.includes('LRC')
+    ) {
+        return 'Academics & Library';
+    }
+
+    if (
+        trimmed === 'Campus Infrastructure & IT' ||
+        trimmed.includes('Infrastructure') ||
+        trimmed.includes('IT') ||
+        trimmed.includes('Estate')
+    ) {
+        return 'Campus Infrastructure & IT';
+    }
+
+    if (
+        trimmed === 'Student Life & Sports' ||
+        trimmed.includes('Sport') ||
+        trimmed.includes('Student Life') ||
+        trimmed.includes('Activities')
+    ) {
+        return 'Student Life & Sports';
+    }
+
+    if (
+        trimmed === 'Health, Well-being & Safety' ||
+        trimmed.includes('Health') ||
+        trimmed.includes('Wellness') ||
+        trimmed.includes('Safety') ||
+        trimmed.includes('Security')
+    ) {
+        return 'Health, Well-being & Safety';
+    }
+
+    if (
+        trimmed === 'Administration & Support' ||
+        trimmed.includes('Admin') ||
+        trimmed.includes('Support') ||
+        trimmed.includes('Registrar')
+    ) {
+        return 'Administration & Support';
+    }
+
+    return trimmed;
+}
+
 /** Transforms raw database row to UI Issue structure */
 export function mapRowToIssue(row: any, currentUserId: string = DEFAULT_USER_ID): Issue {
     const upvotesCount = Array.isArray(row.upvote) ? row.upvote.length : 0;
@@ -32,7 +98,7 @@ export function mapRowToIssue(row: any, currentUserId: string = DEFAULT_USER_ID)
         status: row.status || 'Not Started',
         statusColor: row.status_color || 'rose',
         time: new Date(row.created_at).toLocaleDateString(),
-        department: row.department?.name || 'Campus Infrastructure & IT',
+        department: canonicalizeDepartmentName(row.department?.name),
         category: row.category?.name || 'General',
         specificIssue: row.specific_issue || 'General Issue',
         imageUrl: row.image_url || undefined,
@@ -61,6 +127,7 @@ export const fetchAllTickets = async (activeUserId: string): Promise<Issue[]> =>
       department ( name ),
       category ( name ),
       upvote ( user_id ),
+      app_user ( name, email ),
       ticket_update ( id, author_name, content, update_type, created_at, app_user ( name, email ) )
     `)
         .order('created_at', { ascending: false });
@@ -94,8 +161,10 @@ export const fetchAllTickets = async (activeUserId: string): Promise<Issue[]> =>
             status: t.status || 'Not Started',
             statusColor: t.status_color || 'rose',
             time: new Date(t.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            department: t.department?.[0]?.name || 'General',
-            category: t.category?.[0]?.name || 'General',
+            department: canonicalizeDepartmentName(
+                Array.isArray(t.department) ? t.department[0]?.name : (t.department as any)?.name
+            ),
+            category: t.category?.[0]?.name || (t.category as any)?.name || 'General',
             specificIssue: t.specific_issue || 'General Issue',
             imageUrl: t.image_url || undefined,
             isLiked: activeUserId ? upvotesList.some((u: any) => u.user_id === activeUserId) : false,
@@ -108,6 +177,11 @@ export const fetchAllTickets = async (activeUserId: string): Promise<Issue[]> =>
             slaTimer: t.sla_due_at ? 'Active SLA' : undefined,
             isOverdue: t.sla_due_at ? new Date(t.sla_due_at) < new Date() : false,
             comments,
+            reporterName: (Array.isArray(t.app_user) ? t.app_user[0]?.name : (t.app_user as any)?.name) || undefined,
+            reporterEmail: (Array.isArray(t.app_user) ? t.app_user[0]?.email : (t.app_user as any)?.email) || undefined,
+            userId: t.user_id,
+            createdAt: t.created_at,
+            rawId: typeof t.id === 'number' ? t.id : parseInt(String(t.id), 10),
         };
     });
 };
@@ -365,3 +439,120 @@ export const deleteTicketInDb = async (ticketId: string) => {
 
     if (error) throw error;
 };
+
+/** 9. Admin Specific Override Functions */
+export async function adminDeleteTicketInDb(ticketId: string): Promise<void> {
+    const numericTicketId = parseInt(ticketId.replace('TKT-', ''), 10);
+    if (!Number.isSafeInteger(numericTicketId) || numericTicketId <= 0) {
+        throw new Error('Invalid ticket ID.');
+    }
+
+    const { data: ticket } = await supabase
+        .from('ticket')
+        .select('image_url')
+        .eq('id', numericTicketId)
+        .single();
+
+    if (ticket?.image_url) {
+        try {
+            const urlParts = ticket.image_url.split('/evidence/');
+            if (urlParts.length > 1) {
+                const filePath = decodeURIComponent(urlParts[1]);
+                await supabase.storage.from('evidence').remove([filePath]);
+            }
+        } catch (err) {
+            console.warn('Could not remove storage attachment:', err);
+        }
+    }
+
+    const { error } = await supabase
+        .from('ticket')
+        .delete()
+        .eq('id', numericTicketId);
+
+    if (error) throw error;
+}
+
+export async function adminUpdateTicketStatusInDb(
+    ticketCode: string,
+    newStatus: 'Not Started' | 'Seen' | 'In Progress' | 'Solved',
+    adminEmail?: string
+): Promise<void> {
+    const numericId = parseInt(ticketCode.replace('TKT-', ''), 10);
+    const statusColorMap = {
+        'Not Started': 'rose',
+        'Seen': 'blue',
+        'In Progress': 'amber',
+        'Solved': 'emerald',
+    } as const;
+
+    const statusColor = statusColorMap[newStatus] || 'rose';
+
+    const { error } = await supabase
+        .from('ticket')
+        .update({
+            status: newStatus,
+            status_color: statusColor,
+            ...(newStatus === 'Solved' ? { resolved_at: new Date().toISOString() } : {}),
+            updated_at: new Date().toISOString(),
+        })
+        .eq('id', numericId);
+
+    if (error) throw error;
+
+    try {
+        const { data: { user } } = await supabase.auth.getUser();
+        await supabase.from('ticket_update').insert([
+            {
+                ticket_id: numericId,
+                user_id: user?.id || DEFAULT_USER_ID,
+                author_name: adminEmail ? `Admin (${adminEmail.split('@')[0]})` : 'Admin Console',
+                content: `Status changed to "${newStatus}" via Admin Console override.`,
+                update_type: 'official_update',
+                new_status: newStatus,
+            },
+        ]);
+    } catch (e) {
+        console.warn('Could not log admin update:', e);
+    }
+}
+
+export async function adminForceEscalateInDb(
+    ticketCode: string,
+    nextLevel: number,
+    nextTitle: string,
+    reason: string,
+    note?: string,
+    adminEmail?: string
+): Promise<void> {
+    const numericId = parseInt(ticketCode.replace('TKT-', ''), 10);
+
+    const { error } = await supabase
+        .from('ticket')
+        .update({
+            current_level: nextLevel,
+            assigned_authority: nextTitle,
+            is_escalated: true,
+            escalated_from: `Admin Override to L${nextLevel}`,
+            escalation_reason: reason,
+            updated_at: new Date().toISOString(),
+        })
+        .eq('id', numericId);
+
+    if (error) throw error;
+
+    try {
+        const { data: { user } } = await supabase.auth.getUser();
+        await supabase.from('ticket_update').insert([
+            {
+                ticket_id: numericId,
+                user_id: user?.id || DEFAULT_USER_ID,
+                author_name: adminEmail ? `Admin (${adminEmail.split('@')[0]})` : 'Admin Console',
+                content: `Force-escalated to Level ${nextLevel} (${nextTitle}). Reason: ${reason}${note ? ` | Note: "${note}"` : ''}.`,
+                update_type: 'escalation',
+            },
+        ]);
+    } catch (e) {
+        console.warn('Could not log admin escalation update:', e);
+    }
+}

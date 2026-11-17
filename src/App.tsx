@@ -22,6 +22,7 @@ import { IssueDetails } from './components/issues/IssueDetails';
 import { ReportIssueForm } from './components/issues/ReportIssueForm';
 import { AuthorityDashboard } from './components/authority/AuthorityDashboard';
 import { EscalationModal } from './components/authority/EscalationModal';
+import { AdminDashboard } from './components/admin/AdminDashboard';
 
 import {
   RoleSelectionOverlay,
@@ -42,6 +43,9 @@ import {
   solveTicketInDb,
   postCommentToDb,
   deleteTicketInDb,
+  adminDeleteTicketInDb,
+  adminUpdateTicketStatusInDb,
+  adminForceEscalateInDb,
 } from './lib/supabaseService';
 
 import { supabase } from './lib/supabase';
@@ -307,6 +311,35 @@ export default function App() {
     }
   };
 
+  const handleAdminSolve = async (ticketId: string) => {
+    await adminUpdateTicketStatusInDb(ticketId, 'Solved', userEmail);
+    await refreshTickets();
+  };
+
+  const handleAdminStatusChange = async (
+    ticketId: string,
+    status: 'Not Started' | 'Seen' | 'In Progress' | 'Solved'
+  ) => {
+    await adminUpdateTicketStatusInDb(ticketId, status, userEmail);
+    await refreshTickets();
+  };
+
+  const handleAdminEscalate = async (
+    ticketId: string,
+    nextLevel: number,
+    nextTitle: string,
+    reason: string,
+    note?: string
+  ) => {
+    await adminForceEscalateInDb(ticketId, nextLevel, nextTitle, reason, note, userEmail);
+    await refreshTickets();
+  };
+
+  const handleAdminDelete = async (ticketId: string) => {
+    await adminDeleteTicketInDb(ticketId);
+    await refreshTickets();
+  };
+
   if (authLoading) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
@@ -370,6 +403,7 @@ export default function App() {
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
         userRole={userRole}
+        userEmail={userEmail}
       />
 
       <ProfileModal
@@ -580,6 +614,24 @@ export default function App() {
               setSelectedKpiFilter={setSelectedKpiFilter}
               onOpenIssueDetails={(issue) => navigate(`/issue/${issue.id}`)}
               onBackToHome={() => navigate('/dashboard')}
+            />
+          }
+        />
+
+        {/* Master Admin Console (Strictly for 2 Whitelisted Admins) */}
+        <Route
+          path="/admin"
+          element={
+            <AdminDashboard
+              issues={issues}
+              loading={loading}
+              error={ticketsError}
+              currentUserEmail={userEmail}
+              onRefresh={refreshTickets}
+              onSolveTicket={handleAdminSolve}
+              onStatusChange={handleAdminStatusChange}
+              onEscalateTicket={handleAdminEscalate}
+              onDeleteTicket={handleAdminDelete}
             />
           }
         />
