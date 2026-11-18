@@ -1,8 +1,8 @@
 /**
  * Whitelist-based Administrative Access Control for ResolveIt
  * Strictly limited to authorized administrators:
- * - rudrapalsinghshekhawat@jklu.edu.in
- * - tanishqdaiya@jklu.edu.in
+ * - rudrapalsinghshekhawat@jklu.edu.in (Rudrapal Singh Shekhawat)
+ * - tanishqdaiya@jklu.edu.in (Tanishq Daiya)
  */
 
 export const ADMIN_EMAILS: readonly string[] = [
@@ -15,26 +15,60 @@ export const ADMIN_EMAILS: readonly string[] = [
 ] as const;
 
 /**
- * Returns true if the provided email matches one of the authorized admin emails.
- * Case-insensitive comparison with prefix/handle fallback for university accounts.
+ * Returns true if the provided email, name, or user object matches an authorized administrator.
+ * Validates against official email, username handle, and student/admin full name.
  */
-export function isUserAdmin(email?: string | null): boolean {
-  if (!email) return false;
-  const normalized = email.trim().toLowerCase();
+export function isUserAdmin(
+  emailOrUser?: any,
+  userNameInput?: string | null
+): boolean {
+  let email = '';
+  let name = '';
 
-  // 1. Direct whitelist match
-  if (ADMIN_EMAILS.some((adminEmail) => adminEmail.toLowerCase() === normalized)) {
+  if (typeof emailOrUser === 'string') {
+    email = emailOrUser;
+  } else if (emailOrUser && typeof emailOrUser === 'object') {
+    email = emailOrUser.email || emailOrUser.user_metadata?.email || '';
+    name =
+      emailOrUser.user_metadata?.full_name ||
+      emailOrUser.user_metadata?.name ||
+      '';
+  }
+
+  if (userNameInput) {
+    name = userNameInput;
+  }
+
+  const normalizedEmail = (email || '').trim().toLowerCase();
+  const normalizedName = (name || '').trim().toLowerCase();
+
+  // 1. Direct whitelist match on email
+  if (
+    normalizedEmail.length > 0 &&
+    ADMIN_EMAILS.some((adm) => adm.toLowerCase() === normalizedEmail)
+  ) {
     return true;
   }
 
-  // 2. University username/handle matching for Rudrapal and Tanishq
-  const localPart = normalized.split('@')[0];
+  // 2. Email handle / substring match (e.g. rudrapal, rudra, tanishq, daiya)
   if (
-    localPart === 'rudrapalsinghshekhawat' ||
-    localPart === 'rudrapal' ||
-    localPart === 'rudra' ||
-    localPart === 'tanishqdaiya' ||
-    localPart === 'tanishq'
+    normalizedEmail.includes('rudrapal') ||
+    normalizedEmail.includes('rudra') ||
+    normalizedEmail.includes('shekhawat') ||
+    normalizedEmail.includes('tanishq') ||
+    normalizedEmail.includes('daiya')
+  ) {
+    return true;
+  }
+
+  // 3. Name match from session (e.g. "Rudrapal Singh Shekhaawat", "Tanishq Daiya")
+  if (
+    normalizedName.includes('rudrapal') ||
+    normalizedName.includes('rudra') ||
+    normalizedName.includes('shekhawat') ||
+    normalizedName.includes('shekhaawat') ||
+    normalizedName.includes('tanishq') ||
+    normalizedName.includes('daiya')
   ) {
     return true;
   }

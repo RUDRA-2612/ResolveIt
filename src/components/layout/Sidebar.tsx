@@ -8,9 +8,10 @@ interface SidebarProps {
     setSidebarOpen: (open: boolean) => void
     userRole: UserRole
     userEmail?: string
+    userName?: string
 }
 
-export function Sidebar({ sidebarOpen, setSidebarOpen, userRole, userEmail }: SidebarProps) {
+export function Sidebar({ sidebarOpen, setSidebarOpen, userRole, userEmail, userName }: SidebarProps) {
     const location = useLocation()
     const navigate = useNavigate()
 
@@ -24,7 +25,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, userRole, userEmail }: Si
         navItems.push({ id: 'authority-dashboard', path: '/authority-dashboard', label: 'Authority Workspace', icon: ShieldCheck })
     }
 
-    if (isUserAdmin(userEmail)) {
+    if (isUserAdmin(userEmail, userName)) {
         navItems.push({ id: 'admin', path: '/admin', label: 'Admin Panel', icon: ShieldCheck })
     }
 

@@ -209,7 +209,7 @@ export function Navbar({
                     </div>
 
                     {/* Direct Admin Console Link for Authorized Admins */}
-                    {isUserAdmin(userEmail) && (
+                    {isUserAdmin(userEmail, userName) && (
                         <button
                             onClick={() => navigate('/admin')}
                             className={`hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
@@ -258,7 +258,7 @@ export function Navbar({
                                     <User size={15} className="text-slate-400" /> View Profile
                                 </button>
 
-                                {isUserAdmin(userEmail) && (
+                                {isUserAdmin(userEmail, userName) && (
                                     <button
                                         onClick={() => { setUserMenuOpen(false); navigate('/admin'); }}
                                         className="w-full text-left px-3 py-2.5 rounded-xl text-xs font-black text-teal-900 bg-teal-50 hover:bg-teal-100/90 flex items-center justify-between transition-all cursor-pointer mb-1 border border-teal-200"

@@ -31,6 +31,7 @@ interface AdminDashboardProps {
     loading: boolean;
     error: string | null;
     currentUserEmail?: string | null;
+    currentUserName?: string | null;
     onRefresh: () => void;
     onSolveTicket: (ticketId: string) => Promise<void>;
     onStatusChange: (ticketId: string, status: 'Not Started' | 'Seen' | 'In Progress' | 'Solved') => Promise<void>;
@@ -51,6 +52,7 @@ export function AdminDashboard({
     loading,
     error,
     currentUserEmail,
+    currentUserName,
     onRefresh,
     onSolveTicket,
     onStatusChange,
@@ -58,7 +60,7 @@ export function AdminDashboard({
     onDeleteTicket,
 }: AdminDashboardProps) {
     const navigate = useNavigate();
-    const authorized = isUserAdmin(currentUserEmail);
+    const authorized = isUserAdmin(currentUserEmail, currentUserName);
 
     // Active View Tab
     const [activeTab, setActiveTab] = useState<AdminViewTab>('master');

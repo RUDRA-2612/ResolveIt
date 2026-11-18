@@ -404,6 +404,7 @@ export default function App() {
         setSidebarOpen={setSidebarOpen}
         userRole={userRole}
         userEmail={userEmail}
+        userName={userName}
       />
 
       <ProfileModal
@@ -627,6 +628,7 @@ export default function App() {
               loading={loading}
               error={ticketsError}
               currentUserEmail={userEmail}
+              currentUserName={userName}
               onRefresh={refreshTickets}
               onSolveTicket={handleAdminSolve}
               onStatusChange={handleAdminStatusChange}
