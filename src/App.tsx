@@ -739,27 +739,29 @@ export default function App() {
 
         {/* Fallback 404 Route */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
-      </Routes>
+      </Routes >
 
-      {location.pathname === '/dashboard' && (
-        <footer className="mt-auto bg-gradient-to-b from-[#f8fafc] to-teal-50/30 flex flex-col items-center pb-10 pt-10">
-          <p className="text-slate-500 text-sm mb-4 flex items-center justify-center gap-1.5 font-medium">
-            Crafted with <Heart size={14} className="text-rose-500 fill-rose-500 inline mx-0.5 animate-pulse" /> by
-            <span className="text-rose-500">H</span>
-            <span className="text-teal-600">R</span>
-            <span className="text-amber-500">T</span>
-            <span className="text-violet-500">T</span>
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 mb-6 text-xs sm:text-sm font-bold">
-            <span className="px-4 py-1.5 rounded-full bg-rose-50 text-rose-500 border border-rose-200/70 hover:scale-105 hover:shadow-sm transition-all">Hritvika</span>
-            <span className="px-4 py-1.5 rounded-full bg-teal-50 text-teal-600 border border-teal-200/70 hover:scale-105 hover:shadow-sm transition-all">Rudra</span>
-            <span className="px-4 py-1.5 rounded-full bg-amber-50 text-amber-500 border border-amber-200/70 hover:scale-105 hover:shadow-sm transition-all">Tanishq</span>
-            <span className="px-4 py-1.5 rounded-full bg-violet-50 text-violet-500 border border-violet-200/70 hover:scale-105 hover:shadow-sm transition-all">Tvesha</span>
-          </div>
-          <p className="text-xs text-slate-400 font-medium">© 2026 Resolvelt · All rights reserved</p>
-        </footer>
-      )}
-    </div>
+      {
+        location.pathname === '/dashboard' && (
+          <footer className="mt-auto bg-gradient-to-b from-[#f8fafc] to-teal-50/30 flex flex-col items-center pb-10 pt-10">
+            <p className="text-slate-500 text-sm mb-4 flex items-center justify-center gap-1.5 font-medium">
+              Crafted with <Heart size={14} className="text-rose-500 fill-rose-500 inline mx-0.5 animate-pulse" /> by
+              <span className="text-rose-500">H</span>
+              <span className="text-teal-600">R</span>
+              <span className="text-amber-500">T</span>
+              <span className="text-violet-500">T</span>
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 mb-6 text-xs sm:text-sm font-bold">
+              <span className="px-4 py-1.5 rounded-full bg-rose-50 text-rose-500 border border-rose-200/70 hover:scale-105 hover:shadow-sm transition-all">Hritvika</span>
+              <span className="px-4 py-1.5 rounded-full bg-teal-50 text-teal-600 border border-teal-200/70 hover:scale-105 hover:shadow-sm transition-all">Rudra</span>
+              <span className="px-4 py-1.5 rounded-full bg-amber-50 text-amber-500 border border-amber-200/70 hover:scale-105 hover:shadow-sm transition-all">Tanishq</span>
+              <span className="px-4 py-1.5 rounded-full bg-violet-50 text-violet-500 border border-violet-200/70 hover:scale-105 hover:shadow-sm transition-all">Tvesha</span>
+            </div>
+            <p className="text-xs text-slate-400 font-medium">© 2026 Resolvelt · All rights reserved</p>
+          </footer>
+        )
+      }
+    </div >
   );
 }
 

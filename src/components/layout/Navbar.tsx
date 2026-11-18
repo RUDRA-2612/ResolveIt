@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import type { UserRole, IssueNotification } from '../../types/issue';
 import { isUserAdmin } from '../../lib/adminAuth';
+import { useEffect, useRef } from 'react';
 
 interface NavbarProps {
     userRole: UserRole;
@@ -62,7 +63,26 @@ export function Navbar({
     const navigate = useNavigate();
     const location = useLocation();
 
+    const notificationsMenuRef = useRef<HTMLDivElement>(null);
+    const profileMenuRef = useRef<HTMLDivElement>(null);
     const unreadCount = notifications.filter((n) => !(n.isRead ?? !n.unread)).length;
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            const target = event.target as Node;
+
+            if (notificationsOpen && !notificationsMenuRef.current?.contains(target)) {
+                setNotificationsOpen(false);
+            }
+
+            if (userMenuOpen && !profileMenuRef.current?.contains(target)) {
+                setUserMenuOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [notificationsOpen, setNotificationsOpen, userMenuOpen, setUserMenuOpen]);
 
     return (
         <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200/80">
@@ -129,7 +149,7 @@ export function Navbar({
                     )}
 
                     {/* Notifications Dropdown Toggle */}
-                    <div className="relative">
+                    <div className="relative" ref={notificationsMenuRef}>
                         <button
                             onClick={() => {
                                 setNotificationsOpen(!notificationsOpen);
@@ -189,7 +209,7 @@ export function Navbar({
                     </div>
 
                     {/* User Profile Menu Dropdown */}
-                    <div className="relative">
+                    <div className="relative" ref={profileMenuRef}>
                         <button
                             onClick={() => {
                                 setUserMenuOpen(!userMenuOpen);
