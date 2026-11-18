@@ -1,4 +1,3 @@
-import { useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
     Search,
@@ -13,6 +12,8 @@ import {
     Trash2,
 } from 'lucide-react';
 import type { UserRole, IssueNotification } from '../../types/issue';
+import { isUserAdmin } from '../../lib/adminAuth';
+import { useEffect, useRef } from 'react';
 
 interface NavbarProps {
     userRole: UserRole;
@@ -61,36 +62,27 @@ export function Navbar({
 }: NavbarProps) {
     const navigate = useNavigate();
     const location = useLocation();
-    const profileMenuRef = useRef<HTMLDivElement>(null);
-    const notificationsMenuRef = useRef<HTMLDivElement>(null);
 
+    const notificationsMenuRef = useRef<HTMLDivElement>(null);
+    const profileMenuRef = useRef<HTMLDivElement>(null);
     const unreadCount = notifications.filter((n) => !(n.isRead ?? !n.unread)).length;
 
     useEffect(() => {
-        if (!userMenuOpen) return;
+        const handleClickOutside = (event: MouseEvent) => {
+            const target = event.target as Node;
 
-        const handleOutsideClick = (event: MouseEvent) => {
-            if (event.target instanceof Node && !profileMenuRef.current?.contains(event.target)) {
+            if (notificationsOpen && !notificationsMenuRef.current?.contains(target)) {
+                setNotificationsOpen(false);
+            }
+
+            if (userMenuOpen && !profileMenuRef.current?.contains(target)) {
                 setUserMenuOpen(false);
             }
         };
 
-        document.addEventListener('mousedown', handleOutsideClick);
-        return () => document.removeEventListener('mousedown', handleOutsideClick);
-    }, [userMenuOpen, setUserMenuOpen]);
-
-    useEffect(() => {
-        if (!notificationsOpen) return;
-
-        const handleOutsideClick = (event: MouseEvent) => {
-            if (event.target instanceof Node && !notificationsMenuRef.current?.contains(event.target)) {
-                setNotificationsOpen(false);
-            }
-        };
-
-        document.addEventListener('mousedown', handleOutsideClick);
-        return () => document.removeEventListener('mousedown', handleOutsideClick);
-    }, [notificationsOpen, setNotificationsOpen]);
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [notificationsOpen, setNotificationsOpen, userMenuOpen, setUserMenuOpen]);
 
     return (
         <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200/80">
@@ -111,7 +103,7 @@ export function Navbar({
                         className="flex items-center gap-2.5 cursor-pointer select-none"
                     >
                         <div className="w-9 h-9 rounded-xl bg-teal-600 text-white flex items-center justify-center font-black text-lg shadow-md shadow-teal-600/20">
-                            <img src="/logo.png" alt="Logo" className="h-8 w-8 object-contain" />
+                            R
                         </div>
                         <span className="font-extrabold text-xl text-slate-900 tracking-tight">
                             Resolve<span className="text-teal-600">It</span>
@@ -250,6 +242,21 @@ export function Navbar({
                                 >
                                     <User size={15} className="text-slate-400" /> View Profile
                                 </button>
+
+                                {isUserAdmin(userEmail) && (
+                                    <button
+                                        onClick={() => { setUserMenuOpen(false); navigate('/admin'); }}
+                                        className="w-full text-left px-3 py-2.5 rounded-xl text-xs font-black text-teal-900 bg-teal-50 hover:bg-teal-100/90 flex items-center justify-between transition-all cursor-pointer mb-1 border border-teal-200"
+                                    >
+                                        <div className="flex items-center gap-2.5">
+                                            <ShieldCheck size={16} className="text-teal-600" />
+                                            <span>Admin Panel</span>
+                                        </div>
+                                        <span className="text-[9px] uppercase tracking-wider bg-teal-700 text-white px-1.5 py-0.5 rounded font-black">
+                                            Admin
+                                        </span>
+                                    </button>
+                                )}
 
                                 <button
                                     onClick={() => { setUserMenuOpen(false); onToggleRole(); }}
