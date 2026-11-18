@@ -208,6 +208,21 @@ export function Navbar({
                         )}
                     </div>
 
+                    {/* Direct Admin Console Link for Authorized Admins */}
+                    {isUserAdmin(userEmail) && (
+                        <button
+                            onClick={() => navigate('/admin')}
+                            className={`hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                                location.pathname === '/admin'
+                                    ? 'bg-slate-900 text-teal-300 shadow-md ring-2 ring-teal-500/50'
+                                    : 'bg-gradient-to-r from-slate-900 via-slate-800 to-teal-950 text-teal-300 hover:text-white border border-teal-500/30 hover:border-teal-400 shadow-xs'
+                            }`}
+                        >
+                            <ShieldCheck size={15} className="text-teal-400" />
+                            <span>Admin Panel</span>
+                        </button>
+                    )}
+
                     {/* User Profile Menu Dropdown */}
                     <div className="relative" ref={profileMenuRef}>
                         <button

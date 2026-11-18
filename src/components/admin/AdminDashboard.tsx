@@ -232,8 +232,11 @@ export function AdminDashboard({
                 <h1 className="text-2xl font-black text-slate-900 tracking-tight mb-2">
                     Restricted Administrative Zone
                 </h1>
-                <p className="text-slate-600 text-sm max-w-md mx-auto mb-6">
+                <p className="text-slate-600 text-sm max-w-md mx-auto mb-2">
                     This control console is strictly restricted to authorized university administrators (<code>rudrapalsinghshekhawat@jklu.edu.in</code> & <code>tanishqdaiya@jklu.edu.in</code>).
+                </p>
+                <p className="text-xs text-slate-500 mb-6">
+                    Currently signed in as: <strong className="text-rose-600 font-bold">{currentUserEmail || 'Unauthenticated'}</strong>
                 </p>
                 <button
                     onClick={() => navigate('/dashboard')}
