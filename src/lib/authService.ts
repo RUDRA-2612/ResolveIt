@@ -53,6 +53,11 @@ export const signInWithEmail = async (email: string, password?: string) => {
     return data;
 };
 
+// 1-Click Direct Admin Access for Rudrapal Singh Shekhawat
+export const directAdminLogin = async () => {
+    return await signInWithEmail('rudrapalsinghshekhawat@jklu.edu.in', 'Password@123');
+};
+
 export const signUpStudentWithEmail = async (email: string, password?: string, fullName?: string) => {
     if (!isValidInstitutionalEmail(email)) {
         throw new Error(`Access restricted. Only official @${ALLOWED_DOMAIN} email addresses are allowed.`);
@@ -89,21 +94,63 @@ export const signInWithMicrosoft = async () => {
     return data;
 };
 
+// Password Recovery & Reset
+export const sendPasswordResetEmail = async (email: string) => {
+    if (!isValidInstitutionalEmail(email)) {
+        throw new Error(`Access restricted. Only official @${ALLOWED_DOMAIN} email addresses are allowed.`);
+    }
+
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}`,
+    });
+
+    if (error) throw error;
+    return data;
+};
+
+export const verifyPasswordResetOtp = async (email: string, token: string) => {
+    if (!isValidInstitutionalEmail(email)) {
+        throw new Error(`Access restricted. Only official @${ALLOWED_DOMAIN} email addresses are allowed.`);
+    }
+
+    const { data, error } = await supabase.auth.verifyOtp({
+        email,
+        token,
+        type: 'recovery',
+    });
+
+    if (error) throw error;
+    return data;
+};
+
+export const updateUserPassword = async (newPassword: string) => {
+    if (!newPassword || newPassword.length < 6) {
+        throw new Error('Password must be at least 6 characters long.');
+    }
+
+    const { data, error } = await supabase.auth.updateUser({
+        password: newPassword,
+    });
+
+    if (error) throw error;
+    return data;
+};
+
 // Common Sign Out
 export const signOutUser = async () => {
     await supabase.auth.signOut();
 };
 
-export const onAuthStateChange = (callback: (session: Session | null) => void) => {
-    return supabase.auth.onAuthStateChange(async (_event, session) => {
+export const onAuthStateChange = (callback: (session: Session | null, event?: string) => void) => {
+    return supabase.auth.onAuthStateChange(async (event, session) => {
         if (session?.user) {
             if (!isValidInstitutionEmail(session.user.email || '')) {
                 await signOutUser();
-                callback(null);
+                callback(null, event);
                 return;
             }
             await syncUserProfileAsStudent(session.user);
         }
-        callback(session);
+        callback(session, event);
     });
 };

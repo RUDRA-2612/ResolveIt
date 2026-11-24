@@ -1,16 +1,14 @@
 /**
  * Whitelist-based Administrative Access Control for ResolveIt
  * Strictly limited to authorized administrators:
- * - rudrapalsinghshekhawat@jklu.edu.in (Rudrapal Singh Shekhawat)
+ * - rudrapalsinghshekhawat@jklu.edu.in (Rudrapal Singh Shekhawat) - Primary Admin
  * - tanishqdaiya@jklu.edu.in (Tanishq Daiya)
  */
 
 export const ADMIN_EMAILS: readonly string[] = [
   'rudrapalsinghshekhawat@jklu.edu.in',
-  'rudra@jklu.edu.in',
   'shaansingh101206@gmail.com',
   'tanishqdaiya@jklu.edu.in',
-  'tanishq@jklu.edu.in',
   'tanishqdaiya@yahoo.com',
 ] as const;
 
@@ -42,7 +40,7 @@ export function isUserAdmin(
   const normalizedEmail = (email || '').trim().toLowerCase();
   const normalizedName = (name || '').trim().toLowerCase();
 
-  // 1. Direct whitelist match on email
+  // 1. Direct whitelist match on official email
   if (
     normalizedEmail.length > 0 &&
     ADMIN_EMAILS.some((adm) => adm.toLowerCase() === normalizedEmail)
@@ -50,10 +48,9 @@ export function isUserAdmin(
     return true;
   }
 
-  // 2. Email handle / substring match (e.g. rudrapal, rudra, tanishq, daiya)
+  // 2. Email handle / substring match (rudrapal, shekhawat, tanishq, daiya)
   if (
     normalizedEmail.includes('rudrapal') ||
-    normalizedEmail.includes('rudra') ||
     normalizedEmail.includes('shekhawat') ||
     normalizedEmail.includes('tanishq') ||
     normalizedEmail.includes('daiya')
@@ -61,10 +58,9 @@ export function isUserAdmin(
     return true;
   }
 
-  // 3. Name match from session (e.g. "Rudrapal Singh Shekhaawat", "Tanishq Daiya")
+  // 3. Name match from session (e.g. "Rudrapal Singh Shekhawat", "Rudrapal Singh Shekhaawat", "Tanishq Daiya")
   if (
     normalizedName.includes('rudrapal') ||
-    normalizedName.includes('rudra') ||
     normalizedName.includes('shekhawat') ||
     normalizedName.includes('shekhaawat') ||
     normalizedName.includes('tanishq') ||
