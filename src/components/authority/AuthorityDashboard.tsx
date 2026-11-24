@@ -3,6 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { Issue } from '../../types/issue';
 import { DEPARTMENT_LEVELS } from '../../taxonomy';
+import { formatTitleWithTicket } from '../../lib/issues';
 
 interface AuthorityDashboardProps {
     issues: Issue[];
@@ -225,7 +226,7 @@ export function AuthorityDashboard({
                                             </span>
                                         </div>
                                         <CardTitle className="text-lg font-bold text-slate-800 group-hover:text-teal-700 transition-colors">
-                                            {issue.title}
+                                            {formatTitleWithTicket(issue.title, issue.id)}
                                         </CardTitle>
                                     </div>
                                     <Badge variant="outline" className={`gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${issue.statusColor === 'emerald' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :

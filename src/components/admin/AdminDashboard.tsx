@@ -25,6 +25,7 @@ import type { Issue } from '../../types/issue';
 import { DEPARTMENT_LEVELS } from '../../taxonomy';
 import { isUserAdmin } from '../../lib/adminAuth';
 import { canonicalizeDepartmentName } from '../../lib/supabaseService';
+import { formatTitleWithTicket } from '../../lib/issues';
 
 interface AdminDashboardProps {
     issues: Issue[];
@@ -637,7 +638,7 @@ export function AdminDashboard({
                                         {/* Issue Details & Location */}
                                         <td className="py-3.5 px-4 align-top max-w-xs">
                                             <p className="font-bold text-slate-900 leading-snug line-clamp-1" title={issue.title}>
-                                                {issue.title}
+                                                {formatTitleWithTicket(issue.title, issue.id)}
                                             </p>
                                             <p className="text-[11px] text-slate-500 line-clamp-1 mt-0.5">
                                                 {issue.department} • <span className="text-slate-600 font-medium">{issue.specificIssue}</span>
@@ -926,7 +927,7 @@ export function AdminDashboard({
 
                         <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-700 space-y-1">
                             <p>
-                                <strong>Title:</strong> {deleteModalIssue.title}
+                                <strong>Title:</strong> {formatTitleWithTicket(deleteModalIssue.title, deleteModalIssue.id)}
                             </p>
                             <p>
                                 <strong>Reported by:</strong>{' '}
@@ -990,7 +991,7 @@ export function AdminDashboard({
                                     Ticket Audit #{detailIssue.id}
                                 </span>
                                 <h3 className="text-lg font-black text-slate-900 mt-0.5">
-                                    {detailIssue.title}
+                                    {formatTitleWithTicket(detailIssue.title, detailIssue.id)}
                                 </h3>
                             </div>
                             <button

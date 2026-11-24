@@ -6,6 +6,12 @@ import type {
 } from '../types/issue';
 
 /** Converts the UI's relative-time labels to minutes for newest-first sorting. */
+export function formatTitleWithTicket(title: string, id: string | number): string {
+    const rawId = String(id).replace(/^TKT-/, '');
+    if (title.includes(`(Ticket #${rawId})`)) return title;
+    return `${title} (Ticket #${rawId})`;
+}
+
 export function getIssueAgeMinutes(time: string): number {
     const value = Number.parseInt(time, 10);
 

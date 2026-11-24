@@ -2,6 +2,7 @@ import { CheckCircle, AlertCircle, Clock, MessageSquare, ArrowUp } from 'lucide-
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import type { Issue } from '../../types/issue';
+import { formatTitleWithTicket } from '../../lib/issues';
 
 interface IssueCardProps {
     issue: Issue;
@@ -26,7 +27,7 @@ export function IssueCard({ issue, onClick, onUpvote }: IssueCardProps) {
                     )}
                     <div className="flex-1 min-w-0">
                         <CardTitle className="text-base font-bold text-slate-800 group-hover:text-teal-700 transition-colors leading-snug mb-2">
-                            {issue.title}
+                            {formatTitleWithTicket(issue.title, issue.id)}
                         </CardTitle>
                         <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-slate-500">
                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600">

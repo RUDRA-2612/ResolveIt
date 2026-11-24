@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import type { Issue, UserRole, IssueSourceView } from '../../types/issue';
 import { DEPARTMENT_LEVELS } from '../../taxonomy';
+import { formatTitleWithTicket } from '../../lib/issues';
 
 interface IssueDetailsProps {
     issue: Issue;
@@ -80,7 +81,7 @@ export function IssueDetails({
                 </div>
 
                 <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                    <h1 className="text-3xl md:text-4xl font-bold text-slate-800">{issue.title}</h1>
+                    <h1 className="text-3xl md:text-4xl font-bold text-slate-800">{formatTitleWithTicket(issue.title, issue.id)}</h1>
                     {issue.isMine && (
                         <Button
                             variant="outline"

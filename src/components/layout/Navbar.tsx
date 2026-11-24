@@ -12,6 +12,7 @@ import {
     Trash2,
 } from 'lucide-react';
 import type { UserRole, IssueNotification } from '../../types/issue';
+import { isUserAdmin } from '../../lib/adminAuth';
 import { useEffect, useRef } from 'react';
 
 interface NavbarProps {
@@ -242,12 +243,14 @@ export function Navbar({
                                     <User size={15} className="text-slate-400" /> View Profile
                                 </button>
 
-                                <button
-                                    onClick={() => { setUserMenuOpen(false); onToggleRole(); }}
-                                    className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-teal-700 hover:bg-teal-50 flex items-center gap-2.5 transition-colors cursor-pointer mb-0.5"
-                                >
-                                    <ShieldCheck size={15} className="text-teal-600" /> Switch to {userRole === 'authority' ? 'Student' : 'Authority'}
-                                </button>
+                                {isUserAdmin(userEmail) && (
+                                    <button
+                                        onClick={() => { setUserMenuOpen(false); onToggleRole(); }}
+                                        className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-teal-700 hover:bg-teal-50 flex items-center gap-2.5 transition-colors cursor-pointer mb-0.5"
+                                    >
+                                        <ShieldCheck size={15} className="text-teal-600" /> Switch to {userRole === 'authority' ? 'Student' : 'Authority'}
+                                    </button>
+                                )}
 
                                 <button
                                     onClick={() => { setUserMenuOpen(false); onOpenFeedback(); }}

@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import type { Issue, UserRole } from '../../types/issue';
+import { formatTitleWithTicket } from '../../lib/issues';
 
 export function RoleSelectionOverlay({
     open,
@@ -162,7 +163,7 @@ export function PostUpdateModal({
                     <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center"><MessageSquare size={20} /></div>
                     <div>
                         <h3 className="text-xl font-bold text-slate-800">Post Official Update</h3>
-                        <p className="text-xs text-slate-500 font-mono font-medium">{actionTicket.id} • {actionTicket.title}</p>
+                        <p className="text-xs text-slate-500 font-medium">{formatTitleWithTicket(actionTicket.title, actionTicket.id)}</p>
                     </div>
                 </div>
 
@@ -223,7 +224,7 @@ export function DuplicateModal({
                         <span className="font-mono text-xs font-bold text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">{matchedDuplicate.id}</span>
                         <Badge variant="outline" className="text-xs font-bold bg-white text-teal-700 border-teal-200">{matchedDuplicate.status}</Badge>
                     </div>
-                    <h4 className="font-bold text-slate-800 text-sm mb-1">{matchedDuplicate.title}</h4>
+                    <h4 className="font-bold text-slate-800 text-sm mb-1">{formatTitleWithTicket(matchedDuplicate.title, matchedDuplicate.id)}</h4>
                     <p className="text-xs text-slate-500 mb-2 font-medium">{matchedDuplicate.location} • {matchedDuplicate.category}</p>
                 </div>
 

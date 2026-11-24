@@ -23,6 +23,7 @@ import { ReportIssueForm } from './components/issues/ReportIssueForm';
 import { AuthorityDashboard } from './components/authority/AuthorityDashboard';
 import { EscalationModal } from './components/authority/EscalationModal';
 import { AdminDashboard } from './components/admin/AdminDashboard';
+import { isUserAdmin } from './lib/adminAuth';
 
 import {
   RoleSelectionOverlay,
@@ -121,12 +122,24 @@ export default function App() {
   // Supabase Auth Listener
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setCurrentUser(session?.user ?? null);
+      const user = session?.user ?? null;
+      setCurrentUser(user);
+      if (user && !isUserAdmin(user.email)) {
+        setUserRole('student');
+        localStorage.setItem('resolveit_role', 'student');
+        setHasSelectedRole(true);
+      }
       setAuthLoading(false);
     });
 
     const { data: { subscription } } = onAuthStateChange((session) => {
-      setCurrentUser(session?.user ?? null);
+      const user = session?.user ?? null;
+      setCurrentUser(user);
+      if (user && !isUserAdmin(user.email)) {
+        setUserRole('student');
+        localStorage.setItem('resolveit_role', 'student');
+        setHasSelectedRole(true);
+      }
       setAuthLoading(false);
     });
 
@@ -168,6 +181,7 @@ export default function App() {
   };
 
   const handleToggleRole = () => {
+    if (!isUserAdmin(userEmail)) return;
     const nextRole: UserRole = userRole === 'authority' ? 'student' : 'authority';
     setUserRole(nextRole);
     localStorage.setItem('resolveit_role', nextRole);
@@ -367,7 +381,7 @@ export default function App() {
   return (
     <div className={`min-h-screen bg-[#f8fafc] font-[Inter,system-ui,sans-serif] text-slate-800 flex flex-col ${!hasSelectedRole ? 'overflow-hidden h-screen' : ''}`}>
       <RoleSelectionOverlay
-        open={!hasSelectedRole}
+        open={!hasSelectedRole && isUserAdmin(userEmail)}
         onSelectRole={(role) => {
           localStorage.setItem('resolveit_role', role);
           setUserRole(role);
@@ -603,19 +617,23 @@ export default function App() {
         <Route
           path="/authority-dashboard"
           element={
-            <AuthorityDashboard
-              issues={issues}
-              loading={loading}
-              error={ticketsError}
-              selectedDepartment={selectedAuthorityDepartment}
-              setSelectedDepartment={setSelectedAuthorityDepartment}
-              selectedLevel={selectedAuthorityLevel}
-              setSelectedLevel={setSelectedAuthorityLevel}
-              selectedKpiFilter={selectedKpiFilter}
-              setSelectedKpiFilter={setSelectedKpiFilter}
-              onOpenIssueDetails={(issue) => navigate(`/issue/${issue.id}`)}
-              onBackToHome={() => navigate('/dashboard')}
-            />
+            !isUserAdmin(userEmail) ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <AuthorityDashboard
+                issues={issues}
+                loading={loading}
+                error={ticketsError}
+                selectedDepartment={selectedAuthorityDepartment}
+                setSelectedDepartment={setSelectedAuthorityDepartment}
+                selectedLevel={selectedAuthorityLevel}
+                setSelectedLevel={setSelectedAuthorityLevel}
+                selectedKpiFilter={selectedKpiFilter}
+                setSelectedKpiFilter={setSelectedKpiFilter}
+                onOpenIssueDetails={(issue) => navigate(`/issue/${issue.id}`)}
+                onBackToHome={() => navigate('/dashboard')}
+              />
+            )
           }
         />
 
@@ -623,18 +641,22 @@ export default function App() {
         <Route
           path="/admin"
           element={
-            <AdminDashboard
-              issues={issues}
-              loading={loading}
-              error={ticketsError}
-              currentUserEmail={userEmail}
-              currentUserName={userName}
-              onRefresh={refreshTickets}
-              onSolveTicket={handleAdminSolve}
-              onStatusChange={handleAdminStatusChange}
-              onEscalateTicket={handleAdminEscalate}
-              onDeleteTicket={handleAdminDelete}
-            />
+            !isUserAdmin(userEmail) ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <AdminDashboard
+                issues={issues}
+                loading={loading}
+                error={ticketsError}
+                currentUserEmail={userEmail}
+                currentUserName={userName}
+                onRefresh={refreshTickets}
+                onSolveTicket={handleAdminSolve}
+                onStatusChange={handleAdminStatusChange}
+                onEscalateTicket={handleAdminEscalate}
+                onDeleteTicket={handleAdminDelete}
+              />
+            )
           }
         />
 

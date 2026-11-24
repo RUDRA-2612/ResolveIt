@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { Issue } from '../../types/issue';
 import { DEPARTMENT_LEVELS } from '../../taxonomy';
+import { formatTitleWithTicket } from '../../lib/issues';
 
 interface EscalationModalProps {
     open: boolean;
@@ -55,7 +56,7 @@ export function EscalationModal({
                     </div>
                     <div className="min-w-0 pr-6">
                         <h3 className="text-lg font-bold text-slate-900">Escalate Ticket</h3>
-                        <p className="text-xs text-slate-500 font-medium truncate">{actionTicket.id} • {actionTicket.title}</p>
+                        <p className="text-xs text-slate-500 font-medium truncate">{formatTitleWithTicket(actionTicket.title, actionTicket.id)}</p>
                     </div>
                 </div>
 
