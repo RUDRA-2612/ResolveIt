@@ -8,7 +8,7 @@ import { DEPARTMENT_LEVELS } from '../../taxonomy';
 interface IssueDetailsProps {
     issue: Issue;
     userRole: UserRole | null;
-    issueSourceView: IssueSourceView;
+    issueSourceView?: IssueSourceView;
     onBack: () => void;
     onToggleUpvote: (issueId: string) => void;
     onAddComment: (commentText: string) => void;
@@ -16,14 +16,13 @@ interface IssueDetailsProps {
     onOpenPostUpdate: (issue: Issue) => void;
     onOpenEscalate: (issue: Issue) => void;
     onSolve: (issueId: string) => void;
-    onSwitchToWorkspaceView: () => void;
+    onSwitchToWorkspaceView?: () => void;
     onDelete: (issueId: string) => void;
 }
 
 export function IssueDetails({
     issue,
     userRole,
-    issueSourceView,
     onBack,
     onToggleUpvote,
     onAddComment,
@@ -31,7 +30,6 @@ export function IssueDetails({
     onOpenPostUpdate,
     onOpenEscalate,
     onSolve,
-    onSwitchToWorkspaceView,
     onDelete,
 }: IssueDetailsProps) {
     const [isCommenting, setIsCommenting] = useState(false);
@@ -61,7 +59,7 @@ export function IssueDetails({
                     onClick={onBack}
                     className="text-teal-600 font-bold mb-6 flex items-center gap-1 hover:text-teal-800 transition-colors cursor-pointer"
                 >
-                    <ArrowLeft size={16} /> Back to {issueSourceView === 'authority-dashboard' ? 'Authority Workspace' : issueSourceView === 'recent-reported' ? 'My Tickets' : 'Home'}
+                    <ArrowLeft size={16} /> Back
                 </button>
 
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-6 border-b border-slate-100">
@@ -160,8 +158,8 @@ export function IssueDetails({
                     </div>
                 </div>
 
-                {/* Action Panel for Authority in Workspace Mode */}
-                {userRole === 'authority' && issueSourceView === 'authority-dashboard' && (
+                {/* Action Panel for Authority */}
+                {userRole === 'authority' && (
                     <div className="mb-8 p-6 bg-slate-50 border border-slate-200 rounded-2xl shadow-sm">
                         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                             <div>
@@ -170,7 +168,7 @@ export function IssueDetails({
                                         <ShieldCheck className="text-teal-600" size={20} /> Authority Actions
                                     </h3>
                                     <span className="text-[10px] font-extrabold uppercase tracking-wider bg-teal-100 text-teal-800 px-2 py-0.5 rounded-full border border-teal-200">
-                                        Workspace Action Mode
+                                        Official Action Mode
                                     </span>
                                 </div>
                                 <p className="text-slate-500 text-sm mt-0.5">Take immediate official action on this ticket in your department queue.</p>
@@ -226,33 +224,6 @@ export function IssueDetails({
                                 </Button>
                             </div>
                         </div>
-                    </div>
-                )}
-
-                {userRole === 'authority' && issueSourceView !== 'authority-dashboard' && (
-                    <div className="mb-8 p-5 bg-gradient-to-r from-teal-50/90 via-emerald-50/50 to-teal-50/90 border border-teal-200/90 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
-                        <div className="flex items-start sm:items-center gap-3.5">
-                            <div className="w-10 h-10 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center shrink-0">
-                                <ShieldCheck size={22} />
-                            </div>
-                            <div>
-                                <div className="flex items-center gap-2">
-                                    <p className="text-sm font-bold text-slate-800">Public Campus Issue View</p>
-                                    <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-200/80 text-slate-700 px-2 py-0.5 rounded-full">
-                                        Read-Only (Student View)
-                                    </span>
-                                </div>
-                                <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">
-                                    You are viewing this grievance as students see it. Switch to your Authority Workspace to manage this ticket.
-                                </p>
-                            </div>
-                        </div>
-                        <Button
-                            onClick={onSwitchToWorkspaceView}
-                            className="bg-[#115e59] hover:bg-[#0f524e] text-white text-xs font-bold px-4 py-2.5 rounded-xl shrink-0 flex items-center gap-2 shadow-sm transition-transform active:scale-95 cursor-pointer"
-                        >
-                            <ShieldCheck size={14} /> Take Official Action on Ticket &rarr;
-                        </Button>
                     </div>
                 )}
 
