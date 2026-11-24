@@ -12,7 +12,6 @@ import {
     Trash2,
 } from 'lucide-react';
 import type { UserRole, IssueNotification } from '../../types/issue';
-import { isUserAdmin } from '../../lib/adminAuth';
 import { useEffect, useRef } from 'react';
 
 interface NavbarProps {
@@ -208,21 +207,6 @@ export function Navbar({
                         )}
                     </div>
 
-                    {/* Direct Admin Console Link for Authorized Admins */}
-                    {isUserAdmin(userEmail, userName) && (
-                        <button
-                            onClick={() => navigate('/admin')}
-                            className={`hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
-                                location.pathname === '/admin'
-                                    ? 'bg-slate-900 text-teal-300 shadow-md ring-2 ring-teal-500/50'
-                                    : 'bg-gradient-to-r from-slate-900 via-slate-800 to-teal-950 text-teal-300 hover:text-white border border-teal-500/30 hover:border-teal-400 shadow-xs'
-                            }`}
-                        >
-                            <ShieldCheck size={15} className="text-teal-400" />
-                            <span>Admin Panel</span>
-                        </button>
-                    )}
-
                     {/* User Profile Menu Dropdown */}
                     <div className="relative" ref={profileMenuRef}>
                         <button
@@ -257,21 +241,6 @@ export function Navbar({
                                 >
                                     <User size={15} className="text-slate-400" /> View Profile
                                 </button>
-
-                                {isUserAdmin(userEmail, userName) && (
-                                    <button
-                                        onClick={() => { setUserMenuOpen(false); navigate('/admin'); }}
-                                        className="w-full text-left px-3 py-2.5 rounded-xl text-xs font-black text-teal-900 bg-teal-50 hover:bg-teal-100/90 flex items-center justify-between transition-all cursor-pointer mb-1 border border-teal-200"
-                                    >
-                                        <div className="flex items-center gap-2.5">
-                                            <ShieldCheck size={16} className="text-teal-600" />
-                                            <span>Admin Panel</span>
-                                        </div>
-                                        <span className="text-[9px] uppercase tracking-wider bg-teal-700 text-white px-1.5 py-0.5 rounded font-black">
-                                            Admin
-                                        </span>
-                                    </button>
-                                )}
 
                                 <button
                                     onClick={() => { setUserMenuOpen(false); onToggleRole(); }}
