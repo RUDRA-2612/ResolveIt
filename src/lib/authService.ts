@@ -53,11 +53,6 @@ export const signInWithEmail = async (email: string, password?: string) => {
     return data;
 };
 
-// 1-Click Direct Admin Access for Rudrapal Singh Shekhawat
-export const directAdminLogin = async () => {
-    return await signInWithEmail('rudrapalsinghshekhawat@jklu.edu.in', 'Password@123');
-};
-
 export const signUpStudentWithEmail = async (email: string, password?: string, fullName?: string) => {
     if (!isValidInstitutionalEmail(email)) {
         throw new Error(`Access restricted. Only official @${ALLOWED_DOMAIN} email addresses are allowed.`);
